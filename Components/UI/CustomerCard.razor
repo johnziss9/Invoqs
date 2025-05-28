@@ -1,0 +1,63 @@
+@using Invoqs.Models
+
+<div class="card h-100 shadow-sm customer-card">
+    <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="customer-avatar">
+                <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center">
+                    @GetInitials(Customer.Name)
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id"><i class="bi bi-eye me-2"></i>View Details</a></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/edit"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button class="dropdown-item text-danger" @onclick="() => OnDelete.InvokeAsync(Customer)">
+                        <i class="bi bi-trash me-2"></i>Delete
+                    </button></li>
+                </ul>
+            </div>
+        </div>
+
+        <h5 class="card-title text-primary mb-2">@Customer.Name</h5>
+        
+        <div class="customer-details mb-3 flex-grow-1">
+            <div class="detail-item mb-2">
+                <i class="bi bi-envelope text-muted me-2"></i>
+                <span class="text-muted small">@Customer.Email</span>
+            </div>
+            <div class="detail-item mb-2">
+                <i class="bi bi-telephone text-muted me-2"></i>
+                <span class="text-muted small">@Customer.Phone</span>
+            </div>
+        </div>
+
+        <div class="customer-stats mb-3">
+            <div class="row text-center">
+                <div class="col-4">
+                    <div class="stat-number text-primary fw-bold">@Customer.ActiveJobs</div>
+                    <div class="stat-label text-muted small">Active Jobs</div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-number text-success fw-bold">@Customer.CompletedJobs</div>
+                    <div class="stat-label text-muted small">Completed</div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-number text-warning fw-bold">£@Customer.TotalRevenue.ToString("N0")</div>
+                    <div class="stat-label text-muted small">Revenue</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-auto">
+            <button class="btn btn-primary btn-sm w-100" @onclick="() => OnViewJobs.InvokeAsync(Customer)">
+                <i class="bi bi-calendar-check me-1"></i>
+                View Jobs
+            </button>
+        </div>
+    </div>
+</div>
