@@ -6,6 +6,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddHttpClient("InvoiceAPI", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7001/api/"); // TODO Update with API URL later
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+// Scoped HTTP client for dependency injection
+builder.Services.AddScoped(sp => 
+{
+    var clientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    return clientFactory.CreateClient("InvoiceAPI");
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -16,8 +29,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-
+// app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
