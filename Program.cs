@@ -1,4 +1,5 @@
 using Invoqs.Components;
+using Invoqs.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +14,13 @@ builder.Services.AddHttpClient("InvoiceAPI", client =>
 });
 
 // Scoped HTTP client for dependency injection
-builder.Services.AddScoped(sp => 
+builder.Services.AddScoped(sp =>
 {
     var clientFactory = sp.GetRequiredService<IHttpClientFactory>();
     return clientFactory.CreateClient("InvoiceAPI");
 });
+
+builder.Services.AddScoped<ICustomerService, MockCustomerService>();
 
 var app = builder.Build();
 
