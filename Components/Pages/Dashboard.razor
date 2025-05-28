@@ -1,0 +1,211 @@
+@rendermode InteractiveServer
+@page "/"
+@page "/dashboard"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+
+<PageTitle>Dashboard - Invoqs</PageTitle>
+
+<Navbar CurrentUser="@currentUser" OnLogout="HandleLogout" />
+
+<div class="container-fluid py-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">Good @GetTimeOfDay(), @currentUser!</h2>
+                </div>
+                <div class="d-flex gap-2 mt-2 mt-md-0">
+                    <button class="btn btn-primary" @onclick="@(() => NavigateToPage("/customer/new"))">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        New Customer
+                    </button>
+                    <button class="btn btn-success" @onclick="@(() => NavigateToPage("/jobs/new"))">
+                        <i class="bi bi-calendar-plus me-1"></i>
+                        New Job
+                    </button>
+                    <button class="btn btn-info" @onclick="@(() => NavigateToPage("/invoices/new"))">
+                        <i class="bi bi-receipt me-1"></i>
+                        Create Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading dashboard...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Key Metrics Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-primary text-white border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 class="mb-1">£@dashboardData.WeekRevenue.ToString("N0")</h3>
+                                <p class="mb-0 small">This Week's Revenue</p>
+                                <small class="opacity-75">
+                                    <i class="bi bi-arrow-up me-1"></i>
+                                    @dashboardData.RevenueGrowth% vs last week
+                                </small>
+                            </div>
+                            <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-success text-white border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 class="mb-1">@dashboardData.ActiveJobs</h3>
+                                <p class="mb-0 small">Active Jobs</p>
+                                <small class="opacity-75">
+                                    @dashboardData.JobsScheduledToday scheduled today
+                                </small>
+                            </div>
+                            <i class="bi bi-calendar-check fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-info text-white border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 class="mb-1">@dashboardData.TotalCustomers</h3>
+                                <p class="mb-0 small">Total Customers</p>
+                                <small class="opacity-75">
+                                    @dashboardData.NewCustomersThisWeek new this week
+                                </small>
+                            </div>
+                            <i class="bi bi-people fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-warning text-white border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 class="mb-1">@dashboardData.PendingInvoices</h3>
+                                <p class="mb-0 small">Pending Invoices</p>
+                                <small class="opacity-75">
+                                    £@dashboardData.PendingAmount.ToString("N0") outstanding
+                                </small>
+                            </div>
+                            <i class="bi bi-receipt fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Breakdown -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">Service Breakdown</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Skip Rentals</span>
+                                        <span class="fw-bold fs-5">@dashboardData.SkipRentals</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-primary" 
+                                            style="width: @(dashboardData.ActiveJobs > 0 ? (dashboardData.SkipRentals * 100 / dashboardData.ActiveJobs) : 0)%">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Sand Delivery</span>
+                                        <span class="fw-bold fs-5">@dashboardData.SandDeliveries</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" 
+                                            style="width: @(dashboardData.ActiveJobs > 0 ? (dashboardData.SandDeliveries * 100 / dashboardData.ActiveJobs) : 0)%">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Fort Cliff Service</span>
+                                        <span class="fw-bold fs-5">@dashboardData.FortCliffServices</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-info" 
+                                            style="width: @(dashboardData.ActiveJobs > 0 ? (dashboardData.FortCliffServices * 100 / dashboardData.ActiveJobs) : 0)%">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-3">
+                        <div class="text-center">
+                            <h4 class="text-primary mb-1">@dashboardData.ActiveJobs</h4>
+                            <small class="text-muted">Total Active Jobs</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4 col-sm-6">
+                                <button class="btn btn-outline-secondary w-100 h-100" 
+                                    @onclick="@(() => NavigateToPage("/customers"))">
+                                    <i class="bi bi-people d-block fs-2 mb-2"></i>
+                                    <small>Manage Customers</small>
+                                </button>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <button class="btn btn-outline-warning w-100 h-100" 
+                                    @onclick="@(() => NavigateToPage("/jobs"))">
+                                    <i class="bi bi-briefcase d-block fs-2 mb-2"></i>
+                                    <small>Manage Jobs</small>
+                                </button>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <button class="btn btn-outline-dark w-100 h-100" 
+                                    @onclick="@(() => NavigateToPage("/invoices"))">
+                                    <i class="bi bi-file-text d-block fs-2 mb-2"></i>
+                                    <small>Manage Invoices</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
