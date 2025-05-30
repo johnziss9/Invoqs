@@ -21,6 +21,7 @@ builder.Services.AddScoped(sp =>
 });
 
 builder.Services.AddScoped<ICustomerService, MockCustomerService>();
+builder.Services.AddScoped<IJobService, MockJobService>();
 
 var app = builder.Build();
 

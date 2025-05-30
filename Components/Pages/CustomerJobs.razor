@@ -1,0 +1,326 @@
+@rendermode InteractiveServer
+@page "/customer/{customerId:int}/jobs"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+
+<PageTitle>Customer Jobs - @customerName - Invoqs</PageTitle>
+
+<Navbar CurrentUser="@currentUser" OnLogout="HandleLogout" />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Customers</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@customerName Jobs</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">Jobs for @customerName</h2>
+                    <p class="text-muted mb-0">@addressGroups.Count location(s) • @jobs.Count total jobs</p>
+                </div>
+                <div class="d-flex gap-2 mt-2 mt-md-0">
+                    <button class="btn btn-outline-secondary" @onclick="@(() => Navigation.NavigateTo("/customers"))">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Back to Customers
+                    </button>
+                    <button class="btn btn-primary" @onclick="ShowAddJobModal">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Add Job
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Info Card -->
+    @if (customer != null)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle bg-primary text-white me-3">
+                                @GetInitials(customer.Name)
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">@customer.Name</h5>
+                                <div class="text-muted small">
+                                    <i class="bi bi-envelope me-1"></i>@customer.Email
+                                    <span class="mx-2">•</span>
+                                    <i class="bi bi-telephone me-1"></i>@customer.Phone
+                                </div>
+                                @if (!string.IsNullOrEmpty(customer.Notes))
+                                {
+                                    <div class="text-muted small mt-1">
+                                        <i class="bi bi-info-circle me-1"></i>@customer.Notes
+                                    </div>
+                                }
+                            </div>
+                            @if (!string.IsNullOrEmpty(customer.VatNumber) ||
+                                                    !string.IsNullOrEmpty(customer.CompanyRegistrationNumber))
+                            {
+                                <div class="text-end text-muted small">
+                                    @if (!string.IsNullOrEmpty(customer.CompanyRegistrationNumber))
+                                    {
+                                        <div>Reg: @customer.CompanyRegistrationNumber</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(customer.VatNumber))
+                                    {
+                                        <div>VAT: @customer.VatNumber</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Job Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-secondary text-white border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.New)</h3>
+                            <p class="mb-0 small">New Jobs</p>
+                        </div>
+                        <i class="bi bi-clock fs-1 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-primary text-white border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Active)</h3>
+                            <p class="mb-0 small">Active Jobs</p>
+                        </div>
+                        <i class="bi bi-play-circle fs-1 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-success text-white border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Completed)</h3>
+                            <p class="mb-0 small">Completed</p>
+                        </div>
+                        <i class="bi bi-check-circle fs-1 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-danger text-white border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Cancelled)</h3>
+                            <p class="mb-0 small">Cancelled</p>
+                        </div>
+                        <i class="bi bi-x-circle fs-1 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-info text-white border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">@jobs.Count</h3>
+                            <p class="mb-0 small">Total Jobs</p>
+                        </div>
+                        <i class="bi bi-briefcase fs-1 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-warning text-white border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">£@jobs.Where(j => j.Status == JobStatus.Completed).Sum(j =>
+                                                                j.Price).ToString("N0")</h3>
+                            <p class="mb-0 small">Revenue</p>
+                        </div>
+                        <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Groups -->
+    @if (addressGroups.Any())
+    {
+        @foreach (var addressGroup in addressGroups.OrderBy(g => g.Address))
+        {
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <!-- Address Header (Always Visible) -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-geo-alt text-primary me-2 fs-5"></i>
+                                <h5 class="mb-0 fw-bold">@addressGroup.Address</h5>
+                            </div>
+                            <div class="row text-center">
+                                <div class="col-md-2 col-sm-4 col-6 mb-2">
+                                    <div class="fw-bold text-primary">@addressGroup.ActiveJobs</div>
+                                    <small class="text-muted">Active</small>
+                                </div>
+                                <div class="col-md-2 col-sm-4 col-6 mb-2">
+                                    <div class="fw-bold text-secondary">@addressGroup.NewJobs</div>
+                                    <small class="text-muted">New</small>
+                                </div>
+                                <div class="col-md-2 col-sm-4 col-6 mb-2">
+                                    <div class="fw-bold text-success">@addressGroup.CompletedJobs</div>
+                                    <small class="text-muted">Completed</small>
+                                </div>
+                                <div class="col-md-2 col-sm-4 col-6 mb-2">
+                                    <div class="fw-bold text-danger">@addressGroup.CancelledJobs</div>
+                                    <small class="text-muted">Cancelled</small>
+                                </div>
+                                <div class="col-md-2 col-sm-4 col-6 mb-2">
+                                    <div class="fw-bold text-info">@addressGroup.TotalJobs</div>
+                                    <small class="text-muted">Total</small>
+                                </div>
+                                <div class="col-md-2 col-sm-4 col-6 mb-2">
+                                    <div class="fw-bold text-warning">£@addressGroup.TotalRevenue.ToString("N0")</div>
+                                    <small class="text-muted">Revenue</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column gap-2 ms-3">
+                            @if (addressGroup.Jobs.Any(j => j.Status == JobStatus.Completed))
+                            {
+                                <button class="btn btn-success btn-sm"
+                                    @onclick="() => HandleGenerateInvoiceForAddress(addressGroup.Address)">
+                                    <i class="bi bi-file-earmark-text me-1"></i>
+                                    Invoice
+                                </button>
+                            }
+                            <button class="btn btn-outline-primary btn-sm"
+                                @onclick="() => HandleViewFullAddress(addressGroup.Address)">
+                                <i class="bi bi-eye me-1"></i>
+                                View All (@addressGroup.TotalJobs)
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm"
+                                @onclick="() => ToggleAddressExpansion(addressGroup.Address)">
+                                <i
+                                    class="bi @(IsAddressExpanded(addressGroup.Address) ? "bi-chevron-up" : "bi-chevron-down") me-1"></i>
+                                @(IsAddressExpanded(addressGroup.Address) ? "Collapse" : "Expand")
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Expandable Job List (Hidden by Default) -->
+                    @if (IsAddressExpanded(addressGroup.Address))
+                    {
+                        <hr class="my-3">
+                        <div class="jobs-list">
+                            @{
+                                var relevantJobs = GetRelevantJobsForAddress(addressGroup.Jobs);
+                            }
+                            @foreach (var job in relevantJobs)
+                            {
+                                <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <span class="badge bg-@job.StatusColor me-2">
+                                                <i class="@job.StatusIcon me-1"></i>
+                                                @job.Status
+                                            </span>
+                                            <h6 class="mb-0 fw-medium">@job.Title</h6>
+                                        </div>
+                                        <div class="text-muted small">
+                                            <i class="@job.TypeIcon me-1"></i>
+                                            @job.TypeDisplayName •
+                                            @job.StartDate.ToString("MMM dd, yyyy")
+                                            @if (job.EndDate.HasValue)
+                                            {
+                                                <span> - @job.EndDate.Value.ToString("MMM dd, yyyy")</span>
+                                            }
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(job.Description))
+                                        {
+                                            <div class="text-muted small mt-1">@job.Description</div>
+                                        }
+                                    </div>
+                                    <div class="text-end ms-3">
+                                        <div class="fw-bold text-success mb-2">£@job.Price.ToString("N2")</div>
+                                        <div class="btn-group btn-group-sm">
+                                            @if (job.Status == JobStatus.New)
+                                            {
+                                                <button class="btn btn-primary btn-sm"
+                                                    @onclick="() => HandleStatusChange(job, JobStatus.Active)">
+                                                    <i class="bi bi-play"></i>
+                                                </button>
+                                            }
+                                            else if (job.Status == JobStatus.Active)
+                                            {
+                                                <button class="btn btn-success btn-sm"
+                                                    @onclick="() => HandleStatusChange(job, JobStatus.Completed)">
+                                                    <i class="bi bi-check"></i>
+                                                </button>
+                                            }
+                                            else if (job.Status == JobStatus.Completed)
+                                            {
+                                                <button class="btn btn-outline-success btn-sm" @onclick="() => HandleGenerateInvoice(job)">
+                                                    <i class="bi bi-file-earmark-text"></i>
+                                                </button>
+                                            }
+                                            <button class="btn btn-outline-secondary btn-sm" @onclick="() => HandleEditJob(job)">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (addressGroup.TotalJobs > relevantJobs.Count)
+                            {
+                                <div class="text-center py-3">
+                                    <button class="btn btn-outline-primary"
+                                        @onclick="() => HandleViewFullAddress(addressGroup.Address)">
+                                        <i class="bi bi-eye me-1"></i>
+                                        View All @addressGroup.TotalJobs Jobs at This Address
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-geo-alt text-muted" style="font-size: 4rem;"></i>
+            <h4 class="text-muted mt-3">No job locations found</h4>
+            <p class="text-muted">Add your first job to get started</p>
+            <button class="btn btn-primary" @onclick="ShowAddJobModal">
+                <i class="bi bi-plus-lg me-1"></i>
+                Add First Job
+            </button>
+        </div>
+    }
+</div>
