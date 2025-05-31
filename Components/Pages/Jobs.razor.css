@@ -1,0 +1,134 @@
+/* Breadcrumb navigation */
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: "›";
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.breadcrumb-item a {
+    color: #6c757d;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #0d6efd;
+}
+
+/* Job status badges */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+}
+
+/* Cards styling */
+.card {
+    border-radius: 12px;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Tables */
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.table td {
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+
+/* Form controls */
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border-color: #e9ecef;
+    font-size: 0.9rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+    border-radius: 8px 0 0 8px;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-outline-secondary {
+    border-color: #e9ecef;
+    color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Customer name buttons in table */
+.btn-link {
+    text-decoration: none !important;
+}
+
+.btn-link:hover {
+    color: #0d6efd !important;
+}
+
+/* Clear filters button */
+.btn-link.btn-sm {
+    font-size: 0.875rem;
+    vertical-align: baseline;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between.align-items-center.flex-wrap {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .d-flex.gap-2.mt-2.mt-md-0 {
+        margin-top: 1rem !important;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
