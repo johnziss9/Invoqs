@@ -1,0 +1,222 @@
+@rendermode InteractiveServer
+@page "/customer/new"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+@using Invoqs.Services
+
+<PageTitle>Add New Customer - Invoqs</PageTitle>
+
+<Navbar CurrentUser="@currentUser" OnLogout="HandleLogout" />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Customers</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add New Customer</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">Add New Customer</h2>
+                </div>
+                <div class="d-flex gap-2 mt-2 mt-md-0">
+                    <a href="@GetReturnUrl()" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Back to @GetReturnText()
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <EditForm Model="newCustomer" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        
+        <div class="row">
+            <!-- Main Form -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">Customer Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- Customer Name -->
+                            <div class="col-12">
+                                <label class="form-label required">Customer Name</label>
+                                <InputText @bind-Value="newCustomer.Name" @bind-Value:after="UpdatePreview" 
+                                          class="form-control" placeholder="Enter customer or company name" />
+                                <ValidationMessage For="@(() => newCustomer.Name)" class="text-danger small" />
+                                <div class="form-text">Enter the full business name or individual customer name</div>
+                            </div>
+
+                            <!-- Email and Phone -->
+                            <div class="col-md-6">
+                                <label class="form-label required">Email Address</label>
+                                <InputText @bind-Value="newCustomer.Email" @bind-Value:after="UpdatePreview" 
+                                          class="form-control" type="email" placeholder="customer@example.com" />
+                                <ValidationMessage For="@(() => newCustomer.Email)" class="text-danger small" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Phone Number</label>
+                                <InputText @bind-Value="newCustomer.Phone" @bind-Value:after="UpdatePreview" 
+                                          class="form-control" placeholder="01234 567890" />
+                                <ValidationMessage For="@(() => newCustomer.Phone)" class="text-danger small" />
+                            </div>
+
+                            <!-- Business Details -->
+                            <div class="col-md-6">
+                                <label class="form-label">Company Registration Number</label>
+                                <InputText @bind-Value="newCustomer.CompanyRegistrationNumber" @bind-Value:after="UpdatePreview" 
+                                          class="form-control" placeholder="Optional" />
+                                <div class="form-text">For limited companies only</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">VAT Number</label>
+                                <InputText @bind-Value="newCustomer.VatNumber" @bind-Value:after="UpdatePreview" 
+                                          class="form-control" placeholder="GB123456789" />
+                                <div class="form-text">If VAT registered</div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <InputTextArea @bind-Value="newCustomer.Notes" @bind-Value:after="UpdatePreview" 
+                                              class="form-control" rows="4" 
+                                              placeholder="Any additional notes about this customer..." />
+                                <div class="form-text">Special requirements, preferences, or important information</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                @if (!string.IsNullOrEmpty(errorMessage))
+                                {
+                                    <div class="alert alert-danger mb-0" role="alert">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        @errorMessage
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(successMessage))
+                                {
+                                    <div class="alert alert-success mb-0" role="alert">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        @successMessage
+                                    </div>
+                                }
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="@GetReturnUrl()" class="btn btn-outline-secondary">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary" disabled="@isSaving">
+                                    @if (isSaving)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-check-lg me-1"></i>
+                                    }
+                                    @(isSaving ? "Creating..." : "Create Customer")
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Preview Sidebar -->
+            <div class="col-lg-4">
+                <!-- Customer Preview -->
+                <div class="card border-0 shadow-sm mb-4 preview-card">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h6 class="mb-0 text-white">
+                            <i class="bi bi-eye me-2"></i>
+                            Customer Preview
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="avatar-circle bg-primary text-white mx-auto mb-2">
+                                @GetCustomerInitials()
+                            </div>
+                            <h5 class="mb-1">@(string.IsNullOrWhiteSpace(newCustomer.Name) ? "Customer Name" : newCustomer.Name)</h5>
+                            <small class="text-muted">New Customer</small>
+                        </div>
+
+                        <div class="customer-details">
+                            <div class="detail-row mb-2">
+                                <i class="bi bi-envelope text-muted me-2"></i>
+                                <span class="@(string.IsNullOrWhiteSpace(newCustomer.Email) ? "text-muted" : "")">
+                                    @(string.IsNullOrWhiteSpace(newCustomer.Email) ? "Email address" : newCustomer.Email)
+                                </span>
+                            </div>
+                            <div class="detail-row mb-2">
+                                <i class="bi bi-telephone text-muted me-2"></i>
+                                <span class="@(string.IsNullOrWhiteSpace(newCustomer.Phone) ? "text-muted" : "")">
+                                    @(string.IsNullOrWhiteSpace(newCustomer.Phone) ? "Phone number" : newCustomer.Phone)
+                                </span>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(newCustomer.CompanyRegistrationNumber))
+                            {
+                                <div class="detail-row mb-2">
+                                    <i class="bi bi-building text-muted me-2"></i>
+                                    <span class="small">Co. Reg: @newCustomer.CompanyRegistrationNumber</span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(newCustomer.VatNumber))
+                            {
+                                <div class="detail-row mb-2">
+                                    <i class="bi bi-receipt text-muted me-2"></i>
+                                    <span class="small">VAT: @newCustomer.VatNumber</span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(newCustomer.Notes))
+                            {
+                                <hr class="my-3">
+                                <div class="notes-preview">
+                                    <small class="text-muted d-block mb-1">Notes:</small>
+                                    <small class="text-dark">@newCustomer.Notes</small>
+                                </div>
+                            }
+                        </div>
+
+                        <hr class="my-3">
+                        <div class="text-center">
+                            <small class="text-muted">Customer will be created with:</small>
+                            <div class="row g-2 mt-2">
+                                <div class="col-6">
+                                    <div class="bg-light p-2 rounded">
+                                        <div class="fw-bold text-success">0</div>
+                                        <small class="text-muted">Active Jobs</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="bg-light p-2 rounded">
+                                        <div class="fw-bold text-primary">£0</div>
+                                        <small class="text-muted">Revenue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+</div>
