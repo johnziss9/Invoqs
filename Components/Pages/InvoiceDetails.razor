@@ -1,0 +1,420 @@
+@page "/invoice/{id:int}"
+@using Invoqs.Models
+@using Invoqs.Services
+
+<div class="invoice-details-container">
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading invoice...</p>
+        </div>
+    }
+    else if (invoice == null)
+    {
+        <div class="alert alert-danger">
+            <h4>Invoice Not Found</h4>
+            <p>The requested invoice could not be found.</p>
+            <a href="/invoices" class="btn btn-primary">← Back to Invoices</a>
+        </div>
+    }
+    else
+    {
+        <!-- Header Actions -->
+        <div class="page-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/invoices">Invoices</a></li>
+                        <li class="breadcrumb-item active">@invoice.InvoiceNumber</li>
+                    </ol>
+                </nav>
+                <h1 class="h3 mb-0">Invoice @invoice.InvoiceNumber</h1>
+            </div>
+            
+            <div class="header-actions">
+                @if (invoice.Status == InvoiceStatus.Draft)
+                {
+                    <button class="btn btn-outline-primary me-2" @onclick="() => EditMode = !EditMode">
+                        <i class="bi bi-pencil"></i> @(EditMode ? "Cancel Edit" : "Edit")
+                    </button>
+                }
+                <button class="btn btn-outline-secondary me-2" @onclick="PrintInvoice">
+                    <i class="bi bi-printer"></i> Print
+                </button>
+                <button class="btn btn-primary" @onclick="DownloadPdf">
+                    <i class="bi bi-file-earmark-pdf"></i> Download PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @successMessage
+                <button type="button" class="btn-close" @onclick="() => successMessage = string.Empty"></button>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @errorMessage
+                <button type="button" class="btn-close" @onclick="() => errorMessage = string.Empty"></button>
+            </div>
+        }
+
+        <div class="row">
+            <!-- Main Invoice Content -->
+            <div class="col-lg-8">
+                <div class="invoice-card">
+                    <!-- Invoice Header -->
+                    <div class="invoice-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="company-info">
+                                    <h2>Your Company Name</h2>
+                                    <p class="text-muted mb-0">
+                                        123 Business Street<br>
+                                        London, SW1A 1AA<br>
+                                        Phone: 020 1234 5678<br>
+                                        Email: info@company.com
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <h3 class="invoice-title">INVOICE</h3>
+                                <p class="invoice-number">#@invoice.InvoiceNumber</p>
+                                <span class="badge @invoice.StatusBadgeClass">@invoice.Status</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Info & Invoice Details -->
+                    <div class="invoice-details-section">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Bill To:</h5>
+                                @if (customer != null)
+                                {
+                                    <div class="customer-info">
+                                        <strong>@customer.Name</strong><br>
+                                        @if (!string.IsNullOrWhiteSpace(customer.Email))
+                                        {
+                                            @customer.Email<br>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(customer.Phone))
+                                        {
+                                            @customer.Phone
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <div class="invoice-meta">
+                                    <div class="row">
+                                        <div class="col-5"><strong>Invoice Date:</strong></div>
+                                        <div class="col-7">@invoice.CreatedDate.ToString("dd MMM yyyy")</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-5"><strong>Due Date:</strong></div>
+                                        <div class="col-7 @(invoice.IsOverdue ? "text-danger" : "")">
+                                            @invoice.DueDate.ToString("dd MMM yyyy")
+                                            @if (invoice.IsOverdue)
+                                            {
+                                                <span class="ms-1">(Overdue)</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-5"><strong>Payment Terms:</strong></div>
+                                        <div class="col-7">@invoice.PaymentTermsDays days</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line Items Table -->
+                    <div class="invoice-items">
+                        <h5 class="mb-3">Services Provided</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Date</th>
+                                        <th class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in invoice.LineItems)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="item-description">
+                                                    @item.Description
+                                                    @if (item.Job != null)
+                                                    {
+                                                        <small class="text-muted d-block">
+                                                            @item.Job.Address
+                                                        </small>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (item.Job != null)
+                                                {
+                                                    @item.Job.StartDate.ToString("dd MMM yyyy")
+                                                }
+                                            </td>
+                                            <td class="text-end">£@item.LineTotal.ToString("F2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Totals -->
+                    <div class="invoice-totals">
+                        <div class="row">
+                            <div class="col-md-6">
+                                @if (!string.IsNullOrWhiteSpace(invoice.Notes))
+                                {
+                                    <div class="invoice-notes">
+                                        <h6>Notes:</h6>
+                                        <p class="text-muted">@invoice.Notes</p>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <div class="totals-table">
+                                    <div class="row mb-2">
+                                        <div class="col-6"><strong>Subtotal:</strong></div>
+                                        <div class="col-6 text-end">£@invoice.Subtotal.ToString("F2")</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-6">VAT (@(invoice.VatRate)%):</div>
+                                        <div class="col-6 text-end">£@invoice.VatAmount.ToString("F2")</div>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="row">
+                                        <div class="col-6"><strong>Total:</strong></div>
+                                        <div class="col-6 text-end"><strong>£@invoice.Total.ToString("F2")</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Info -->
+                    @if (invoice.Status == InvoiceStatus.Paid && invoice.PaidDate.HasValue)
+                    {
+                        <div class="payment-info mt-4 p-3 bg-light rounded">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Payment Received:</strong> @invoice.PaidDate.Value.ToString("dd MMM yyyy")
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Payment Method:</strong> @(invoice.PaymentMethod ?? "Not specified")
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(invoice.PaymentReference))
+                            {
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <strong>Payment Reference:</strong> @invoice.PaymentReference
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Status Actions -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Invoice Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (invoice.Status == InvoiceStatus.Draft)
+                        {
+                            <button class="btn btn-success w-100 mb-2" @onclick="MarkAsSent" disabled="@isProcessing">
+                                @if (isProcessing)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                <i class="bi bi-send"></i> Mark as Sent
+                            </button>
+                        }
+                        else if (invoice.Status == InvoiceStatus.Sent)
+                        {
+                            <button class="btn btn-primary w-100 mb-2" @onclick="() => showPaymentModal = true">
+                                <i class="bi bi-credit-card"></i> Record Payment
+                            </button>
+                            <button class="btn btn-outline-secondary w-100 mb-2" @onclick="ResendInvoice" disabled="@isProcessing">
+                                @if (isProcessing)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                <i class="bi bi-envelope"></i> Resend Invoice
+                            </button>
+                        }
+
+                        @if (invoice.Status != InvoiceStatus.Paid && invoice.Status != InvoiceStatus.Cancelled)
+                        {
+                            <hr>
+                            <button class="btn btn-outline-danger w-100" @onclick="() => showCancelModal = true">
+                                <i class="bi bi-x-circle"></i> Cancel Invoice
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Invoice Summary -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="summary-item">
+                            <span class="text-muted">Status:</span>
+                            <span class="badge @invoice.StatusBadgeClass ms-2">@invoice.Status</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="text-muted">Total Amount:</span>
+                            <strong class="ms-2">£@invoice.Total.ToString("F2")</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span class="text-muted">Line Items:</span>
+                            <span class="ms-2">@invoice.LineItems.Count</span>
+                        </div>
+                        @if (invoice.Status != InvoiceStatus.Paid && invoice.Status != InvoiceStatus.Cancelled)
+                        {
+                            <div class="summary-item">
+                                <span class="text-muted">Days Until Due:</span>
+                                <span class="ms-2 @(invoice.IsOverdue ? "text-danger" : "")">
+                                    @invoice.DaysUntilDue
+                                </span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Customer Link -->
+                @if (customer != null)
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Customer</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>@customer.Name</h6>
+                            <p class="text-muted small mb-2">@customer.Email</p>
+                            <a href="/customer/@customer.Id/jobs" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-briefcase"></i> View Jobs
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Payment Recording Modal -->
+@if (showPaymentModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Record Payment</h5>
+                    <button type="button" class="btn-close" @onclick="() => showPaymentModal = false"></button>
+                </div>
+                <EditForm Model="paymentInfo" OnValidSubmit="RecordPayment">
+                    <DataAnnotationsValidator />
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <small><strong>Invoice Total:</strong> £@invoice.Total.ToString("F2")</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Payment Date</label>
+                            <InputDate @bind-Value="paymentInfo.PaymentDate" class="form-control" />
+                            <ValidationMessage For="() => paymentInfo.PaymentDate" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Payment Method</label>
+                            <InputSelect @bind-Value="paymentInfo.PaymentMethod" class="form-select">
+                                <option value="">Select method...</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Cheque">Cheque</option>
+                                <option value="Card">Card</option>
+                                <option value="Other">Other</option>
+                            </InputSelect>
+                            <ValidationMessage For="() => paymentInfo.PaymentMethod" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Payment Reference (optional)</label>
+                            <InputText @bind-Value="paymentInfo.PaymentReference" class="form-control" placeholder="e.g., Check #12345, Transfer Ref: ABC123" />
+                            <ValidationMessage For="() => paymentInfo.PaymentReference" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes (optional)</label>
+                            <InputTextArea @bind-Value="paymentInfo.Notes" class="form-control" rows="2" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="() => showPaymentModal = false">Cancel</button>
+                        <button type="submit" class="btn btn-primary" disabled="@isProcessing">
+                            @if (isProcessing)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                            }
+                            Record Payment
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Cancel Invoice Modal -->
+@if (showCancelModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancel Invoice</h5>
+                    <button type="button" class="btn-close" @onclick="() => showCancelModal = false"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <strong>Warning!</strong> This action cannot be undone.
+                    </div>
+                    <p>Are you sure you want to cancel invoice <strong>@invoice.InvoiceNumber</strong>?</p>
+                    <p>This will mark the invoice as cancelled and make the associated jobs available for invoicing again.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="() => showCancelModal = false">Keep Invoice</button>
+                    <button type="button" class="btn btn-danger" @onclick="CancelInvoice" disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        Cancel Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

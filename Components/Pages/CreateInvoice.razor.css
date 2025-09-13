@@ -1,0 +1,291 @@
+/* Create Invoice Page Styles */
+
+.card {
+    border-radius: 12px;
+    border: none;
+}
+
+.card-header {
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: "›";
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.breadcrumb-item a {
+    color: #6c757d;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #0d6efd;
+}
+
+/* Job Selection Cards */
+.job-selection-card {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.job-selection-card:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+.job-selection-card.selected {
+    border-color: #0d6efd;
+    background-color: #e7f3ff;
+}
+
+.job-selection-card .form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.job-selection-card .form-check-input {
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+}
+
+.job-selection-card .job-info {
+    flex: 1;
+}
+
+.job-selection-card h6 {
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.job-selection-card .text-success {
+    color: #198754 !important;
+}
+
+/* Customer Info Sidebar */
+.avatar-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.customer-contact .contact-row {
+    display: flex;
+    align-items: center;
+    word-break: break-word;
+}
+
+.customer-contact .contact-row i {
+    width: 16px;
+    flex-shrink: 0;
+}
+
+/* Invoice Summary */
+.invoice-summary .summary-row {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.invoice-summary .summary-row span:first-child {
+    flex: 1;
+}
+
+.invoice-summary .summary-row span:last-child {
+    text-align: right;
+}
+
+/* Form Controls */
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.input-group .form-control:focus {
+    z-index: 3;
+}
+
+/* Buttons */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #58151c;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Filter Section */
+.card-body .row.g-3 {
+    --bs-gutter-x: 1rem;
+    --bs-gutter-y: 1rem;
+}
+
+.form-control-sm, .form-select-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Job Grid */
+.job-selection-card .form-check {
+    margin-bottom: 0;
+}
+
+.job-selection-card:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between.align-items-center.flex-wrap {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .d-flex.gap-2.mt-2.mt-md-0 {
+        margin-top: 1rem !important;
+        justify-content: stretch;
+    }
+
+    .d-flex.gap-2.mt-2.mt-md-0 .btn {
+        flex: 1;
+    }
+
+    .job-selection-card {
+        padding: 0.75rem;
+    }
+
+    .invoice-summary .summary-row {
+        font-size: 0.9rem;
+    }
+
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+        font-size: 1rem;
+    }
+
+    .customer-contact .contact-row {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .job-selection-card {
+        padding: 0.5rem;
+    }
+
+    .job-selection-card .form-check {
+        gap: 0.5rem;
+    }
+
+    .invoice-summary .summary-row {
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* Focus states for accessibility */
+.job-selection-card:focus-within {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Loading states */
+.spinner-border {
+    color: #0d6efd;
+}
+
+/* Animation for selected cards */
+.job-selection-card.selected {
+    animation: selectCard 0.3s ease-in-out;
+}
+
+@keyframes selectCard {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Empty state styling */
+.text-center i[style*="font-size: 3rem"] {
+    opacity: 0.5;
+}
+
+/* Sticky sidebar on desktop */
+@media (min-width: 992px) {
+    .col-lg-4 .card {
+        position: sticky;
+        top: 2rem;
+    }
+}
+
+/* Form validation styling */
+.form-control.modified:invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control.modified:valid {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}

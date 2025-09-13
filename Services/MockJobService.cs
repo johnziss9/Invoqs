@@ -400,6 +400,15 @@ namespace Invoqs.Services
                 existingJob.EndDate = job.EndDate;
                 existingJob.Price = job.Price;
                 existingJob.Notes = job.Notes;
+
+                // Preserve invoice properties - only update if explicitly provided
+                if (job.IsInvoiced != existingJob.IsInvoiced)
+                    existingJob.IsInvoiced = job.IsInvoiced;
+                if (job.InvoiceId != existingJob.InvoiceId)
+                    existingJob.InvoiceId = job.InvoiceId;
+                if (job.InvoicedDate != existingJob.InvoicedDate)
+                    existingJob.InvoicedDate = job.InvoicedDate;
+
                 existingJob.UpdatedDate = DateTime.Now;
 
                 return true;
@@ -556,6 +565,130 @@ namespace Invoqs.Services
             }
 
             _jobs.Add(job);
+        }
+        
+        public async Task<List<JobModel>> GetCompletedUninvoicedJobsAsync()
+        {
+            await Task.Delay(150);
+            return _jobs.Where(j => j.CanBeInvoiced).OrderBy(j => j.StartDate).ToList();
+        }
+
+        public async Task<List<JobModel>> GetCompletedUninvoicedJobsByCustomerAsync(int customerId)
+        {
+            await Task.Delay(150);
+            return _jobs.Where(j => j.CustomerId == customerId && j.CanBeInvoiced)
+                    .OrderBy(j => j.StartDate).ToList();
+        }
+
+        public async Task<List<JobModel>> GetCompletedUninvoicedJobsByAddressAsync(int customerId, string address)
+        {
+            await Task.Delay(150);
+            return _jobs.Where(j => j.CustomerId == customerId && 
+                                j.Address.Equals(address, StringComparison.OrdinalIgnoreCase) && 
+                                j.CanBeInvoiced)
+                    .OrderBy(j => j.StartDate).ToList();
+        }
+
+        public async Task<List<JobModel>> GetJobsByInvoiceIdAsync(int invoiceId)
+        {
+            await Task.Delay(150);
+            return _jobs.Where(j => j.InvoiceId == invoiceId).OrderBy(j => j.StartDate).ToList();
+        }
+
+        public async Task<bool> MarkJobsAsInvoicedAsync(List<int> jobIds, int invoiceId)
+        {
+            await Task.Delay(200);
+            
+            bool anyUpdated = false;
+            foreach (var jobId in jobIds)
+            {
+                var job = _jobs.FirstOrDefault(j => j.Id == jobId);
+                if (job != null && job.CanBeInvoiced)
+                {
+                    job.MarkAsInvoiced(invoiceId);
+                    anyUpdated = true;
+                }
+            }
+            
+            return anyUpdated;
+        }
+
+        public async Task<bool> RemoveJobsFromInvoiceAsync(List<int> jobIds)
+        {
+            await Task.Delay(200);
+            
+            bool anyUpdated = false;
+            foreach (var jobId in jobIds)
+            {
+                var job = _jobs.FirstOrDefault(j => j.Id == jobId);
+                if (job != null && job.IsInvoiced)
+                {
+                    job.RemoveFromInvoice();
+                    anyUpdated = true;
+                }
+            }
+            
+            return anyUpdated;
+        }
+
+        public async Task<bool> CanJobBeInvoicedAsync(int jobId)
+        {
+            await Task.Delay(50);
+            var job = _jobs.FirstOrDefault(j => j.Id == jobId);
+            return job?.CanBeInvoiced ?? false;
+        }
+
+        public async Task<bool> CanJobsBeInvoicedAsync(List<int> jobIds)
+        {
+            await Task.Delay(100);
+            
+            foreach (var jobId in jobIds)
+            {
+                var job = _jobs.FirstOrDefault(j => j.Id == jobId);
+                if (job == null || !job.CanBeInvoiced)
+                    return false;
+            }
+            
+            return jobIds.Any(); // Return true only if there are jobs and all can be invoiced
+        }
+
+        public async Task<List<AddressJobGroup>> GetUninvoicedJobsGroupedByAddressAsync(int customerId)
+        {
+            await Task.Delay(200);
+            
+            var customerJobs = _jobs.Where(j => j.CustomerId == customerId && j.CanBeInvoiced).ToList();
+            var groupedJobs = customerJobs
+                .GroupBy(j => j.Address)
+                .Select(g => new AddressJobGroup
+                {
+                    Address = g.Key,
+                    Jobs = g.OrderBy(j => j.StartDate).ToList()
+                })
+                .Where(g => g.HasJobsToInvoice) // Only groups with invoiceable jobs
+                .OrderBy(g => g.Address)
+                .ToList();
+            
+            return groupedJobs;
+        }
+
+        public async Task<AddressJobGroup?> GetUninvoicedAddressJobGroupAsync(int customerId, string address)
+        {
+            await Task.Delay(150);
+            
+            var addressJobs = _jobs.Where(j => j.CustomerId == customerId &&
+                                            j.Address.Equals(address, StringComparison.OrdinalIgnoreCase) &&
+                                            j.CanBeInvoiced)
+                                .OrderBy(j => j.StartDate)
+                                .ToList();
+            
+            if (!addressJobs.Any())
+                return null;
+            
+            return new AddressJobGroup
+            {
+                Address = address,
+                Jobs = addressJobs
+            };
         }
     }
 }

@@ -1,0 +1,170 @@
+@using Invoqs.Models
+
+<div class="card h-100 shadow-sm invoice-card">
+    <div class="card-body d-flex flex-column">
+        <!-- Header with invoice number and status -->
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="invoice-number">
+                <h6 class="text-primary mb-1 fw-bold">@Invoice.InvoiceNumber</h6>
+                <small class="text-muted">ID: @Invoice.Id</small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge @Invoice.StatusBadgeClass">
+                    <i class="@Invoice.StatusIcon me-1"></i>
+                    @Invoice.Status
+                </span>
+                @if (Invoice.IsOverdue)
+                {
+                    <span class="badge bg-danger">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Overdue
+                    </span>
+                }
+            </div>
+        </div>
+
+        <!-- Customer Information -->
+        <div class="customer-info mb-3">
+            <div class="d-flex align-items-center mb-2">
+                <div class="avatar-circle bg-primary text-white me-2">
+                    @GetCustomerInitials()
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-0">@(Invoice.Customer?.Name ?? "Unknown Customer")</h6>
+                    <small class="text-muted">@(Invoice.Customer?.Email ?? "")</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Details -->
+        <div class="invoice-details mb-3 flex-grow-1">
+            <div class="detail-item mb-2">
+                <i class="bi bi-calendar text-muted me-2"></i>
+                <span class="text-muted small">
+                    Created: @Invoice.CreatedDate.ToString("dd/MM/yyyy")
+                </span>
+            </div>
+            
+            <div class="detail-item mb-2">
+                <i class="bi bi-calendar-event text-muted me-2"></i>
+                <span class="text-muted small @(Invoice.IsOverdue ? "text-danger fw-bold" : "")">
+                    Due: @Invoice.DueDate.ToString("dd/MM/yyyy")
+                </span>
+            </div>
+
+            @if (Invoice.PaidDate.HasValue)
+            {
+                <div class="detail-item mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i>
+                    <span class="text-success small">
+                        Paid: @Invoice.PaidDate.Value.ToString("dd/MM/yyyy")
+                    </span>
+                </div>
+            }
+
+            <div class="detail-item mb-2">
+                <i class="bi bi-receipt text-muted me-2"></i>
+                <span class="text-muted small">
+                    @Invoice.LineItems.Count job(s) • @Invoice.VatRate% VAT
+                </span>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Invoice.Notes))
+            {
+                <div class="detail-item mb-2">
+                    <i class="bi bi-sticky text-muted me-2"></i>
+                    <span class="text-muted small">@Invoice.Notes</span>
+                </div>
+            }
+        </div>
+
+        <!-- Invoice Totals -->
+        <div class="invoice-totals mb-3">
+            <div class="row text-center">
+                <div class="col-4">
+                    <div class="stat-number text-muted small">£@Invoice.Subtotal.ToString("N2")</div>
+                    <div class="stat-label text-muted small">Subtotal</div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-number text-muted small">£@Invoice.VatAmount.ToString("N2")</div>
+                    <div class="stat-label text-muted small">VAT</div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-number text-success fw-bold">£@Invoice.Total.ToString("N2")</div>
+                    <div class="stat-label text-muted small">Total</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Due Date Display -->
+        <div class="due-date-display mb-3 text-center">
+            <div class="@(Invoice.IsOverdue ? "text-danger" : Invoice.DaysUntilDue <= 7 ? "text-warning" : "text-muted")">
+                <i class="@(Invoice.IsOverdue ? "bi-exclamation-triangle" : "bi-calendar-event") me-1"></i>
+                <small>@Invoice.DueDateDisplay</small>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-auto">
+            <div class="d-flex gap-2 mb-2">
+                <button class="btn btn-primary btn-sm flex-fill" @onclick="() => OnView.InvokeAsync(Invoice)">
+                    <i class="bi bi-eye me-1"></i>
+                    View
+                </button>
+                
+                @if (Invoice.Status == InvoiceStatus.Draft)
+                {
+                    <button class="btn btn-outline-secondary btn-sm flex-fill" @onclick="() => OnEdit.InvokeAsync(Invoice)">
+                        <i class="bi bi-pencil me-1"></i>
+                        Edit
+                    </button>
+                }
+            </div>
+            
+            <div class="d-flex gap-2">
+                @if (Invoice.Status == InvoiceStatus.Draft)
+                {
+                    <button class="btn btn-success btn-sm flex-fill" @onclick="() => OnMarkAsSent.InvokeAsync(Invoice)">
+                        <i class="bi bi-send me-1"></i>
+                        Send
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm flex-fill" @onclick="() => OnCancel.InvokeAsync(Invoice)">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Cancel
+                    </button>
+                }
+                else if (Invoice.Status == InvoiceStatus.Sent || Invoice.Status == InvoiceStatus.Overdue)
+                {
+                    <button class="btn btn-success btn-sm flex-fill" @onclick="() => OnMarkAsPaid.InvokeAsync(Invoice)">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Mark Paid
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm flex-fill" disabled title="Cannot edit sent invoice">
+                        <i class="bi bi-lock me-1"></i>
+                        Sent
+                    </button>
+                }
+                else if (Invoice.Status == InvoiceStatus.Paid)
+                {
+                    <button class="btn btn-outline-success btn-sm flex-fill" disabled>
+                        <i class="bi bi-check-circle me-1"></i>
+                        Paid
+                    </button>
+                    @if (!string.IsNullOrEmpty(Invoice.PaymentMethod))
+                    {
+                        <small class="text-muted text-center flex-fill align-self-center">
+                            via @Invoice.PaymentMethod
+                        </small>
+                    }
+                }
+                else if (Invoice.Status == InvoiceStatus.Cancelled)
+                {
+                    <button class="btn btn-outline-dark btn-sm flex-fill" disabled>
+                        <i class="bi bi-x-circle me-1"></i>
+                        Cancelled
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
