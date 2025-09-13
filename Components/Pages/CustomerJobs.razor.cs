@@ -221,14 +221,15 @@ namespace Invoqs.Components.Pages
 
         protected Task HandleGenerateInvoice(JobModel job)
         {
-            Navigation.NavigateTo($"/invoice/generate/{job.Id}");
+            // Navigate to create invoice page with this customer, job will be pre-selected if only one
+            Navigation.NavigateTo($"/customer/{CustomerId}/invoice/new");
             return Task.CompletedTask;
         }
 
         protected Task HandleGenerateInvoiceForAddress(string address)
         {
-            // Navigate to invoice generation for all completed jobs at this address
-            Navigation.NavigateTo($"/invoice/generate/address/{CustomerId}/{Uri.EscapeDataString(address)}");
+            // Navigate to create invoice page - user can filter by jobs from this address
+            Navigation.NavigateTo($"/customer/{CustomerId}/invoice/new");
             return Task.CompletedTask;
         }
 

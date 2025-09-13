@@ -12,6 +12,14 @@
                     <i class="@Job.StatusIcon me-1"></i>
                     @Job.Status
                 </span>
+                @if (Job.IsInvoiced)
+                {
+                    <span class="badge bg-info text-white ms-1"
+                        title="Invoiced on @Job.InvoicedDate?.ToString("dd/MM/yyyy")">
+                        <i class="bi bi-receipt me-1"></i>
+                        Invoiced
+                    </span>
+                }
                 <div class="dropdown">
                     <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
                         <i class="bi bi-three-dots-vertical"></i>
@@ -54,12 +62,18 @@
                         <li><button class="dropdown-item" @onclick="() => OnEdit.InvokeAsync(Job)">
                                 <i class="bi bi-pencil me-2"></i>Edit Job
                             </button></li>
-                        @if (Job.Status == JobStatus.Completed)
+                        @if (Job.CanBeInvoiced)
                         {
                             <li><button class="dropdown-item text-success"
                                     @onclick="() => OnGenerateInvoice.InvokeAsync(Job)">
                                     <i class="bi bi-file-earmark-text me-2"></i>Generate Invoice
                                 </button></li>
+                        }
+                        else if (Job.Status == JobStatus.Completed && Job.IsInvoiced)
+                        {
+                            <li><span class="dropdown-item-text text-muted">
+                                    <i class="bi bi-check-circle me-2"></i>Already Invoiced
+                                </span></li>
                         }
                         <li>
                             <hr class="dropdown-divider">
@@ -139,11 +153,18 @@
                     <i class="bi bi-pencil me-1"></i>
                     Edit
                 </button>
-                @if (Job.Status == JobStatus.Completed)
+                @if (Job.CanBeInvoiced)
                 {
                     <button class="btn btn-success btn-sm flex-fill" @onclick="() => OnGenerateInvoice.InvokeAsync(Job)">
                         <i class="bi bi-file-earmark-text me-1"></i>
                         Invoice
+                    </button>
+                }
+                else if (Job.Status == JobStatus.Completed && Job.IsInvoiced)
+                {
+                    <button class="btn btn-outline-info btn-sm flex-fill" disabled title="Already invoiced">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Invoiced
                     </button>
                 }
                 else if (Job.Status == JobStatus.New)

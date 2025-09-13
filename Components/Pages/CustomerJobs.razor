@@ -210,12 +210,12 @@
                             </div>
                         </div>
                         <div class="d-flex flex-column gap-2 ms-3">
-                            @if (addressGroup.Jobs.Any(j => j.Status == JobStatus.Completed))
+                            @if (addressGroup.Jobs.Any(j => j.CanBeInvoiced))
                             {
                                 <button class="btn btn-success btn-sm"
                                     @onclick="() => HandleGenerateInvoiceForAddress(addressGroup.Address)">
                                     <i class="bi bi-file-earmark-text me-1"></i>
-                                    Invoice
+                                    Invoice (@addressGroup.Jobs.Count(j => j.CanBeInvoiced))
                                 </button>
                             }
                             <button class="btn btn-outline-primary btn-sm"
@@ -282,10 +282,16 @@
                                                     <i class="bi bi-check"></i>
                                                 </button>
                                             }
-                                            else if (job.Status == JobStatus.Completed)
+                                            else if (job.CanBeInvoiced)
                                             {
                                                 <button class="btn btn-outline-success btn-sm" @onclick="() => HandleGenerateInvoice(job)">
                                                     <i class="bi bi-file-earmark-text"></i>
+                                                </button>
+                                            }
+                                            else if (job.Status == JobStatus.Completed && job.IsInvoiced)
+                                            {
+                                                <button class="btn btn-outline-info btn-sm" disabled title="Already invoiced">
+                                                    <i class="bi bi-check-circle"></i>
                                                 </button>
                                             }
                                             <button class="btn btn-outline-secondary btn-sm" @onclick="() => HandleEditJob(job)">

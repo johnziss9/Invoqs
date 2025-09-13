@@ -55,10 +55,16 @@ namespace Invoqs.Models
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
-        // Navigation property
-        public CustomerModel? Customer { get; set; }
+        // NEW: Invoice integration properties
+        public bool IsInvoiced { get; set; } = false;
+        public int? InvoiceId { get; set; }
+        public DateTime? InvoicedDate { get; set; }
 
-        // Computed properties
+        // Navigation properties
+        public CustomerModel? Customer { get; set; }
+        public InvoiceModel? Invoice { get; set; }
+
+        // Existing computed properties
         public int DurationDays => EndDate.HasValue
             ? (int)(EndDate.Value - StartDate).TotalDays + 1
             : (int)(DateTime.Now - StartDate).TotalDays + 1;
@@ -98,6 +104,52 @@ namespace Invoqs.Models
         };
 
         public string ShortAddress => Address.Length > 50 ? Address.Substring(0, 47) + "..." : Address;
+
+        // NEW: Invoice integration helper properties and methods
+        public bool CanBeInvoiced => Status == JobStatus.Completed && !IsInvoiced;
+
+        public decimal GetVatRate() => Type switch
+        {
+            JobType.SkipRental => 5m,
+            JobType.SandDelivery => 19m,
+            JobType.FortCliffService => 19m,
+            _ => 5m // Default to lower rate
+        };
+
+        public string FormattedPrice => $"£{Price:N2}";
+
+        public void MarkAsInvoiced(int invoiceId)
+        {
+            IsInvoiced = true;
+            InvoiceId = invoiceId;
+            InvoicedDate = DateTime.Now;
+            UpdatedDate = DateTime.Now;
+        }
+
+        public void RemoveFromInvoice()
+        {
+            IsInvoiced = false;
+            InvoiceId = null;
+            InvoicedDate = null;
+            UpdatedDate = DateTime.Now;
+        }
+
+        public string GetInvoiceDescription()
+        {
+            var dateRange = EndDate.HasValue && EndDate != StartDate
+                ? $"{StartDate:dd/MM/yyyy} - {EndDate:dd/MM/yyyy}"
+                : StartDate.ToString("dd/MM/yyyy");
+
+            var description = $"{TypeDisplayName} - {Address} ({dateRange})";
+            
+            // Add job title if it's different from type
+            if (!string.IsNullOrEmpty(Title) && Title != TypeDisplayName)
+            {
+                description = $"{Title} - {TypeDisplayName} - {Address} ({dateRange})";
+            }
+
+            return description;
+        }
     }
 
     public class AddressJobGroup
@@ -112,5 +164,10 @@ namespace Invoqs.Models
         public decimal TotalRevenue => Jobs.Where(j => j.Status == JobStatus.Completed).Sum(j => j.Price);
         public DateTime? EarliestJobDate => Jobs.Min(j => j.StartDate);
         public DateTime? LatestJobDate => Jobs.Max(j => j.StartDate);
+
+        // NEW: Invoice-related properties for address groups
+        public int CompletedUninvoicedJobs => Jobs.Count(j => j.CanBeInvoiced);
+        public decimal UninvoicedRevenue => Jobs.Where(j => j.CanBeInvoiced).Sum(j => j.Price);
+        public bool HasJobsToInvoice => CompletedUninvoicedJobs > 0;
     }
 }
