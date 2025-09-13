@@ -7,6 +7,8 @@ namespace Invoqs.Components.Pages
     public partial class Dashboard : ComponentBase
     {
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
+        [Inject] private IJobService JobService { get; set; } = default!;
+        [Inject] private IInvoiceService InvoiceService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         // [Inject] private IJobService JobService { get; set; } = default!;
         // [Inject] private IInvoiceService InvoiceService { get; set; } = default!;
@@ -26,32 +28,48 @@ namespace Invoqs.Components.Pages
             {
                 isLoading = true;
 
-                // Load data from various services
+                // Load data from all services
                 var customers = await CustomerService.GetAllCustomersAsync();
+                var jobs = await JobService.GetAllJobsAsync();
+                var invoices = await InvoiceService.GetAllInvoicesAsync();
 
-                // Simulate loading other data - replace with actual service calls
-                await Task.Delay(800);
+                // Calculate active jobs by type
+                var activeJobs = jobs.Where(j => j.Status == JobStatus.Active).ToList();
+                var skipRentals = activeJobs.Count(j => j.Type == JobType.SkipRental);
+                var sandDeliveries = activeJobs.Count(j => j.Type == JobType.SandDelivery);
+                var fortCliffServices = activeJobs.Count(j => j.Type == JobType.FortCliffService);
+
+                // Calculate jobs scheduled today
+                var today = DateTime.Today;
+                var jobsToday = jobs.Count(j => j.StartDate.Date == today && j.Status == JobStatus.New);
+
+                // Calculate new customers this week
+                var oneWeekAgo = DateTime.Now.AddDays(-7);
+                var newCustomersThisWeek = customers.Count(c => c.CreatedDate >= oneWeekAgo);
+
+                // Calculate pending invoices and amount
+                var pendingInvoices = invoices.Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Overdue).ToList();
 
                 dashboardData = new DashboardDataModel
                 {
-                    // Revenue metrics
-                    WeekRevenue = 12450m,
-                    RevenueGrowth = 12.5m,
+                    // Revenue metrics - get from invoice service
+                    WeekRevenue = await InvoiceService.GetWeeklyRevenueAsync(),
+                    RevenueGrowth = 12.5m, // Calculate vs previous week if needed
 
                     // Job metrics
-                    ActiveJobs = 23,
-                    JobsScheduledToday = 5,
-                    SkipRentals = 14,
-                    SandDeliveries = 6,
-                    FortCliffServices = 3,
+                    ActiveJobs = activeJobs.Count,
+                    JobsScheduledToday = jobsToday,
+                    SkipRentals = skipRentals,
+                    SandDeliveries = sandDeliveries,
+                    FortCliffServices = fortCliffServices,
 
                     // Customer metrics
                     TotalCustomers = customers.Count,
-                    NewCustomersThisWeek = 3,
+                    NewCustomersThisWeek = newCustomersThisWeek,
 
                     // Invoice metrics
-                    PendingInvoices = 8,
-                    PendingAmount = 12450m
+                    PendingInvoices = pendingInvoices.Count,
+                    PendingAmount = pendingInvoices.Sum(i => i.Total)
                 };
             }
             catch (Exception ex)
