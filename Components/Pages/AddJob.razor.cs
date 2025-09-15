@@ -12,6 +12,8 @@ namespace Invoqs.Components.Pages
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
 
+        [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+
         protected string currentUser = "John Doe";
         protected JobModel newJob = new();
         protected List<CustomerModel> customers = new();
@@ -20,7 +22,6 @@ namespace Invoqs.Components.Pages
         protected bool isSaving = false;
         protected string errorMessage = "";
         protected string successMessage = "";
-        protected string? returnUrl;
 
         // Job type display properties
         protected string jobTypeIcon = "";
@@ -28,14 +29,6 @@ namespace Invoqs.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            // Check if we have a return URL in the query string
-            var uri = new Uri(Navigation.Uri);
-            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
-            if (query.TryGetValue("returnUrl", out var returnUrlValue))
-            {
-                returnUrl = returnUrlValue.FirstOrDefault();
-            }
-
             await LoadData();
         }
 
@@ -147,38 +140,16 @@ namespace Invoqs.Components.Pages
                     return;
                 }
 
-                // Set end date if status is Active (immediate start)
-                if (newJob.Status == JobStatus.Active)
-                {
-                    // Don't set end date - it's active but not completed
-                    // End date will be set when job is marked as completed
-                }
-
-                // Create the job
                 var createdJob = await JobService.CreateJobAsync(newJob);
 
                 if (createdJob != null)
                 {
                     successMessage = "Job created successfully!";
+                    StateHasChanged();
 
-                    // Navigate after a short delay to show success message
-                    _ = Task.Run(async () =>
-                    {
-                        await Task.Delay(1500);
-                        await InvokeAsync(() =>
-                        {
-                            if (CustomerId > 0)
-                            {
-                                // Return to customer jobs page
-                                Navigation.NavigateTo($"/customer/{CustomerId}/jobs");
-                            }
-                            else
-                            {
-                                // Return to global jobs page or specific return URL
-                                Navigation.NavigateTo(returnUrl ?? "/jobs");
-                            }
-                        });
-                    });
+                    // Navigate to job details to show created job
+                    await Task.Delay(1500);
+                    Navigation.NavigateTo($"/job/{createdJob.Id}", forceLoad: true);
                 }
                 else
                 {
@@ -203,22 +174,22 @@ namespace Invoqs.Components.Pages
             StateHasChanged();
         }
 
+        private string GetReturnUrl()
+        {
+            if (!string.IsNullOrEmpty(ReturnUrl))
+                return ReturnUrl;
+                
+            // Context-specific fallbacks
+            if (CustomerId > 0)
+                return $"/customer/{CustomerId}/jobs";
+            else
+                return "/jobs";
+        }
+
+
         private void GoBack()
         {
-            if (!string.IsNullOrEmpty(returnUrl))
-            {
-                Navigation.NavigateTo(returnUrl);
-            }
-            else if (CustomerId > 0)
-            {
-                // Go back to customer jobs page
-                Navigation.NavigateTo($"/customer/{CustomerId}/jobs");
-            }
-            else
-            {
-                // Go back to global jobs page
-                Navigation.NavigateTo("/jobs");
-            }
+            Navigation.NavigateTo(GetReturnUrl());
         }
 
         private Task HandleLogout()

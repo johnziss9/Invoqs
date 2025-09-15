@@ -36,38 +36,32 @@ namespace Invoqs.Components.Pages
         }
 
         private async Task HandleValidSubmit()
-        {
-            try
-            {
-                isSaving = true;
-                errorMessage = "";
-                successMessage = "";
+{
+    try
+    {
+        isSaving = true;
+        errorMessage = "";
+        successMessage = "";
 
-                var createdCustomer = await CustomerService.CreateCustomerAsync(newCustomer);
-                
-                successMessage = $"Customer '{createdCustomer.Name}' created successfully!";
-                
-                // Auto-navigate after short delay to show success message
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(1500);
-                    await InvokeAsync(() =>
-                    {
-                        var returnUrl = GetReturnUrl();
-                        Navigation.NavigateTo(returnUrl);
-                    });
-                });
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Error creating customer: {ex.Message}";
-            }
-            finally
-            {
-                isSaving = false;
-                StateHasChanged();
-            }
-        }
+        var createdCustomer = await CustomerService.CreateCustomerAsync(newCustomer);
+        
+        successMessage = $"Customer '{createdCustomer.Name}' created successfully!";
+        StateHasChanged();
+        
+        // Show success message briefly, then navigate to customer details
+        await Task.Delay(1500);
+        Navigation.NavigateTo($"/customer/{createdCustomer.Id}", forceLoad: true);
+    }
+    catch (Exception ex)
+    {
+        errorMessage = $"Error creating customer: {ex.Message}";
+    }
+    finally
+    {
+        isSaving = false;
+        StateHasChanged();
+    }
+}
 
         private void HandleInvalidSubmit()
         {

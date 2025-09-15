@@ -14,7 +14,7 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="/customer/@Customer.Id"><i class="bi bi-eye me-2"></i>View Details</a></li>
-                    <li><a class="dropdown-item" href="/customer/@Customer.Id/edit"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                    <li><a class="dropdown-item" @onclick="() => EditCustomer(Customer.Id)"><i class="bi bi-pencil me-2"></i>Edit</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><button class="dropdown-item text-danger" @onclick="() => OnDelete.InvokeAsync(Customer)">
                         <i class="bi bi-trash me-2"></i>Delete

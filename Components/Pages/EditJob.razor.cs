@@ -14,6 +14,8 @@ namespace Invoqs.Components.Pages
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JS { get; set; } = default!;
 
+        [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+
         protected string currentUser = "John Doe"; // Replace with actual user service
         protected JobModel? job;
         protected CustomerModel? customer;
@@ -101,14 +103,10 @@ namespace Invoqs.Components.Pages
                 if (success)
                 {
                     successMessage = "Job updated successfully!";
+                    StateHasChanged();
 
-                    // Auto-hide success message after 3 seconds
-                    _ = Task.Run(async () =>
-                    {
-                        await Task.Delay(3000);
-                        successMessage = "";
-                        await InvokeAsync(StateHasChanged);
-                    });
+                    await Task.Delay(1500);
+                    Navigation.NavigateTo($"/job/{job.Id}", forceLoad: true);
                 }
                 else
                 {
@@ -236,6 +234,11 @@ namespace Invoqs.Components.Pages
                 // Fallback to all jobs page
                 Navigation.NavigateTo("/jobs");
             }
+        }
+
+        private string GetReturnUrl()
+        {
+            return !string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : "/jobs";
         }
 
         private void GenerateInvoice()

@@ -99,7 +99,15 @@ namespace Invoqs.Components.Pages
 
         protected void NavigateToPage(string url)
         {
-            Navigation.NavigateTo(url, forceLoad: true);
+            if (url == "/customer/new")
+            {
+                var currentUrl = Navigation.Uri;
+                Navigation.NavigateTo($"/customer/new?returnUrl={Uri.EscapeDataString(currentUrl)}", forceLoad: true);
+            }
+            else
+            {
+                Navigation.NavigateTo(url, forceLoad: true);
+            }
         }
 
         protected Task HandleLogout()

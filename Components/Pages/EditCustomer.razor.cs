@@ -13,6 +13,8 @@ namespace Invoqs.Components.Pages
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JS { get; set; } = default!;
 
+        [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+
         protected string currentUser = "John Doe"; // Replace with actual user service
         protected CustomerModel? customer;
         protected bool isLoading = true;
@@ -33,6 +35,11 @@ namespace Invoqs.Components.Pages
             {
                 await LoadCustomer();
             }
+        }
+
+        private string GetReturnUrl()
+        {
+            return !string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : "/customers";
         }
 
         private async Task LoadCustomer()
@@ -71,17 +78,13 @@ namespace Invoqs.Components.Pages
                 successMessage = "";
 
                 var updatedCustomer = await CustomerService.UpdateCustomerAsync(customer);
-                customer = updatedCustomer; // Update with returned data
+                customer = updatedCustomer;
 
                 successMessage = "Customer updated successfully!";
+                StateHasChanged();
 
-                // Auto-hide success message after 3 seconds
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(3000);
-                    successMessage = "";
-                    await InvokeAsync(StateHasChanged);
-                });
+                await Task.Delay(1500);
+                Navigation.NavigateTo($"/customer/{customer.Id}", forceLoad: true);
             }
             catch (Exception ex)
             {
@@ -154,9 +157,8 @@ namespace Invoqs.Components.Pages
 
         private void CreateNewJob()
         {
-            // Navigate to create job page for this customer
-            Console.WriteLine($"Create new job for customer {customer?.Name}");
-            Navigation.NavigateTo($"/customer/{customer?.Id}/jobs/new");
+            var currentUrl = Navigation.Uri;
+            Navigation.NavigateTo($"/customer/{customer?.Id}/job/new?returnUrl={Uri.EscapeDataString(currentUrl)}");
         }
     }
 }

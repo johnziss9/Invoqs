@@ -225,8 +225,8 @@ namespace Invoqs.Components.Pages
 
         protected Task ShowAddJobModal()
         {
-            // For a global add job, we might want to go to a customer selection page first
-            Navigation.NavigateTo("/job/new");
+            var currentUrl = Navigation.Uri;
+            Navigation.NavigateTo($"/job/new?returnUrl={Uri.EscapeDataString(currentUrl)}");
             return Task.CompletedTask;
         }
 
