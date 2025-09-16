@@ -58,6 +58,12 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        private void CreateInvoice()
+        {
+            var currentUrl = Navigation.Uri;
+            Navigation.NavigateTo($"/invoice/new?returnUrl={Uri.EscapeDataString(currentUrl)}", forceLoad: true);
+        }
+
         protected IEnumerable<JobModel> filteredJobs
         {
             get

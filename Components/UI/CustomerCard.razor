@@ -13,18 +13,28 @@
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
+<<<<<<< Updated upstream
                     <li><a class="dropdown-item" href="/customer/@Customer.Id"><i class="bi bi-eye me-2"></i>View Details</a></li>
                     <li><a class="dropdown-item" href="/customer/@Customer.Id/edit"><i class="bi bi-pencil me-2"></i>Edit</a></li>
                     <li><hr class="dropdown-divider"></li>
+=======
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id"><i class="bi bi-eye me-2"></i>View
+                            Details</a></li>
+                    <li><a class="dropdown-item" @onclick="() => EditCustomer(Customer.Id)"><i
+                                class="bi bi-pencil me-2"></i>Edit</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+>>>>>>> Stashed changes
                     <li><button class="dropdown-item text-danger" @onclick="() => OnDelete.InvokeAsync(Customer)">
-                        <i class="bi bi-trash me-2"></i>Delete
-                    </button></li>
+                            <i class="bi bi-trash me-2"></i>Delete
+                        </button></li>
                 </ul>
             </div>
         </div>
 
         <h5 class="card-title text-primary mb-2">@Customer.Name</h5>
-        
+
         <div class="customer-details mb-3 flex-grow-1">
             <div class="detail-item mb-2">
                 <i class="bi bi-envelope text-muted me-2"></i>
@@ -54,10 +64,22 @@
         </div>
 
         <div class="mt-auto">
-            <button class="btn btn-primary btn-sm w-100" @onclick="() => OnViewJobs.InvokeAsync(Customer)">
-                <i class="bi bi-calendar-check me-1"></i>
-                View Jobs
-            </button>
+            <div class="d-grid gap-2">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <button class="btn btn-primary btn-sm w-100" @onclick="() => OnViewJobs.InvokeAsync(Customer)">
+                            <i class="bi bi-calendar-check me-1"></i>
+                            View Jobs
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <a href="/customer/@Customer.Id/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="bi bi-receipt me-1"></i>
+                            Create Invoice
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

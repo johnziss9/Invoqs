@@ -6,16 +6,19 @@ namespace Invoqs.Components.Pages
 {
     public partial class CreateInvoice : ComponentBase
     {
-        [Parameter] public int CustomerId { get; set; }
+        [Parameter] public int CustomerId { get; set; } = 0;
 
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
         [Inject] private IJobService JobService { get; set; } = default!;
         [Inject] private IInvoiceService InvoiceService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
 
+        [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+
         // Component state
         protected string currentUser = "John Doe";
-        protected CustomerModel? customer;
+        protected CustomerModel? selectedCustomer;
+        protected List<CustomerModel> customers = new();
         protected List<JobModel> availableJobs = new();
         protected List<JobModel> filteredJobs = new();
         protected HashSet<int> selectedJobIds = new();
@@ -33,38 +36,34 @@ namespace Invoqs.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadCustomerAndJobs();
             InitializeInvoice();
+            await LoadData();
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            if (CustomerId > 0)
-            {
-                await LoadCustomerAndJobs();
-                InitializeInvoice();
-            }
+            // Only reload if CustomerId changes
+            await LoadData();
         }
 
-        private async Task LoadCustomerAndJobs()
+        private async Task LoadData()
         {
             try
             {
                 isLoading = true;
                 errorMessage = "";
 
-                // Load customer
-                customer = await CustomerService.GetCustomerByIdAsync(CustomerId);
-                
-                if (customer == null)
-                {
-                    errorMessage = "Customer not found.";
-                    return;
-                }
+                // Load all customers
+                customers = await CustomerService.GetAllCustomersAsync();
 
-                // Load available jobs (completed and not invoiced)
-                availableJobs = await JobService.GetCompletedUninvoicedJobsByCustomerAsync(CustomerId);
-                filteredJobs = availableJobs.ToList();
+                // Load selected customer if CustomerId is provided
+                await LoadSelectedCustomer();
+                
+                // Load jobs if customer is selected
+                if (selectedCustomer != null)
+                {
+                    await LoadCustomerJobs();
+                }
             }
             catch (Exception ex)
             {
@@ -75,6 +74,53 @@ namespace Invoqs.Components.Pages
                 isLoading = false;
                 StateHasChanged();
             }
+        }
+
+        private async Task LoadSelectedCustomer()
+        {
+            if (CustomerId > 0)
+            {
+                selectedCustomer = await CustomerService.GetCustomerByIdAsync(CustomerId);
+                if (selectedCustomer != null)
+                {
+                    newInvoice.CustomerId = CustomerId;
+                }
+            }
+        }
+
+        private async Task LoadCustomerJobs()
+        {
+            var customerId = selectedCustomer?.Id ?? newInvoice.CustomerId;
+            if (customerId > 0)
+            {
+                availableJobs = await JobService.GetCompletedUninvoicedJobsByCustomerAsync(customerId);
+                filteredJobs = availableJobs.ToList();
+                FilterJobs(); // Apply any existing filters
+            }
+        }
+        
+        private string GetReturnUrl()
+        {
+            return !string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : "/invoices";
+        }
+
+        protected async void OnCustomerChanged()
+        {
+            selectedCustomer = customers.FirstOrDefault(c => c.Id == newInvoice.CustomerId);
+            selectedJobIds.Clear(); // Clear any previously selected jobs
+
+            if (selectedCustomer != null)
+            {
+                await LoadCustomerJobs();
+            }
+            else
+            {
+                availableJobs.Clear();
+                filteredJobs.Clear();
+            }
+
+            RecalculateTotals();
+            StateHasChanged();
         }
 
         private void InitializeInvoice()
@@ -199,8 +245,9 @@ namespace Invoqs.Components.Pages
                 }
 
                 // Create invoice through service
+                var customerId = selectedCustomer?.Id ?? newInvoice.CustomerId;
                 var createdInvoice = await InvoiceService.CreateInvoiceFromJobsAsync(
-                    CustomerId, 
+                    customerId, 
                     selectedJobIds.ToList(), 
                     newInvoice.DueDate
                 );
@@ -234,10 +281,10 @@ namespace Invoqs.Components.Pages
 
         protected string GetCustomerInitials()
         {
-            if (customer == null || string.IsNullOrWhiteSpace(customer.Name))
+            if (selectedCustomer == null || string.IsNullOrWhiteSpace(selectedCustomer.Name))
                 return "?";
 
-            var parts = customer.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var parts = selectedCustomer.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 1)
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
 

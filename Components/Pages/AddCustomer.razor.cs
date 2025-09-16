@@ -8,7 +8,7 @@ namespace Invoqs.Components.Pages
     {
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
-        
+
         [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
 
         protected string currentUser = "John Doe";
@@ -44,6 +44,7 @@ namespace Invoqs.Components.Pages
                 successMessage = "";
 
                 var createdCustomer = await CustomerService.CreateCustomerAsync(newCustomer);
+<<<<<<< Updated upstream
                 
                 successMessage = $"Customer '{createdCustomer.Name}' created successfully!";
                 
@@ -57,6 +58,15 @@ namespace Invoqs.Components.Pages
                         Navigation.NavigateTo(returnUrl);
                     });
                 });
+=======
+
+                successMessage = $"Customer '{createdCustomer.Name}' created successfully!";
+                StateHasChanged();
+
+                // Show success message briefly, then navigate to customer details
+                await Task.Delay(1500);
+                Navigation.NavigateTo($"/customer/{createdCustomer.Id}", forceLoad: true);
+>>>>>>> Stashed changes
             }
             catch (Exception ex)
             {
@@ -94,7 +104,7 @@ namespace Invoqs.Components.Pages
             var parts = newCustomer.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 1)
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
-            
+
             return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
         }
 
