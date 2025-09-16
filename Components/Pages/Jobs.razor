@@ -24,9 +24,13 @@
                     <h2 class="text-primary mb-1">All Jobs</h2>
                 </div>
                 <div class="d-flex gap-2 mt-2 mt-md-0">
-                    <button class="btn btn-outline-secondary" @onclick="@(() => Navigation.NavigateTo("/customers"))">
+                    <button class="btn btn-outline-secondary" @onclick="@(() => Navigation.NavigateTo("/customers", true))">
                         <i class="bi bi-people me-1"></i>
                         View Customers
+                    </button>
+                    <button class="btn btn-outline-primary" @onclick="CreateInvoice">
+                        <i class="bi bi-receipt me-1"></i>
+                        Create Invoice
                     </button>
                     <button class="btn btn-primary" @onclick="ShowAddJobModal">
                         <i class="bi bi-plus-lg me-1"></i>
