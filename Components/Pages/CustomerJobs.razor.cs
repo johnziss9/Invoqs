@@ -191,7 +191,8 @@ namespace Invoqs.Components.Pages
 
         protected Task HandleEditJob(JobModel job)
         {
-            Navigation.NavigateTo($"/job/{job.Id}/edit");
+            var currentUrl = Navigation.Uri;
+            Navigation.NavigateTo($"/job/{job.Id}/edit?returnUrl={Uri.EscapeDataString(currentUrl)}");
             return Task.CompletedTask;
         }
 
@@ -241,7 +242,8 @@ namespace Invoqs.Components.Pages
 
         protected Task ShowAddJobModal()
         {
-            Navigation.NavigateTo($"/customer/{CustomerId}/job/new");
+            var currentUrl = Navigation.Uri;
+            Navigation.NavigateTo($"/customer/{CustomerId}/job/new?returnUrl={Uri.EscapeDataString(currentUrl)}");
             return Task.CompletedTask;
         }
 

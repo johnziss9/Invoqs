@@ -99,24 +99,7 @@ namespace Invoqs.Components.Pages
 
         protected void NavigateToPage(string url)
         {
-<<<<<<< Updated upstream
             Navigation.NavigateTo(url, forceLoad: true);
-=======
-            if (url == "/invoice/new")
-            {
-                var currentUrl = Navigation.Uri;
-                Navigation.NavigateTo($"/invoice/new?returnUrl={Uri.EscapeDataString(currentUrl)}", forceLoad: true);
-            }
-            else if (url == "/customer/new")
-            {
-                var currentUrl = Navigation.Uri;
-                Navigation.NavigateTo($"/customer/new?returnUrl={Uri.EscapeDataString(currentUrl)}", forceLoad: true);
-            }
-            else
-            {
-                Navigation.NavigateTo(url, forceLoad: true);
-            }
->>>>>>> Stashed changes
         }
 
         protected Task HandleLogout()

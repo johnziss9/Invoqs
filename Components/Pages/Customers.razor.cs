@@ -166,9 +166,8 @@ namespace Invoqs.Components.Pages
 
         protected Task ShowAddCustomerModal()
         {
-            // Navigate to add customer page
-            Console.WriteLine("Add new customer");
-            Navigation.NavigateTo("/customer/new");
+            var currentUrl = Navigation.Uri;
+            Navigation.NavigateTo($"/customer/new?returnUrl={Uri.EscapeDataString(currentUrl)}");
             return Task.CompletedTask;
         }
 

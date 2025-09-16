@@ -36,12 +36,12 @@ namespace Invoqs.Components.Pages
         }
 
         private async Task HandleValidSubmit()
-        {
-            try
-            {
-                isSaving = true;
-                errorMessage = "";
-                successMessage = "";
+{
+    try
+    {
+        isSaving = true;
+        errorMessage = "";
+        successMessage = "";
 
                 var createdCustomer = await CustomerService.CreateCustomerAsync(newCustomer);
 <<<<<<< Updated upstream
