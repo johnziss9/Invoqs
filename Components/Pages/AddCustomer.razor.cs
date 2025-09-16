@@ -44,7 +44,6 @@ namespace Invoqs.Components.Pages
         successMessage = "";
 
                 var createdCustomer = await CustomerService.CreateCustomerAsync(newCustomer);
-<<<<<<< Updated upstream
                 
                 successMessage = $"Customer '{createdCustomer.Name}' created successfully!";
                 
@@ -58,15 +57,6 @@ namespace Invoqs.Components.Pages
                         Navigation.NavigateTo(returnUrl);
                     });
                 });
-=======
-
-                successMessage = $"Customer '{createdCustomer.Name}' created successfully!";
-                StateHasChanged();
-
-                // Show success message briefly, then navigate to customer details
-                await Task.Delay(1500);
-                Navigation.NavigateTo($"/customer/{createdCustomer.Id}", forceLoad: true);
->>>>>>> Stashed changes
             }
             catch (Exception ex)
             {
