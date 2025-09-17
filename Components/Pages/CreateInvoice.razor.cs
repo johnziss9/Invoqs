@@ -14,6 +14,7 @@ namespace Invoqs.Components.Pages
         [Inject] private NavigationManager Navigation { get; set; } = default!;
 
         [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+        [SupplyParameterFromQuery] public int? PreselectedJobId { get; set; }
 
         // Component state
         protected string currentUser = "John Doe";
@@ -38,6 +39,18 @@ namespace Invoqs.Components.Pages
         {
             InitializeInvoice();
             await LoadData();
+
+            // Handle job preselection
+            if (PreselectedJobId.HasValue && availableJobs.Any())
+            {
+                var jobToPreselect = availableJobs.FirstOrDefault(j => j.Id == PreselectedJobId.Value);
+                if (jobToPreselect != null && jobToPreselect.CanBeInvoiced)
+                {
+                    selectedJobIds.Add(PreselectedJobId.Value);
+                    RecalculateTotals();
+                    StateHasChanged();
+                }
+            }
         }
 
         protected override async Task OnParametersSetAsync()

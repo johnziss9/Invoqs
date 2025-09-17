@@ -229,8 +229,9 @@ namespace Invoqs.Components.Pages
 
         protected Task HandleGenerateInvoiceForAddress(string address)
         {
-            // Navigate to create invoice page - user can filter by jobs from this address
-            Navigation.NavigateTo($"/customer/{CustomerId}/invoice/new");
+            var currentUrl = Navigation.Uri;
+            var returnUrl = Uri.EscapeDataString(currentUrl);
+            Navigation.NavigateTo($"/customer/{CustomerId}/invoice/new?returnUrl={returnUrl}", true);
             return Task.CompletedTask;
         }
 
