@@ -311,10 +311,6 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <a href="/job/@JobId/edit?returnUrl=@Uri.EscapeDataString($"/job/{JobId}")" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-pencil me-1"></i>
-                                Edit Job
-                            </a>
                             @if (job.Status == JobStatus.Completed && !job.IsInvoiced)
                             {
                                 <button class="btn btn-outline-success btn-sm" @onclick="CreateInvoice">
@@ -331,12 +327,16 @@
                             }
                             @if (customer != null)
                             {
-                                <hr class="my-2">
-                                <a href="/customer/@customer.Id/job/new?returnUrl=@Uri.EscapeDataString($"/job/{JobId}")" class="btn btn-outline-secondary btn-sm">
+                                <a href="/customer/@customer.Id/job/new?returnUrl=@Uri.EscapeDataString($"/job/{JobId}")" class="btn btn-outline-primary btn-sm">
                                     <i class="bi bi-plus-lg me-1"></i>
                                     New Job for Customer
                                 </a>
                             }
+                            <hr class="my-2">
+                            <a href="/job/@JobId/edit?returnUrl=@Uri.EscapeDataString($"/job/{JobId}")" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-pencil me-1"></i>
+                                Edit Job
+                            </a>
                         </div>
                     </div>
                 </div>
