@@ -245,7 +245,9 @@ namespace Invoqs.Components.Pages
         {
             if (job != null)
             {
-                Navigation.NavigateTo($"/invoice/generate/{job.Id}");
+                var currentUrl = Navigation.Uri;
+                var returnUrl = Uri.EscapeDataString(currentUrl);
+                Navigation.NavigateTo($"/customer/{job.CustomerId}/invoice/new?preselectedJobId={job.Id}&returnUrl={returnUrl}", true);
             }
         }
 

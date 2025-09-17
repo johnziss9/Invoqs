@@ -219,7 +219,9 @@ namespace Invoqs.Components.Pages
 
         protected Task HandleGenerateInvoice(JobModel job)
         {
-            Navigation.NavigateTo($"/invoice/generate/{job.Id}");
+            var currentUrl = Navigation.Uri;
+            var returnUrl = Uri.EscapeDataString(currentUrl);
+            Navigation.NavigateTo($"/customer/{job.CustomerId}/invoice/new?preselectedJobId={job.Id}&returnUrl={returnUrl}");
             return Task.CompletedTask;
         }
 

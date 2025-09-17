@@ -19,5 +19,19 @@ namespace Invoqs.Components.UI
             var currentUrl = Navigation.Uri;
             Navigation.NavigateTo($"/job/{jobId}?returnUrl={Uri.EscapeDataString(currentUrl)}");
         }
+
+        private async Task HandleGenerateInvoiceClick()
+        {
+            if (OnGenerateInvoice.HasDelegate)
+            {
+                await OnGenerateInvoice.InvokeAsync(Job);
+            }
+            else
+            {
+                var currentUrl = Navigation.Uri;
+                var returnUrl = Uri.EscapeDataString(currentUrl);
+                Navigation.NavigateTo($"/customer/{Job.CustomerId}/invoice/new?preselectedJobId={Job.Id}&returnUrl={returnUrl}");
+            }
+        }
     }
 }

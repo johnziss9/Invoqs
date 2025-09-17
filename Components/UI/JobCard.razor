@@ -86,7 +86,7 @@
                         @if (Job.CanBeInvoiced)
                         {
                             <li><button class="dropdown-item text-success"
-                                    @onclick="() => OnGenerateInvoice.InvokeAsync(Job)" @onclick:preventDefault="true">
+                                    @onclick="HandleGenerateInvoiceClick" @onclick:preventDefault="true">
                                     <i class="bi bi-file-earmark-text me-2"></i>Generate Invoice
                                 </button></li>
                         }
