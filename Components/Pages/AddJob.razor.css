@@ -1,5 +1,16 @@
 /* Add Job Page Styles */
 
+/* Button and form consistency */
+.btn {
+    border-radius: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+}
+
+/* Required field indicator */
 .required::after {
     content: " *";
     color: #dc3545;
@@ -9,16 +20,28 @@
     font-weight: 500;
 }
 
+/* Card styling with 8px radius */
 .card {
-    border-radius: 12px;
+    border-radius: 8px;
     border: none;
 }
 
 .card-header {
     border-bottom: 1px solid #e9ecef;
-    border-radius: 12px 12px 0 0 !important;
+    border-radius: 8px 8px 0 0 !important;
 }
 
+/* Card hover effects matching other pages */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Breadcrumb styling */
 .breadcrumb {
     background: none;
     padding: 0;
@@ -57,8 +80,31 @@
     font-size: 3rem !important;
 }
 
+.job-type-icon-container {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: rgba(13, 110, 253, 0.05);
+    border-radius: 8px;
+    border: 2px dashed rgba(13, 110, 253, 0.2);
+    transition: all 0.3s ease;
+}
+
+.job-type-icon-container.has-selection {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.3);
+}
+
+/* Badge styling */
+.badge {
+    border-radius: 6px;
+}
+
 .badge.fs-6 {
     font-size: 1rem !important;
+    border-radius: 8px;
 }
 
 /* Button states */
@@ -112,15 +158,30 @@
     margin-top: 0.25rem;
 }
 
+/* Form focus states */
+.form-select:focus,
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+}
+
 /* Sidebar customer stats */
 .border.rounded.p-2 {
     border-color: #dee2e6 !important;
+    border-radius: 8px !important;
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .border.rounded.p-2:hover {
     border-color: #0d6efd !important;
     background-color: #f8f9fa;
+}
+
+/* Customer selection highlight */
+.customer-selected {
+    background-color: #e7f3ff;
+    border-color: #0d6efd !important;
+    border-radius: 8px;
 }
 
 /* Tips section styling */
@@ -132,26 +193,22 @@
     color: #495057;
 }
 
-/* Job type icon container */
-.job-type-icon-container {
-    min-height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+.tips-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #0d6efd;
 }
 
-/* Form layout improvements */
-.form-select:focus,
-.form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+/* Job preview card enhancements */
+.job-preview-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
 }
 
-/* Customer selection highlight */
-.customer-selected {
-    background-color: #e7f3ff;
-    border-color: #0d6efd !important;
+.job-preview-card .card-header {
+    background: rgba(13, 110, 253, 0.1);
+    border-bottom: 1px solid rgba(13, 110, 253, 0.2);
 }
 
 /* Mobile responsiveness */
@@ -172,6 +229,10 @@
 
     .job-type-preview .fs-1 {
         font-size: 2.5rem !important;
+    }
+
+    .card-body {
+        padding: 1rem;
     }
 }
 
@@ -199,4 +260,24 @@
     .job-type-preview .fs-1 {
         font-size: 2rem !important;
     }
+
+    .job-type-icon-container {
+        min-height: 100px;
+    }
+}
+
+/* Focus states for accessibility */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }

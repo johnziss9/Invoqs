@@ -1,7 +1,7 @@
 /* Dashboard Styles */
 
 .card {
-    border-radius: 12px;
+    border-radius: 8px;
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
@@ -11,7 +11,7 @@
 }
 
 .card-header {
-    border-radius: 12px 12px 0 0 !important;
+    border-radius: 8px 8px 0 0 !important;
     border-bottom: 1px solid #e9ecef;
 }
 
@@ -33,6 +33,11 @@
 
 .card.bg-warning {
     background: linear-gradient(135deg, var(--bs-warning) 0%, rgba(var(--bs-warning-rgb), 0.8) 100%);
+}
+
+/* Button styling for consistency */
+.btn {
+    border-radius: 8px;
 }
 
 /* Avatar Circle */
@@ -113,12 +118,12 @@
 
 /* Progress bars */
 .progress {
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
 }
 
 .progress-bar {
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 /* Chart Container */
@@ -159,7 +164,7 @@
 
 /* Alert styling */
 .alert {
-    border-radius: 12px;
+    border-radius: 8px;
     border: none;
 }
 

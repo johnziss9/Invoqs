@@ -1,5 +1,16 @@
 /* Edit Job Page Styles */
 
+/* Button and form consistency */
+.btn {
+    border-radius: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+}
+
+/* Required field indicator */
 .required::after {
     content: " *";
     color: #dc3545;
@@ -9,16 +20,28 @@
     font-weight: 500;
 }
 
+/* Card styling with 8px radius */
 .card {
-    border-radius: 12px;
+    border-radius: 8px;
     border: none;
 }
 
 .card-header {
     border-bottom: 1px solid #e9ecef;
-    border-radius: 12px 12px 0 0 !important;
+    border-radius: 8px 8px 0 0 !important;
 }
 
+/* Card hover effects matching other pages */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Breadcrumb styling */
 .breadcrumb {
     background: none;
     padding: 0;
@@ -52,9 +75,18 @@
     font-size: 14px;
 }
 
-/* Job status badge styling */
+/* Badge styling with hierarchy */
+.badge {
+    border-radius: 6px;
+}
+
 .badge.fs-6 {
     font-size: 1rem !important;
+    border-radius: 8px;
+}
+
+.badge .bi {
+    font-size: 0.9em;
 }
 
 /* Modal styling */
@@ -66,6 +98,20 @@
 
 .modal-dialog {
     margin: 0;
+    border-radius: 8px;
+}
+
+.modal-content {
+    border-radius: 8px;
+    border: none;
+}
+
+.modal-header {
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-footer {
+    border-radius: 0 0 8px 8px;
 }
 
 /* Button states */
@@ -117,20 +163,23 @@
     box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
 }
 
+/* Form focus states */
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
 /* Sidebar stats styling */
 .border.rounded.p-2 {
     border-color: #dee2e6 !important;
+    border-radius: 8px !important;
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .border.rounded.p-2:hover {
     border-color: #0d6efd !important;
     background-color: #f8f9fa;
-}
-
-/* Job type icon styling */
-.badge .bi {
-    font-size: 0.9em;
 }
 
 /* Button hover effects */
@@ -154,6 +203,33 @@
     flex-shrink: 0;
 }
 
+.customer-info {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #0d6efd;
+}
+
+/* Status change buttons group */
+.status-buttons {
+    gap: 0.5rem;
+}
+
+.status-buttons .btn {
+    transition: all 0.2s ease;
+}
+
+/* Job type icon styling */
+.job-type-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     .d-flex.justify-content-between.align-items-center.flex-wrap {
@@ -173,6 +249,15 @@
     .modal-dialog {
         margin: 1rem;
         max-width: calc(100% - 2rem);
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .job-type-icon {
+        width: 40px;
+        height: 40px;
     }
 }
 
@@ -196,4 +281,28 @@
         height: 32px;
         font-size: 12px;
     }
+
+    .status-buttons {
+        flex-direction: column;
+    }
+
+    .status-buttons .btn {
+        width: 100%;
+    }
+}
+
+/* Focus states for accessibility */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }

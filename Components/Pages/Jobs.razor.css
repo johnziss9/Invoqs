@@ -1,3 +1,5 @@
+/* Jobs Page Styles */
+
 /* Breadcrumb navigation */
 .breadcrumb {
     background: none;
@@ -24,18 +26,36 @@
 .badge {
     font-size: 0.75rem;
     padding: 0.35em 0.65em;
+    border-radius: 6px;
+    /* Smaller for visual hierarchy */
 }
 
-/* Cards styling */
+/* Cards styling with 8px radius */
 .card {
-    border-radius: 12px;
+    border-radius: 8px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
 }
 
 .card-body {
     padding: 1.5rem;
 }
 
-/* Tables */
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Tables with rounded corners */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 .table tbody tr:hover {
     background-color: rgba(0, 123, 255, 0.05);
 }
@@ -52,7 +72,7 @@
     border-color: #f0f0f0;
 }
 
-/* Form controls */
+/* Form controls with 8px radius */
 .form-control,
 .form-select {
     border-radius: 8px;
@@ -72,7 +92,11 @@
     border-radius: 8px 0 0 8px;
 }
 
-/* Buttons */
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
+}
+
+/* Buttons with 8px radius */
 .btn {
     border-radius: 8px;
     font-weight: 500;
@@ -92,25 +116,88 @@
     background-color: #f8f9fa;
     border-color: #dee2e6;
     color: #495057;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* Button groups with proper radius */
 .btn-group-sm .btn {
     padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.btn-group .btn:not(:first-child):not(:last-child) {
+    border-radius: 0;
 }
 
 /* Customer name buttons in table */
 .btn-link {
     text-decoration: none !important;
+    border-radius: 8px;
 }
 
 .btn-link:hover {
     color: #0d6efd !important;
+    background-color: rgba(13, 110, 253, 0.05);
 }
 
 /* Clear filters button */
 .btn-link.btn-sm {
     font-size: 0.875rem;
     vertical-align: baseline;
+}
+
+/* View mode toggle buttons */
+.btn-check:checked+.btn {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    border-radius: 8px;
+}
+
+.btn-group .btn {
+    border-radius: 8px !important;
+}
+
+.btn-group>.btn:not(:first-child),
+.btn-group>.btn-group:not(:first-child)>.btn {
+    border-radius: 8px !important;
+    margin-left: -1px;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+/* Statistics cards with gradients (if any) */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-info,
+.card.bg-warning {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), 0.8) 100%);
+}
+
+.card.bg-success {
+    background: linear-gradient(135deg, var(--bs-success) 0%, rgba(var(--bs-success-rgb), 0.8) 100%);
+}
+
+.card.bg-info {
+    background: linear-gradient(135deg, var(--bs-info) 0%, rgba(var(--bs-info-rgb), 0.8) 100%);
+}
+
+.card.bg-warning {
+    background: linear-gradient(135deg, var(--bs-warning) 0%, rgba(var(--bs-warning-rgb), 0.8) 100%);
 }
 
 /* Mobile responsive */
@@ -130,5 +217,36 @@
 
     .table-responsive {
         font-size: 0.875rem;
+        border-radius: 8px;
     }
+
+    .btn-group {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .card-body {
+        padding: 0.75rem;
+    }
+}
+
+/* Focus states for accessibility */
+.btn:focus,
+.form-control:focus {
+    outline: none;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
