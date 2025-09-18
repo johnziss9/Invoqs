@@ -120,24 +120,37 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Button groups with proper radius */
-.btn-group-sm .btn {
-    padding: 0.25rem 0.5rem;
+.btn-group {
     border-radius: 8px;
+    overflow: hidden;
+}
+
+.btn-group .btn {
+    border-radius: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-group .btn:first-child {
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-radius: 8px 0 0 8px;
 }
 
 .btn-group .btn:last-child {
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-radius: 0 8px 8px 0;
+    border-right: none;
 }
 
-.btn-group .btn:not(:first-child):not(:last-child) {
-    border-radius: 0;
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Enhanced checked state */
+.btn-check:checked+.btn {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: white !important;
+    position: relative;
+    z-index: 2;
 }
 
 /* Customer name buttons in table */
@@ -155,23 +168,6 @@
 .btn-link.btn-sm {
     font-size: 0.875rem;
     vertical-align: baseline;
-}
-
-/* View mode toggle buttons */
-.btn-check:checked+.btn {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-    border-radius: 8px;
-}
-
-.btn-group .btn {
-    border-radius: 8px !important;
-}
-
-.btn-group>.btn:not(:first-child),
-.btn-group>.btn-group:not(:first-child)>.btn {
-    border-radius: 8px !important;
-    margin-left: -1px;
 }
 
 /* Alert styling */

@@ -182,7 +182,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-6 col-lg-4">
+                        <div class="col-md-3">
                             <label class="form-label small text-muted">Search Invoices</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
@@ -190,7 +190,7 @@
                                     placeholder="Search by invoice number...">
                             </div>
                         </div>
-                        <div class="col-md-3 col-lg-2">
+                        <div class="col-md-2">
                             <label class="form-label small text-muted">Status</label>
                             <select class="form-select" @bind="statusFilter" @bind:after="FilterInvoices">
                                 <option value="">All Statuses</option>
@@ -201,7 +201,7 @@
                                 <option value="Cancelled">Cancelled</option>
                             </select>
                         </div>
-                        <div class="col-md-3 col-lg-2">
+                        <div class="col-md-2">
                             <label class="form-label small text-muted">Date Range</label>
                             <select class="form-select" @bind="dateFilter" @bind:after="FilterInvoices">
                                 <option value="all">All Time</option>
@@ -211,7 +211,7 @@
                                 <option value="thisYear">This Year</option>
                             </select>
                         </div>
-                        <div class="col-md-3 col-lg-2">
+                        <div class="col-md-4">
                             <label class="form-label small text-muted">Sort By</label>
                             <select class="form-select" @bind="sortBy" @bind:after="FilterInvoices">
                                 <option value="created">Created Date</option>
@@ -220,19 +220,21 @@
                                 <option value="total">Total Amount</option>
                             </select>
                         </div>
-                        <div class="col-md-3 col-lg-2">
-                            <div class="btn-group" role="group">
-                                <input type="radio" class="btn-check" name="viewMode" id="gridView"
-                                    checked="@(viewMode == "grid")" @onchange="@(() => SetViewMode("grid"))">
-                                <label class="btn btn-outline-secondary" for="gridView">
-                                    <i class="bi bi-grid-3x3-gap"></i>
-                                </label>
+                        <div class="col-md-1">
+                            <div class="d-flex justify-content-end align-items-center">
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="viewMode" id="gridView"
+                                        checked="@(viewMode == "grid")" @onchange="@(() => SetViewMode("grid"))">
+                                    <label class="btn btn-outline-secondary" for="gridView">
+                                        <i class="bi bi-grid-3x3-gap"></i>
+                                    </label>
 
-                                <input type="radio" class="btn-check" name="viewMode" id="listView"
-                                    checked="@(viewMode == "list")" @onchange="@(() => SetViewMode("list"))">
-                                <label class="btn btn-outline-secondary" for="listView">
-                                    <i class="bi bi-list"></i>
-                                </label>
+                                    <input type="radio" class="btn-check" name="viewMode" id="listView"
+                                        checked="@(viewMode == "list")" @onchange="@(() => SetViewMode("list"))">
+                                    <label class="btn btn-outline-secondary" for="listView">
+                                        <i class="bi bi-list"></i>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
