@@ -1,4 +1,5 @@
 @page "/job/{JobId:int}"
+@rendermode InteractiveServer
 @using Invoqs.Components.UI
 @using Invoqs.Models
 @using Invoqs.Services
@@ -311,20 +312,6 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            @if (job.Status == JobStatus.Completed && !job.IsInvoiced)
-                            {
-                                <button class="btn btn-outline-success btn-sm" @onclick="CreateInvoice">
-                                    <i class="bi bi-receipt me-1"></i>
-                                    Create Invoice
-                                </button>
-                            }
-                            @if (job.IsInvoiced && job.InvoiceId.HasValue)
-                            {
-                                <button class="btn btn-outline-info btn-sm" @onclick="() => ViewInvoice(job.InvoiceId)">
-                                    <i class="bi bi-file-earmark-text me-1"></i>
-                                    View Invoice
-                                </button>
-                            }
                             @if (customer != null)
                             {
                                 <a href="/customer/@customer.Id/job/new?returnUrl=@Uri.EscapeDataString($"/job/{JobId}")" class="btn btn-outline-primary btn-sm">
