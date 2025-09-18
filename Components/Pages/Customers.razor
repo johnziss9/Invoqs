@@ -65,11 +65,8 @@
                             </select>
                         </div>
                         <div class="col-md-12 col-lg-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    Showing @filteredCustomers.Count() of @customers.Count customers
-                                </small>
-                                <div class="btn-group btn-group-sm" role="group">
+                            <div class="d-flex justify-content-end align-items-center">
+                                <div class="btn-group" role="group">
                                     <input type="radio" class="btn-check" name="viewMode" id="gridView" 
                                         @onchange="@(e => viewMode = "grid")" 
                                         checked="@(viewMode == "grid")">
@@ -80,6 +77,13 @@
                                         checked="@(viewMode == "list")">
                                     <label class="btn btn-outline-secondary" for="listView"><i class="bi bi-list"></i></label>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <small class="text-muted">
+                                    Showing @filteredCustomers.Count() of @customers.Count customers
+                                </small>
                             </div>
                         </div>
                     </div>

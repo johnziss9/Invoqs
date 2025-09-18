@@ -175,19 +175,21 @@
                                 <option value="total">Total Amount</option>
                             </select>
                         </div>
-                        <div class="col-md-3 col-lg-1">
-                            <div class="btn-group" role="group">
-                                <input type="radio" class="btn-check" name="viewMode" id="gridView" 
-                                    checked="@(viewMode == "grid")" @onchange="@(() => SetViewMode("grid"))">
-                                <label class="btn btn-outline-secondary" for="gridView">
-                                    <i class="bi bi-grid-3x3-gap"></i>
-                                </label>
+                        <div class="col-md-1">
+                            <div class="d-flex justify-content-end align-items-center">
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="viewMode" id="gridView" 
+                                        checked="@(viewMode == "grid")" @onchange="@(() => SetViewMode("grid"))">
+                                    <label class="btn btn-outline-secondary" for="gridView">
+                                        <i class="bi bi-grid-3x3-gap"></i>
+                                    </label>
 
-                                <input type="radio" class="btn-check" name="viewMode" id="listView" 
-                                    checked="@(viewMode == "list")" @onchange="@(() => SetViewMode("list"))">
-                                <label class="btn btn-outline-secondary" for="listView">
-                                    <i class="bi bi-list"></i>
-                                </label>
+                                    <input type="radio" class="btn-check" name="viewMode" id="listView" 
+                                        checked="@(viewMode == "list")" @onchange="@(() => SetViewMode("list"))">
+                                    <label class="btn btn-outline-secondary" for="listView">
+                                        <i class="bi bi-list"></i>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>

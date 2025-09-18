@@ -48,24 +48,28 @@
     border-color: #f0f0f0;
 }
 
-/* Button groups with proper radius */
-.btn-group-sm .btn {
-    padding: 0.25rem 0.5rem;
+.btn-group {
     border-radius: 8px;
+    overflow: hidden;
+}
+
+.btn-group .btn {
+    border-radius: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-group .btn:first-child {
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-radius: 8px 0 0 8px;
 }
 
 .btn-group .btn:last-child {
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-radius: 0 8px 8px 0;
+    border-right: none;
 }
 
-.btn-group .btn:not(:first-child):not(:last-child) {
-    border-radius: 0;
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
 }
 
 /* Breadcrumb styling */
@@ -213,32 +217,24 @@
     background-color: #f8f9fa;
     border-color: #dee2e6;
     color: #495057;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-outline-primary:hover,
-.btn-outline-secondary:hover,
 .btn-outline-success:hover,
 .btn-outline-danger:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* View Mode Buttons */
+/* Enhanced checked state */
 .btn-check:checked+.btn-outline-secondary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-    color: white;
-    border-radius: 8px;
-}
-
-.btn-group .btn {
-    border-radius: 8px !important;
-}
-
-.btn-group>.btn:not(:first-child),
-.btn-group>.btn-group:not(:first-child)>.btn {
-    border-radius: 8px !important;
-    margin-left: -1px;
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: white !important;
+    position: relative;
+    z-index: 2;
 }
 
 /* Dropdown Styles */
