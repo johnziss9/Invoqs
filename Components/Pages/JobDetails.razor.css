@@ -1,5 +1,16 @@
-/* ViewJob.razor.css - Matching Customer Details Design System */
+/* JobDetails Page Styles */
 
+/* Button and form consistency */
+.btn {
+    border-radius: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+}
+
+/* Form styling */
 .form-label.fw-medium {
     font-weight: 500 !important;
     color: #495057;
@@ -16,16 +27,28 @@
     border: none;
 }
 
+/* Card styling with 8px radius */
 .card {
-    border-radius: 12px;
+    border-radius: 8px;
     border: none;
 }
 
 .card-header {
     border-bottom: 1px solid #e9ecef;
-    border-radius: 12px 12px 0 0 !important;
+    border-radius: 8px 8px 0 0 !important;
 }
 
+/* Card hover effects matching other pages */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Breadcrumb styling */
 .breadcrumb {
     background: none;
     padding: 0;
@@ -47,6 +70,7 @@
     color: #0d6efd;
 }
 
+/* Alert styling */
 .alert {
     border-radius: 8px;
     border: none;
@@ -57,10 +81,12 @@
     color: #58151c;
 }
 
-/* Badge styling to match customer page */
+/* Badge styling with hierarchy */
 .badge {
     font-size: 0.8rem;
     padding: 0.35em 0.65em;
+    border-radius: 6px;
+    /* Smaller for visual hierarchy */
 }
 
 .badge-sm {
@@ -68,6 +94,7 @@
     padding: 0.25em 0.5em;
     margin-left: 0.75rem;
     vertical-align: middle;
+    border-radius: 6px;
 }
 
 /* Button hover effects */
@@ -96,6 +123,7 @@ a[href^="tel:"]:hover {
 .border.rounded.p-3.bg-light {
     background-color: #f8f9fa !important;
     border-color: #e9ecef !important;
+    border-radius: 8px !important;
     line-height: 1.6;
 }
 
@@ -103,11 +131,13 @@ a[href^="tel:"]:hover {
 .card-header.bg-success {
     background-color: #198754 !important;
     border-bottom: 1px solid #146c43;
+    border-radius: 8px 8px 0 0 !important;
 }
 
 .card-header.bg-primary {
     background-color: #0d6efd !important;
     border-bottom: 1px solid #0a58ca;
+    border-radius: 8px 8px 0 0 !important;
 }
 
 .card-header.bg-success h5,
@@ -133,6 +163,18 @@ a[href^="tel:"]:hover {
     font-weight: 600;
 }
 
+/* Sidebar stats boxes */
+.border.rounded.p-2 {
+    border-color: #dee2e6 !important;
+    border-radius: 8px !important;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.border.rounded.p-2:hover {
+    border-color: #0d6efd !important;
+    background-color: #f8f9fa;
+}
+
 /* Quick actions gap */
 .d-grid.gap-2 {
     gap: 0.5rem !important;
@@ -142,7 +184,7 @@ a[href^="tel:"]:hover {
     transition: all 0.2s ease;
 }
 
-/* Empty state styling (when not invoiced but completed) */
+/* Empty state styling */
 .text-center.py-5 i {
     opacity: 0.5;
 }
@@ -190,6 +232,18 @@ a[href^="tel:"]:hover {
 .h5.text-success {
     font-weight: 600;
     color: #198754 !important;
+}
+
+/* Job type icon styling (if present) */
+.job-type-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 8px;
+    flex-shrink: 0;
 }
 
 /* Mobile responsiveness matching customer page */
@@ -247,4 +301,24 @@ a[href^="tel:"]:hover {
     .card-header h6 {
         font-size: 1rem;
     }
+
+    .job-type-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Focus states for accessibility */
+.btn:focus,
+.form-control:focus {
+    outline: none;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }

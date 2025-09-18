@@ -25,6 +25,8 @@ public partial class InvoiceDetails
     private bool showCancelModal = false;
     private PaymentInfo paymentInfo = new();
 
+    private string currentUser = "Demo User"; // This should come from authentication service when implemented
+
     protected override async Task OnInitializedAsync()
     {
         await LoadInvoiceAsync();
@@ -36,7 +38,7 @@ public partial class InvoiceDetails
         {
             isLoading = true;
             invoice = await InvoiceService.GetInvoiceByIdAsync(Id);
-            
+
             if (invoice?.CustomerId != null)
             {
                 customer = await CustomerService.GetCustomerByIdAsync(invoice.CustomerId);
@@ -61,14 +63,14 @@ public partial class InvoiceDetails
         {
             isProcessing = true;
             var success = await InvoiceService.MarkInvoiceAsSentAsync(invoice.Id);
-            
+
             if (success)
             {
                 invoice.Status = InvoiceStatus.Sent;
                 successMessage = "Invoice marked as sent successfully.";
-                
+
                 // Clear the message after 3 seconds
-                _ = Task.Delay(3000).ContinueWith(_ => 
+                _ = Task.Delay(3000).ContinueWith(_ =>
                 {
                     successMessage = string.Empty;
                     InvokeAsync(StateHasChanged);
@@ -97,14 +99,14 @@ public partial class InvoiceDetails
         try
         {
             isProcessing = true;
-            
+
             // Simulate email sending delay
             await Task.Delay(1000);
-            
+
             successMessage = "Invoice resent successfully.";
-            
+
             // Clear the message after 3 seconds
-            _ = Task.Delay(3000).ContinueWith(_ => 
+            _ = Task.Delay(3000).ContinueWith(_ =>
             {
                 successMessage = string.Empty;
                 InvokeAsync(StateHasChanged);
@@ -128,25 +130,25 @@ public partial class InvoiceDetails
         try
         {
             isProcessing = true;
-            
+
             var success = await InvoiceService.MarkInvoiceAsPaidAsync(
-                invoice.Id, 
-                paymentInfo.PaymentDate, 
+                invoice.Id,
+                paymentInfo.PaymentDate,
                 paymentInfo.PaymentMethod,
                 paymentInfo.PaymentReference);
-            
+
             if (success)
             {
                 invoice.Status = InvoiceStatus.Paid;
                 invoice.PaidDate = paymentInfo.PaymentDate;
                 invoice.PaymentMethod = paymentInfo.PaymentMethod;
                 invoice.PaymentReference = paymentInfo.PaymentReference;
-                
+
                 showPaymentModal = false;
                 successMessage = "Payment recorded successfully.";
-                
+
                 // Clear the message after 3 seconds
-                _ = Task.Delay(3000).ContinueWith(_ => 
+                _ = Task.Delay(3000).ContinueWith(_ =>
                 {
                     successMessage = string.Empty;
                     InvokeAsync(StateHasChanged);
@@ -175,18 +177,18 @@ public partial class InvoiceDetails
         try
         {
             isProcessing = true;
-            
+
             var success = await InvoiceService.CancelInvoiceAsync(invoice.Id);
-            
+
             if (success)
             {
                 invoice.Status = InvoiceStatus.Cancelled;
-                
+
                 showCancelModal = false;
                 successMessage = "Invoice cancelled successfully. Associated jobs are now available for invoicing.";
-                
+
                 // Clear the message after 3 seconds
-                _ = Task.Delay(3000).ContinueWith(_ => 
+                _ = Task.Delay(3000).ContinueWith(_ =>
                 {
                     successMessage = string.Empty;
                     InvokeAsync(StateHasChanged);
@@ -227,9 +229,9 @@ public partial class InvoiceDetails
             // This would typically call an API endpoint to generate and download a PDF
             // For now, we'll show a placeholder message
             successMessage = "PDF generation functionality will be implemented with the API.";
-            
+
             // Clear the message after 3 seconds
-            _ = Task.Delay(3000).ContinueWith(_ => 
+            _ = Task.Delay(3000).ContinueWith(_ =>
             {
                 successMessage = string.Empty;
                 InvokeAsync(StateHasChanged);
@@ -247,6 +249,13 @@ public partial class InvoiceDetails
         {
             PaymentDate = DateTime.Today
         };
+    }
+
+    protected async Task HandleLogout()
+    {
+        // This should integrate with your authentication system when implemented
+        // For now, redirect to login or home page
+        Navigation.NavigateTo("/");
     }
 
     protected override void OnParametersSet()

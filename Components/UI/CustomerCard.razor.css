@@ -1,12 +1,14 @@
+/* CustomerCard Component Styles */
+
 .customer-card {
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    border-radius: 12px;
+    border-radius: 8px;
     border: none;
 }
 
 .customer-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
 }
 
 .avatar-circle {
@@ -42,14 +44,60 @@
     padding: 1.5rem;
 }
 
+/* Dropdown menu styling */
+.dropdown-menu {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+    border-radius: 6px;
+    margin: 2px 4px;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Button styling within card */
+.customer-card .btn {
+    border-radius: 8px;
+}
+
+.customer-card .btn-outline-primary,
+.customer-card .btn-outline-success {
+    border-radius: 8px;
+}
+
+.customer-card .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Badge styling */
+.customer-card .badge {
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+
 @media (max-width: 576px) {
     .customer-card .card-body {
         padding: 1rem;
     }
-    
+
     .avatar-circle {
         width: 40px;
         height: 40px;
         font-size: 16px;
+    }
+
+    .stat-number {
+        font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
     }
 }

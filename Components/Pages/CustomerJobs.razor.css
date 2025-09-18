@@ -1,3 +1,6 @@
+/* CustomerJobs Page Styles */
+
+/* Avatar circle */
 .avatar-circle {
     width: 50px;
     height: 50px;
@@ -9,14 +12,49 @@
     font-size: 18px;
 }
 
+/* Tables with rounded corners */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 .table tbody tr:hover {
     background-color: rgba(0, 123, 255, 0.05);
 }
 
-.btn-group-sm .btn {
-    padding: 0.25rem 0.5rem;
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
 }
 
+.table td {
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+
+/* Button groups with proper radius */
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.btn-group .btn:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+/* Breadcrumb styling */
 .breadcrumb {
     background: none;
     padding: 0;
@@ -38,39 +76,66 @@
     color: #0d6efd;
 }
 
+/* Badge styling with hierarchy */
 .badge {
     font-size: 0.75rem;
     padding: 0.35em 0.65em;
+    border-radius: 6px;
+    /* Smaller for visual hierarchy */
 }
 
+/* Cards styling with 8px radius */
 .card {
-    border-radius: 12px;
+    border-radius: 8px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
 }
 
 .card-body {
     padding: 1.5rem;
 }
 
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Statistics cards with enhanced hover */
 .stats-card {
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 8px;
 }
 
 .stats-card:hover {
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
 }
 
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-    background-color: #f8f9fa;
+/* Statistics cards with gradients (if used) */
+.stats-card.bg-primary,
+.stats-card.bg-success,
+.stats-card.bg-info,
+.stats-card.bg-warning {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), 0.8) 100%);
 }
 
-.table td {
-    vertical-align: middle;
-    border-color: #f0f0f0;
+.stats-card.bg-success {
+    background: linear-gradient(135deg, var(--bs-success) 0%, rgba(var(--bs-success-rgb), 0.8) 100%);
 }
 
+.stats-card.bg-info {
+    background: linear-gradient(135deg, var(--bs-info) 0%, rgba(var(--bs-info-rgb), 0.8) 100%);
+}
+
+.stats-card.bg-warning {
+    background: linear-gradient(135deg, var(--bs-warning) 0%, rgba(var(--bs-warning-rgb), 0.8) 100%);
+}
+
+/* Form controls with 8px radius */
 .form-control,
 .form-select {
     border-radius: 8px;
@@ -90,6 +155,11 @@
     border-radius: 8px 0 0 8px;
 }
 
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
+}
+
+/* Buttons with 8px radius */
 .btn {
     border-radius: 8px;
     font-weight: 500;
@@ -109,16 +179,71 @@
     background-color: #f8f9fa;
     border-color: #dee2e6;
     color: #495057;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* Address grouping cards */
+.address-group-card {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.address-group-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.address-group-header {
+    background-color: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.address-group-content {
+    border-radius: 0 0 8px 8px;
+}
+
+/* Collapse buttons */
+.collapse-toggle {
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.collapse-toggle:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+/* Job summary stats */
+.job-summary {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid #0d6efd;
+}
+
+/* Empty state styling */
 .empty-state {
     padding: 4rem 2rem;
+    text-align: center;
 }
 
 .empty-state i {
     opacity: 0.5;
 }
 
+.empty-state .btn {
+    margin-top: 1rem;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+/* Mobile responsiveness */
 @media (max-width: 768px) {
     .d-flex.justify-content-between.align-items-center.flex-wrap {
         flex-direction: column;
@@ -138,4 +263,51 @@
         height: 40px;
         font-size: 16px;
     }
+
+    .address-group-header {
+        padding: 1rem;
+    }
+
+    .job-summary {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-group {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .card-body {
+        padding: 0.875rem;
+    }
+
+    .empty-state {
+        padding: 3rem 1rem;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+}
+
+/* Focus states for accessibility */
+.btn:focus,
+.form-control:focus {
+    outline: none;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }

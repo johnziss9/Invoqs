@@ -1,3 +1,63 @@
+/* Customers Page Styles */
+
+/* Button and form consistency */
+.btn {
+    border-radius: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+}
+
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
+}
+
+/* Card styling */
+.card {
+    border-radius: 8px;
+}
+
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+}
+
+/* Statistics cards with gradients (matching dashboard) */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-info,
+.card.bg-warning {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), 0.8) 100%);
+}
+
+.card.bg-success {
+    background: linear-gradient(135deg, var(--bs-success) 0%, rgba(var(--bs-success-rgb), 0.8) 100%);
+}
+
+.card.bg-info {
+    background: linear-gradient(135deg, var(--bs-info) 0%, rgba(var(--bs-info-rgb), 0.8) 100%);
+}
+
+.card.bg-warning {
+    background: linear-gradient(135deg, var(--bs-warning) 0%, rgba(var(--bs-warning-rgb), 0.8) 100%);
+}
+
+/* Card hover effects */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Avatar circle */
 .avatar-circle {
     width: 40px;
     height: 40px;
@@ -8,14 +68,43 @@
     font-weight: bold;
 }
 
-.table tbody tr:hover {
-    background-color: rgba(0,123,255,0.05);
+/* Table styling */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
 }
 
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Button group styling */
 .btn-group-sm .btn {
     padding: 0.25rem 0.5rem;
+    border-radius: 8px;
 }
 
+.btn-group .btn:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.btn-group .btn:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+/* Badge styling */
+.badge {
+    border-radius: 6px;
+    /* Slightly smaller for badges */
+}
+
+/* Breadcrumb styling */
 .breadcrumb {
     background: none;
     padding: 0;
@@ -37,13 +126,73 @@
     color: #0d6efd;
 }
 
+/* View mode toggle buttons */
+.btn-check:checked+.btn {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    border-radius: 8px;
+}
+
+/* Ensure all buttons in button groups maintain proper radius */
+.btn-group .btn {
+    border-radius: 8px !important;
+}
+
+/* Override Bootstrap's button group radius removal */
+.btn-group>.btn:not(:first-child),
+.btn-group>.btn-group:not(:first-child)>.btn {
+    border-radius: 8px !important;
+    margin-left: -1px;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .d-flex.justify-content-between.align-items-center.flex-wrap {
         flex-direction: column;
         align-items: stretch !important;
     }
-    
+
     .d-flex.gap-2.mt-2.mt-md-0 {
         margin-top: 1rem !important;
     }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .btn-group {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .card-body {
+        padding: 0.75rem;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+}
+
+/* Loading states */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }

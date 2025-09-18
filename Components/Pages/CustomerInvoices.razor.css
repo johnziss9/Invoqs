@@ -1,5 +1,19 @@
 /* Customer Invoices Page Styles */
 
+/* Button and form consistency */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border-color: #e9ecef;
+    font-size: 0.9rem;
+}
+
+/* Avatar circle */
 .avatar-circle {
     width: 50px;
     height: 50px;
@@ -11,14 +25,50 @@
     font-size: 18px;
 }
 
+/* Tables with rounded corners */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 .table tbody tr:hover {
     background-color: rgba(0, 123, 255, 0.05);
 }
 
-.btn-group-sm .btn {
-    padding: 0.25rem 0.5rem;
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
 }
 
+.table td {
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+
+/* Button groups with proper radius */
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.btn-group .btn:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+/* Breadcrumb styling */
 .breadcrumb {
     background: none;
     padding: 0;
@@ -40,32 +90,42 @@
     color: #0d6efd;
 }
 
+/* Badge styling with hierarchy */
 .badge {
     font-size: 0.75rem;
     padding: 0.35em 0.65em;
+    border-radius: 6px;
 }
 
 .badge i {
     font-size: 0.7rem;
 }
 
+/* Cards styling with 8px radius */
 .card {
-    border-radius: 12px;
+    border-radius: 8px;
     border: none;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
 }
 
 .card-header {
     border-bottom: 1px solid #e9ecef;
-    border-radius: 12px 12px 0 0 !important;
+    border-radius: 8px 8px 0 0 !important;
 }
 
 .card-body {
     padding: 1.5rem;
 }
 
-/* Statistics Cards */
+/* Statistics Cards with enhanced styling */
 .stats-card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 8px;
 }
 
 .stats-card:hover {
@@ -73,6 +133,7 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
+/* Statistics cards with gradients */
 .card.bg-secondary,
 .card.bg-primary,
 .card.bg-success,
@@ -80,6 +141,30 @@
 .card.bg-info,
 .card.bg-warning {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card.bg-primary {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), 0.8) 100%);
+}
+
+.card.bg-success {
+    background: linear-gradient(135deg, var(--bs-success) 0%, rgba(var(--bs-success-rgb), 0.8) 100%);
+}
+
+.card.bg-danger {
+    background: linear-gradient(135deg, var(--bs-danger) 0%, rgba(var(--bs-danger-rgb), 0.8) 100%);
+}
+
+.card.bg-info {
+    background: linear-gradient(135deg, var(--bs-info) 0%, rgba(var(--bs-info-rgb), 0.8) 100%);
+}
+
+.card.bg-warning {
+    background: linear-gradient(135deg, var(--bs-warning) 0%, rgba(var(--bs-warning-rgb), 0.8) 100%);
+}
+
+.card.bg-secondary {
+    background: linear-gradient(135deg, var(--bs-secondary) 0%, rgba(var(--bs-secondary-rgb), 0.8) 100%);
 }
 
 .card.bg-secondary:hover,
@@ -92,28 +177,7 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* Table Styles */
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #e9ecef;
-}
-
-.table td {
-    vertical-align: middle;
-    border-color: #f0f0f0;
-}
-
 /* Form Controls */
-.form-control,
-.form-select {
-    border-radius: 8px;
-    border-color: #e9ecef;
-    font-size: 0.9rem;
-}
-
 .form-control:focus,
 .form-select:focus {
     border-color: #0d6efd;
@@ -126,16 +190,15 @@
     border-radius: 8px 0 0 8px;
 }
 
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
+}
+
 .input-group .form-control:focus {
     z-index: 3;
 }
 
 /* Button Styles */
-.btn {
-    border-radius: 8px;
-    font-weight: 500;
-}
-
 .btn-primary {
     background-color: #0d6efd;
     border-color: #0d6efd;
@@ -165,6 +228,17 @@
     background-color: #0d6efd;
     border-color: #0d6efd;
     color: white;
+    border-radius: 8px;
+}
+
+.btn-group .btn {
+    border-radius: 8px !important;
+}
+
+.btn-group>.btn:not(:first-child),
+.btn-group>.btn-group:not(:first-child)>.btn {
+    border-radius: 8px !important;
+    margin-left: -1px;
 }
 
 /* Dropdown Styles */
@@ -177,6 +251,8 @@
 .dropdown-item {
     transition: background-color 0.2s ease;
     padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin: 2px 4px;
 }
 
 .dropdown-item:hover {
@@ -196,15 +272,49 @@
 /* Empty State */
 .empty-state {
     padding: 4rem 2rem;
+    text-align: center;
 }
 
 .empty-state i {
     opacity: 0.5;
 }
 
+.empty-state .btn {
+    margin-top: 1rem;
+}
+
 /* Status-specific styling */
 .text-danger.fw-bold {
     color: #dc3545 !important;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+/* Custom scrollbar for table */
+.table-responsive {
+    border-radius: 8px;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
 }
 
 /* Focus states for accessibility */
@@ -214,30 +324,6 @@
 
 .table tbody tr:focus-within {
     background-color: rgba(0, 123, 255, 0.1);
-}
-
-/* Smooth transitions */
-* {
-    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-}
-
-/* Custom scrollbar for table */
-.table-responsive::-webkit-scrollbar {
-    height: 8px;
-}
-
-.table-responsive::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.table-responsive::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-.table-responsive::-webkit-scrollbar-thumb:hover {
-    background: #a1a1a1;
 }
 
 /* Responsive Design */
@@ -273,6 +359,10 @@
     .table-responsive {
         font-size: 0.875rem;
     }
+
+    .btn-group {
+        flex-wrap: wrap;
+    }
 }
 
 @media (max-width: 576px) {
@@ -295,4 +385,9 @@
         height: 35px;
         font-size: 14px;
     }
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }

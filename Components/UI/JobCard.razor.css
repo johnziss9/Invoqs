@@ -1,0 +1,222 @@
+/* JobCard Component Styles */
+
+.job-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 8px;
+    border: none;
+}
+
+.job-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Job type icon styling */
+.job-type-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+/* Badge styling */
+.job-card .badge {
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Dropdown menu styling */
+.job-card .dropdown-menu {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+}
+
+.job-card .dropdown-item {
+    border-radius: 6px;
+    margin: 2px 4px;
+    transition: background-color 0.2s ease;
+}
+
+.job-card .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.job-card .dropdown-header {
+    color: #6c757d;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.job-card .dropdown-divider {
+    margin: 0.25rem 0;
+}
+
+/* Button styling */
+.job-card .btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.job-card .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+.job-card .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Three dots button */
+.job-card .btn-link {
+    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.job-card .btn-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Job details styling */
+.job-details .detail-item {
+    display: flex;
+    align-items: flex-start;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.job-details .detail-item i {
+    width: 16px;
+    font-size: 0.8rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+/* Job stats styling */
+.job-stats .stat-number {
+    font-size: 1.1rem;
+    line-height: 1.2;
+}
+
+.job-stats .stat-label {
+    font-size: 0.7rem;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Card title styling */
+.job-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* Address and description text wrapping */
+.job-details .text-muted {
+    word-break: break-word;
+    line-height: 1.3;
+}
+
+/* Status-specific styling */
+.job-card .badge.bg-primary {
+    background-color: #0d6efd !important;
+}
+
+.job-card .badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.job-card .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.job-card .badge.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+.job-card .badge.bg-info {
+    background-color: #0dcaf0 !important;
+    color: #000 !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .job-card .card-body {
+        padding: 1rem;
+    }
+
+    .job-type-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .job-card .card-title {
+        font-size: 1rem;
+    }
+
+    .job-details .detail-item {
+        font-size: 0.8rem;
+    }
+
+    .job-stats .stat-number {
+        font-size: 1rem;
+    }
+
+    .job-stats .stat-label {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .job-card .card-body {
+        padding: 0.875rem;
+    }
+
+    .job-card .btn-sm {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .job-details .detail-item {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .job-stats .row.text-center {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Focus states for accessibility */
+.job-card .btn:focus,
+.job-card .dropdown-item:focus {
+    outline: none;
+}
+
+.job-card .btn:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Animation for status changes */
+.job-card .badge {
+    transition: all 0.3s ease;
+}
+
+/* Smooth transitions */
+.job-card * {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
