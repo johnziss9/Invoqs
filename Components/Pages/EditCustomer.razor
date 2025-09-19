@@ -202,14 +202,14 @@
                                     <i class="bi bi-calendar-check me-1"></i>
                                     View Jobs
                                 </a>
-                                <a href="/customer/@customer.Id/invoices" class="btn btn-outline-info btn-sm">
-                                    <i class="bi bi-receipt me-1"></i>
-                                    View Invoices
-                                </a>
                                 <button type="button" class="btn btn-outline-success btn-sm" @onclick="CreateNewJob">
                                     <i class="bi bi-plus-lg me-1"></i>
                                     Create New Job
                                 </button>
+                                <a href="/customer/@customer.Id/invoice/new" class="btn btn-outline-info btn-sm">
+                                    <i class="bi bi-receipt-cutoff me-1"></i>
+                                    Create Invoice
+                                </a>
                                 <hr class="my-2">
                                 <button type="button" class="btn btn-outline-danger btn-sm"
                                     @onclick="ShowDeleteConfirmation">
@@ -247,7 +247,7 @@
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                This customer has @((customer.ActiveJobs + customer.CompletedJobs)) associated jobs.
+                                This customer has @((customer.ActiveJobs + customer.CompletedJobs)) associated jobs which will remain in the system.
                             </div>
                         }
                     </div>

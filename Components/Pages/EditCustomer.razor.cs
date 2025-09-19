@@ -129,7 +129,7 @@ namespace Invoqs.Components.Pages
                 if (success)
                 {
                     // Navigate back to customers list
-                    Navigation.NavigateTo("/customers");
+                    Navigation.NavigateTo("/customers", true);
                 }
                 else
                 {
@@ -157,8 +157,8 @@ namespace Invoqs.Components.Pages
 
         private void CreateNewJob()
         {
-            var currentUrl = Navigation.Uri;
-            Navigation.NavigateTo($"/customer/{customer?.Id}/job/new?returnUrl={Uri.EscapeDataString(currentUrl)}");
+            var returnUrl = $"/customer/{CustomerId}";
+            Navigation.NavigateTo($"/customer/{CustomerId}/job/new?returnUrl={Uri.EscapeDataString(returnUrl)}", true);
         }
     }
 }

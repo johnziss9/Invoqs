@@ -167,7 +167,7 @@ namespace Invoqs.Components.Pages
         protected Task ShowAddCustomerModal()
         {
             var currentUrl = Navigation.Uri;
-            Navigation.NavigateTo($"/customer/new?returnUrl={Uri.EscapeDataString(currentUrl)}");
+            Navigation.NavigateTo($"/customer/new?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
             return Task.CompletedTask;
         }
 
