@@ -192,7 +192,7 @@ namespace Invoqs.Components.Pages
         protected Task HandleEditJob(JobModel job)
         {
             var currentUrl = Navigation.Uri;
-            Navigation.NavigateTo($"/job/{job.Id}/edit?returnUrl={Uri.EscapeDataString(currentUrl)}");
+            Navigation.NavigateTo($"/job/{job.Id}/edit?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
             return Task.CompletedTask;
         }
 
@@ -237,14 +237,14 @@ namespace Invoqs.Components.Pages
 
         protected Task HandleViewFullAddress(string address)
         {
-            Navigation.NavigateTo($"/customer/{CustomerId}/address/{Uri.EscapeDataString(address)}");
+            Navigation.NavigateTo($"/customer/{CustomerId}/address/{Uri.EscapeDataString(address)}", true);
             return Task.CompletedTask;
         }
 
         protected Task ShowAddJobModal()
         {
             var currentUrl = Navigation.Uri;
-            Navigation.NavigateTo($"/customer/{CustomerId}/job/new?returnUrl={Uri.EscapeDataString(currentUrl)}");
+            Navigation.NavigateTo($"/customer/{CustomerId}/job/new?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
             return Task.CompletedTask;
         }
 

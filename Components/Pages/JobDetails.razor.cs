@@ -13,11 +13,13 @@ namespace Invoqs.Components.Pages
         [Inject] protected ICustomerService CustomerService { get; set; } = default!;
         [Inject] protected NavigationManager Navigation { get; set; } = default!;
 
+        protected bool isCustomerDeleted = false;
+        protected bool isLoading = true;
         protected string currentUser = "John Doe"; // Replace with actual user service
+        protected string? errorMessage;
+
         protected JobModel? job;
         protected CustomerModel? customer;
-        protected bool isLoading = true;
-        protected string? errorMessage;
 
         protected override async Task OnInitializedAsync()
         {
@@ -38,12 +40,31 @@ namespace Invoqs.Components.Pages
             {
                 isLoading = true;
                 errorMessage = null;
+                isCustomerDeleted = false;
 
                 job = await JobService.GetJobByIdAsync(JobId);
                 
                 if (job != null)
                 {
                     customer = await CustomerService.GetCustomerByIdAsync(job.CustomerId);
+                    
+                    // Check if customer is soft deleted (when API supports it)
+                    if (customer != null && customer.IsDeleted)
+                    {
+                        isCustomerDeleted = true;
+                    }
+                    else if (customer == null)
+                    {
+                        // Fallback for hard delete (current mock behavior)
+                        isCustomerDeleted = true;
+                        customer = new CustomerModel 
+                        { 
+                            Id = job.CustomerId, 
+                            Name = "[Deleted Customer]",
+                            Email = "",
+                            Phone = ""
+                        };
+                    }
                 }
             }
             catch (Exception ex)

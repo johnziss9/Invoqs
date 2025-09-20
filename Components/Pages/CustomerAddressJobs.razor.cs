@@ -4,16 +4,18 @@ using Invoqs.Services;
 
 namespace Invoqs.Components.Pages
 {
-    public partial class Jobs : ComponentBase
+    public partial class CustomerAddressJobsBase : ComponentBase
     {
-        [Inject] private IJobService JobService { get; set; } = default!;
+        [Parameter] public int CustomerId { get; set; }
+        [Parameter] public string Address { get; set; } = string.Empty;
+
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
-        [Inject] private NavigationManager Navigation { get; set; } = default!;
+        [Inject] private IJobService JobService { get; set; } = default!;
+        [Inject] protected NavigationManager Navigation { get; set; } = default!;
 
         // Component state
         protected string currentUser = "John Doe";
         protected string searchTerm = "";
-        protected string customerFilter = "all";
         protected string statusFilter = "all";
         protected string typeFilter = "all";
         protected string sortBy = "startDate";
@@ -21,35 +23,66 @@ namespace Invoqs.Components.Pages
         protected bool isLoading = true;
         protected string errorMessage = "";
 
+        protected CustomerModel? customer;
+        protected string customerName = "Loading...";
         protected List<JobModel> jobs = new();
-        protected List<CustomerModel> customers = new();
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadData();
+            // Decode the address parameter
+            Address = Uri.UnescapeDataString(Address);
+
+            await LoadCustomerData();
+            await LoadJobs();
         }
 
-        private async Task LoadData()
+        protected override async Task OnParametersSetAsync()
+        {
+            if (CustomerId > 0 && !string.IsNullOrEmpty(Address))
+            {
+                Address = Uri.UnescapeDataString(Address);
+                await LoadCustomerData();
+                await LoadJobs();
+            }
+        }
+
+        private async Task LoadCustomerData()
+        {
+            try
+            {
+                customer = await CustomerService.GetCustomerByIdAsync(CustomerId);
+                if (customer != null)
+                {
+                    customerName = customer.Name;
+                }
+                else
+                {
+                    errorMessage = "Customer not found";
+                    Navigation.NavigateTo("/customers");
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error loading customer: {ex.Message}";
+            }
+        }
+
+        private async Task LoadJobs()
         {
             try
             {
                 isLoading = true;
                 errorMessage = "";
 
-                // Load both jobs and customers in parallel
-                var jobsTask = JobService.GetAllJobsAsync();
-                var customersTask = CustomerService.GetAllCustomersAsync();
+                var allCustomerJobs = await JobService.GetJobsByCustomerIdAsync(CustomerId);
 
-                await Task.WhenAll(jobsTask, customersTask);
-
-                jobs = await jobsTask;
-                customers = await customersTask;
+                // Filter to only jobs at this specific address
+                jobs = allCustomerJobs.Where(j => j.Address.Equals(Address, StringComparison.OrdinalIgnoreCase)).ToList();
             }
             catch (Exception ex)
             {
-                errorMessage = $"Error loading data: {ex.Message}";
+                errorMessage = $"Error loading jobs: {ex.Message}";
                 jobs = new List<JobModel>();
-                customers = new List<CustomerModel>();
             }
             finally
             {
@@ -58,67 +91,42 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        private void CreateInvoice()
-        {
-            var currentUrl = Navigation.Uri;
-            Navigation.NavigateTo($"/invoice/new?returnUrl={Uri.EscapeDataString(currentUrl)}", forceLoad: true);
-        }
-
         protected IEnumerable<JobModel> filteredJobs
         {
             get
             {
                 var filtered = jobs.AsEnumerable();
 
-                // Apply search filter
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
                     filtered = filtered.Where(j =>
                         j.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        j.Address.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                         j.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        GetCustomerName(j.CustomerId).Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+                        j.TypeDisplayName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
                 }
 
-                // Apply customer filter
-                if (customerFilter != "all" && int.TryParse(customerFilter, out int customerId))
-                {
-                    filtered = filtered.Where(j => j.CustomerId == customerId);
-                }
-
-                // Apply status filter
                 if (statusFilter != "all")
                 {
-                    var status = statusFilter switch
+                    if (Enum.TryParse<JobStatus>(statusFilter, true, out var status))
                     {
-                        "new" => JobStatus.New,
-                        "active" => JobStatus.Active,
-                        "completed" => JobStatus.Completed,
-                        "cancelled" => JobStatus.Cancelled,
-                        _ => JobStatus.New
-                    };
-                    filtered = filtered.Where(j => j.Status == status);
+                        filtered = filtered.Where(j => j.Status == status);
+                    }
                 }
 
-                // Apply type filter
                 if (typeFilter != "all")
                 {
-                    var type = typeFilter switch
+                    if (Enum.TryParse<JobType>(typeFilter, out var type))
                     {
-                        "skip" => JobType.SkipRental,
-                        "sand" => JobType.SandDelivery,
-                        "cliff" => JobType.FortCliffService,
-                        _ => JobType.SkipRental
-                    };
-                    filtered = filtered.Where(j => j.Type == type);
+                        filtered = filtered.Where(j => j.Type == type);
+                    }
                 }
 
-                // Apply sorting
                 filtered = sortBy switch
                 {
-                    "customer" => filtered.OrderBy(j => GetCustomerName(j.CustomerId)),
-                    "title" => filtered.OrderBy(j => j.Title),
+                    "startDate" => filtered.OrderByDescending(j => j.StartDate),
+                    "endDate" => filtered.OrderByDescending(j => j.EndDate ?? DateTime.MinValue),
                     "status" => filtered.OrderBy(j => j.Status),
+                    "type" => filtered.OrderBy(j => j.Type),
                     "price" => filtered.OrderByDescending(j => j.Price),
                     _ => filtered.OrderByDescending(j => j.StartDate)
                 };
@@ -127,18 +135,16 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        protected string GetCustomerName(int customerId)
+        protected string GetInitials(string name)
         {
-            return customers.FirstOrDefault(c => c.Id == customerId)?.Name ?? "Unknown Customer";
-        }
+            if (string.IsNullOrWhiteSpace(name))
+                return "?";
 
-        protected void ClearFilters()
-        {
-            searchTerm = "";
-            customerFilter = "all";
-            statusFilter = "all";
-            typeFilter = "all";
-            StateHasChanged();
+            var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 1)
+                return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
+
+            return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
         }
 
         // Event handlers
@@ -170,6 +176,8 @@ namespace Invoqs.Components.Pages
 
                 if (success)
                 {
+                    // Refresh data to update stats
+                    await LoadJobs();
                     StateHasChanged();
                 }
                 else
@@ -189,7 +197,8 @@ namespace Invoqs.Components.Pages
 
         protected Task HandleEditJob(JobModel job)
         {
-            Navigation.NavigateTo($"/job/{job.Id}/edit");
+            var currentUrl = Navigation.Uri;
+            Navigation.NavigateTo($"/job/{job.Id}/edit?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
             return Task.CompletedTask;
         }
 
@@ -197,17 +206,15 @@ namespace Invoqs.Components.Pages
         {
             try
             {
-                // In a real app, you'd show a confirmation dialog here
                 var success = await JobService.DeleteJobAsync(job.Id);
 
                 if (success)
                 {
-                    await LoadData(); // Refresh all data
+                    await LoadJobs();
                 }
                 else
                 {
                     errorMessage = "Failed to delete job";
-                    StateHasChanged();
                 }
             }
             catch (Exception ex)
@@ -221,27 +228,29 @@ namespace Invoqs.Components.Pages
         {
             var currentUrl = Navigation.Uri;
             var returnUrl = Uri.EscapeDataString(currentUrl);
-            Navigation.NavigateTo($"/customer/{job.CustomerId}/invoice/new?preselectedJobId={job.Id}&returnUrl={returnUrl}");
+            Navigation.NavigateTo($"/customer/{CustomerId}/invoice/new?preselectedJobId={job.Id}&returnUrl={returnUrl}", true);
             return Task.CompletedTask;
         }
 
-        protected Task HandleViewCustomer(JobModel job)
+        protected void OnFilterChanged()
         {
-            Navigation.NavigateTo($"/customer/{job.CustomerId}/jobs");
-            return Task.CompletedTask;
-        }
-
-        protected Task ShowAddJobModal()
-        {
-            var currentUrl = Navigation.Uri;
-            Navigation.NavigateTo($"/job/new?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
-            return Task.CompletedTask;
+            // Trigger re-evaluation of filteredJobs
+            StateHasChanged();
         }
 
         // Method to refresh data
         protected async Task RefreshData()
         {
-            await LoadData();
+            await LoadCustomerData();
+            await LoadJobs();
+        }
+
+        protected void ClearFilters()
+        {
+            searchTerm = "";
+            statusFilter = "all";
+            typeFilter = "all";
+            StateHasChanged();
         }
     }
 }

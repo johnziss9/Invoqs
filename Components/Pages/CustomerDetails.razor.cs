@@ -56,7 +56,7 @@ namespace Invoqs.Components.Pages
                         .ToList();
 
                     // Calculate customer statistics
-                    await CalculateCustomerStats(allCustomerJobs);
+                    CalculateCustomerStats(allCustomerJobs);
                 }
             }
             catch (Exception ex)
@@ -70,7 +70,7 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        private async Task CalculateCustomerStats(List<JobModel> jobs)
+        private void CalculateCustomerStats(List<JobModel> jobs)
         {
             try
             {

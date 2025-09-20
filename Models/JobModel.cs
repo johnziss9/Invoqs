@@ -89,10 +89,10 @@ namespace Invoqs.Models
 
         public string TypeIcon => Type switch
         {
-            JobType.SkipRental => "icon-skip", // Custom skip icon
-            JobType.SandDelivery => "icon-delivery-truck", // Custom delivery truck icon
-            JobType.FortCliffService => "icon-cliff", // Custom cliff icon
-            _ => "bi-briefcase"
+            JobType.SkipRental => "/images/icons/skip.png",
+            JobType.SandDelivery => "/images/icons/sand.png", 
+            JobType.FortCliffService => "/images/icons/forklift.png",
+            _ => "bi-building"
         };
 
         public string TypeDisplayName => Type switch
