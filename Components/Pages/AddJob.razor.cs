@@ -186,10 +186,9 @@ namespace Invoqs.Components.Pages
                 return "/jobs";
         }
 
-
         private void GoBack()
         {
-            Navigation.NavigateTo(GetReturnUrl());
+            Navigation.NavigateTo(GetReturnUrl(), true);
         }
 
         private Task HandleLogout()

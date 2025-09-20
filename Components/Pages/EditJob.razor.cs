@@ -25,18 +25,9 @@ namespace Invoqs.Components.Pages
         protected bool showDeleteConfirmation = false;
         protected string errorMessage = "";
         protected string successMessage = "";
-        protected string? returnUrl;
 
         protected override async Task OnInitializedAsync()
         {
-            // Check if we have a return URL in the query string
-            var uri = new Uri(Navigation.Uri);
-            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
-            if (query.TryGetValue("returnUrl", out var returnUrlValue))
-            {
-                returnUrl = returnUrlValue.FirstOrDefault();
-            }
-
             await LoadJob();
         }
 
@@ -191,13 +182,22 @@ namespace Invoqs.Components.Pages
             try
             {
                 isDeleting = true;
+                StateHasChanged();
 
                 var success = await JobService.DeleteJobAsync(job.Id);
 
                 if (success)
                 {
-                    // Navigate back to where we came from
-                    GoBack();
+                    showDeleteConfirmation = false;
+                    successMessage = "Job deleted successfully!";
+                    StateHasChanged();
+
+                    // Navigate back after brief delay to show success message
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(1500);
+                        await InvokeAsync(() => GoBack());
+                    });
                 }
                 else
                 {
@@ -220,19 +220,19 @@ namespace Invoqs.Components.Pages
         private void GoBack()
         {
             // Use return URL if available, otherwise intelligent fallback
-            if (!string.IsNullOrEmpty(returnUrl))
+            if (!string.IsNullOrEmpty(ReturnUrl))
             {
-                Navigation.NavigateTo(returnUrl);
+                Navigation.NavigateTo(ReturnUrl, true);
             }
             else if (customer != null)
             {
                 // Go to customer jobs page
-                Navigation.NavigateTo($"/customer/{customer.Id}/jobs");
+                Navigation.NavigateTo($"/customer/{customer.Id}/jobs", true);
             }
             else
             {
                 // Fallback to all jobs page
-                Navigation.NavigateTo("/jobs");
+                Navigation.NavigateTo("/jobs", true);
             }
         }
 

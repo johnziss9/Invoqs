@@ -26,9 +26,9 @@
                     <p class="text-muted mb-0">@addressGroups.Count location(s) • @jobs.Count total jobs</p>
                 </div>
                 <div class="d-flex gap-2 mt-2 mt-md-0">
-                    <button class="btn btn-outline-secondary" @onclick="@(() => Navigation.NavigateTo("/customers"))">
-                        <i class="bi bi-arrow-left me-1"></i>
-                        Back to Customers
+                    <button class="btn btn-outline-secondary" @onclick="@(() => Navigation.NavigateTo($"/customer/{@customer?.Id}", true))">
+                        <i class="bi bi-person-fill"></i>
+                        View Customer
                     </button>
                     <button class="btn btn-primary" @onclick="ShowAddJobModal">
                         <i class="bi bi-plus-lg me-1"></i>

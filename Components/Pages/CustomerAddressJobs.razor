@@ -1,0 +1,420 @@
+@rendermode InteractiveServer
+@page "/customer/{customerId:int}/address/{address}"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+@inherits CustomerAddressJobsBase
+
+<PageTitle>Jobs at @Address - @customerName - Invoqs</PageTitle>
+
+<Navbar CurrentUser="@currentUser" OnLogout="HandleLogout" />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Customers</a></li>
+            <li class="breadcrumb-item"><a href="/customer/@CustomerId/jobs" class="text-decoration-none">@customerName Jobs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Address</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="bi bi-geo-alt me-2"></i>Jobs at @Address
+                    </h2>
+                    <p class="text-muted mb-0">Customer: @customerName • @filteredJobs.Count() of @jobs.Count jobs</p>
+                </div>
+                <div class="d-flex gap-2 mt-2 mt-md-0">
+                    <a href="/customer/@CustomerId" class="btn btn-outline-secondary">
+                        <i class="bi bi-person-fill me-1"></i>
+                        View Customer
+                    </a>
+                    <a href="/customer/@CustomerId/job/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Add Job
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @errorMessage
+        </div>
+    }
+    else
+    {
+        <!-- Customer Info Card -->
+        @if (customer != null)
+        {
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-primary text-white me-3">
+                                    @GetInitials(customer.Name)
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">@customer.Name</h5>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-envelope me-1"></i>@customer.Email
+                                        <span class="mx-2">•</span>
+                                        <i class="bi bi-telephone me-1"></i>@customer.Phone
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(customer.Notes))
+                                    {
+                                        <div class="text-muted small mt-1">
+                                            <i class="bi bi-info-circle me-1"></i>@customer.Notes
+                                        </div>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrEmpty(customer.VatNumber) || !string.IsNullOrEmpty(customer.CompanyRegistrationNumber))
+                                {
+                                    <div class="text-end text-muted small">
+                                        @if (!string.IsNullOrEmpty(customer.CompanyRegistrationNumber))
+                                        {
+                                            <div>Reg: @customer.CompanyRegistrationNumber</div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(customer.VatNumber))
+                                        {
+                                            <div>VAT: @customer.VatNumber</div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Address Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                <div class="card bg-secondary text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.New)</h3>
+                                <p class="mb-0 small">New Jobs</p>
+                            </div>
+                            <i class="bi bi-clock fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                <div class="card bg-primary text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Active)</h3>
+                                <p class="mb-0 small">Active Jobs</p>
+                            </div>
+                            <i class="bi bi-play-circle fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                <div class="card bg-success text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Completed)</h3>
+                                <p class="mb-0 small">Completed</p>
+                            </div>
+                            <i class="bi bi-check-circle fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                <div class="card bg-danger text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Cancelled)</h3>
+                                <p class="mb-0 small">Cancelled</p>
+                            </div>
+                            <i class="bi bi-x-circle fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                <div class="card bg-info text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@jobs.Count</h3>
+                                <p class="mb-0 small">Total Jobs</p>
+                            </div>
+                            <i class="bi bi-briefcase fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                <div class="card bg-warning text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">£@jobs.Where(j => j.Status == JobStatus.Completed).Sum(j => j.Price).ToString("N0")</h3>
+                                <p class="mb-0 small">Revenue</p>
+                            </div>
+                            <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted">Search Jobs</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" @bind="searchTerm" @bind:event="oninput"
+                                        placeholder="Search by title or description...">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small text-muted">Status</label>
+                                <select class="form-select" @bind="statusFilter">
+                                    <option value="all">All Status</option>
+                                    <option value="new">New</option>
+                                    <option value="active">Active</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small text-muted">Type</label>
+                                <select class="form-select" @bind="typeFilter">
+                                    <option value="all">All Types</option>
+                                    <option value="skip">Skip Rental</option>
+                                    <option value="sand">Sand Delivery</option>
+                                    <option value="cliff">Fort Cliff Service</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small text-muted">Sort By</label>
+                                <select class="form-select" @bind="sortBy">
+                                    <option value="startDate">Start Date</option>
+                                    <option value="endDate">End Date</option>
+                                    <option value="status">Status</option>
+                                    <option value="type">Type</option>
+                                    <option value="price">Price</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <!-- Empty column for spacing -->
+                            </div>
+                            <div class="col-md-1">
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="viewMode" id="gridView" 
+                                            @onchange="@(e => viewMode = "grid")" 
+                                            checked="@(viewMode == "grid")">
+                                        <label class="btn btn-outline-secondary" for="gridView"><i class="bi bi-grid-3x3-gap"></i></label>
+                                        
+                                        <input type="radio" class="btn-check" name="viewMode" id="listView" 
+                                            @onchange="@(e => viewMode = "list")" 
+                                            checked="@(viewMode == "list")">
+                                        <label class="btn btn-outline-secondary" for="listView"><i class="bi bi-list"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <small class="text-muted">
+                                    Showing @filteredJobs.Count() of @jobs.Count jobs at this address
+                                    @if (!string.IsNullOrWhiteSpace(searchTerm) || statusFilter != "all" || typeFilter != "all")
+                                    {
+                                        <span> • <button class="btn btn-link btn-sm p-0 text-decoration-none" @onclick="ClearFilters">Clear filters</button></span>
+                                    }
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jobs Display -->
+        @if (jobs.Any())
+        {
+            @if (viewMode == "grid")
+            {
+                <!-- Grid View -->
+                <div class="row">
+                    @foreach (var job in filteredJobs)
+                    {
+                        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                            <JobCard Job="job" Customer="customer" 
+                                OnStatusChange="@(async (tuple) => await HandleStatusChange(tuple.job, tuple.status))"
+                                OnEdit="@(async (job) => await HandleEditJob(job))"
+                                OnDelete="@(async (job) => await HandleDeleteJob(job))"
+                                OnGenerateInvoice="@(async (job) => await HandleGenerateInvoice(job))" />
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <!-- List View -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Job</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Price</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var job in filteredJobs)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-medium">@job.Title</div>
+                                                    @if (!string.IsNullOrEmpty(job.Description))
+                                                    {
+                                                        <small class="text-muted">@job.Description</small>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark">
+                                                    <i class="@job.TypeIcon me-1"></i>
+                                                    @job.TypeDisplayName
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@job.StatusColor">
+                                                    <i class="@job.StatusIcon me-1"></i>
+                                                    @job.Status
+                                                </span>
+                                            </td>
+                                            <td>@job.StartDate.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                @if (job.EndDate.HasValue)
+                                                {
+                                                    @job.EndDate.Value.ToString("MMM dd, yyyy")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td><strong class="text-success">£@job.Price.ToString("N2")</strong></td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    @if (job.Status == JobStatus.New)
+                                                    {
+                                                        <button class="btn btn-primary btn-sm" @onclick="() => HandleStatusChange(job, JobStatus.Active)">
+                                                            <i class="bi bi-play"></i>
+                                                        </button>
+                                                    }
+                                                    else if (job.Status == JobStatus.Active)
+                                                    {
+                                                        <button class="btn btn-success btn-sm" @onclick="() => HandleStatusChange(job, JobStatus.Completed)">
+                                                            <i class="bi bi-check"></i>
+                                                        </button>
+                                                    }
+                                                    else if (job.CanBeInvoiced)
+                                                    {
+                                                        <button class="btn btn-outline-success btn-sm" @onclick="() => HandleGenerateInvoice(job)">
+                                                            <i class="bi bi-file-earmark-text"></i>
+                                                        </button>
+                                                    }
+                                                    else if (job.Status == JobStatus.Completed && job.IsInvoiced)
+                                                    {
+                                                        <button class="btn btn-outline-info btn-sm" disabled title="Already invoiced">
+                                                            <i class="bi bi-check-circle"></i>
+                                                        </button>
+                                                    }
+                                                    <a href="/job/@job.Id" class="btn btn-outline-secondary btn-sm">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a href="/job/@job.Id/edit?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" class="btn btn-outline-secondary btn-sm">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Invoice Actions -->
+            @if (jobs.Any(j => j.CanBeInvoiced))
+            {
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center py-5">
+                                <i class="bi bi-receipt text-muted" style="font-size: 3rem;"></i>
+                                <h5 class="text-muted mt-3">Ready for Invoicing</h5>
+                                <p class="text-muted mb-3">@jobs.Count(j => j.CanBeInvoiced) completed job(s) at this address can be invoiced.</p>
+                                <a href="/customer/@CustomerId/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" 
+                                class="btn btn-success">
+                                    <i class="bi bi-plus-lg me-1"></i>
+                                    Create Invoice for Address
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="text-center py-5">
+                <i class="bi bi-briefcase text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">No jobs found at this address</h4>
+                <p class="text-muted">Create the first job for this location</p>
+                <a href="/customer/@CustomerId/job/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Add First Job
+                </a>
+            </div>
+        }
+    }
+</div>

@@ -1,0 +1,243 @@
+/* CustomerAddressJobs Page Styles - Matches CustomerJobs.razor.css exactly */
+
+/* Avatar circle */
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Tables with rounded corners */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.table td {
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+
+/* Button groups with proper radius */
+.btn-group {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.btn-group .btn {
+    border-radius: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-group .btn:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.btn-group .btn:last-child {
+    border-radius: 0 8px 8px 0;
+    border-right: none;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Enhanced checked state */
+.btn-check:checked+.btn {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: white !important;
+    position: relative;
+    z-index: 2;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: "›";
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.breadcrumb-item a {
+    color: #6c757d;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #0d6efd;
+}
+
+/* Badge styling with hierarchy */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+    border-radius: 6px;
+    /* Smaller for visual hierarchy */
+}
+
+/* Cards styling with 8px radius */
+.card {
+    border-radius: 8px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Statistics cards with enhanced hover */
+.stats-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 8px;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Form controls with 8px radius */
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border-color: #e9ecef;
+    font-size: 0.9rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+}
+
+/* Buttons with 8px radius */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.btn-outline-secondary {
+    border-color: #e9ecef;
+    color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Empty state styling */
+.empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.empty-state i {
+    opacity: 0.5;
+}
+
+.empty-state .btn {
+    margin-top: 1rem;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between.align-items-center.flex-wrap {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .d-flex.gap-2.mt-2.mt-md-0 {
+        margin-top: 1rem !important;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .btn-group {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .card-body {
+        padding: 0.875rem;
+    }
+
+    .empty-state {
+        padding: 3rem 1rem;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+}
+
+/* Focus states for accessibility */
+.btn:focus,
+.form-control:focus {
+    outline: none;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
