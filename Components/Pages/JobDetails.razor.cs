@@ -17,6 +17,8 @@ namespace Invoqs.Components.Pages
         protected bool isLoading = true;
         protected string currentUser = "John Doe"; // Replace with actual user service
         protected string? errorMessage;
+        protected bool showDeleteJobConfirmation = false;
+        protected bool isDeletingJob = false;
 
         protected JobModel? job;
         protected CustomerModel? customer;
@@ -33,6 +35,11 @@ namespace Invoqs.Components.Pages
                 await LoadJobDetailsAsync();
             }
         }
+        
+        private string GetReturnUrl()
+        {
+            return !string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : "/jobs";
+        }
 
         private async Task LoadJobDetailsAsync()
         {
@@ -43,11 +50,11 @@ namespace Invoqs.Components.Pages
                 isCustomerDeleted = false;
 
                 job = await JobService.GetJobByIdAsync(JobId);
-                
+
                 if (job != null)
                 {
                     customer = await CustomerService.GetCustomerByIdAsync(job.CustomerId);
-                    
+
                     // Check if customer is soft deleted (when API supports it)
                     if (customer != null && customer.IsDeleted)
                     {
@@ -57,9 +64,9 @@ namespace Invoqs.Components.Pages
                     {
                         // Fallback for hard delete (current mock behavior)
                         isCustomerDeleted = true;
-                        customer = new CustomerModel 
-                        { 
-                            Id = job.CustomerId, 
+                        customer = new CustomerModel
+                        {
+                            Id = job.CustomerId,
                             Name = "[Deleted Customer]",
                             Email = "",
                             Phone = ""
@@ -77,6 +84,90 @@ namespace Invoqs.Components.Pages
             {
                 isLoading = false;
                 StateHasChanged();
+            }
+        }
+
+        protected void ShowDeleteJobConfirmation()
+        {
+            showDeleteJobConfirmation = true;
+            StateHasChanged();
+        }
+
+        protected void HideDeleteJobConfirmation()
+        {
+            showDeleteJobConfirmation = false;
+            StateHasChanged();
+        }
+
+        protected async Task ConfirmDeleteJob()
+        {
+            if (job == null) return;
+
+            try
+            {
+                isDeletingJob = true;
+                StateHasChanged();
+
+                var success = await JobService.DeleteJobAsync(job.Id);
+                
+                if (success)
+                {
+                    Navigation.NavigateTo(GetReturnUrl(), true);
+                }
+                else
+                {
+                    errorMessage = "Failed to delete job.";
+                    showDeleteJobConfirmation = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error deleting job: {ex.Message}";
+                showDeleteJobConfirmation = false;
+            }
+            finally
+            {
+                isDeletingJob = false;
+                StateHasChanged();
+            }
+        }
+
+        protected async Task StartJob(int jobId)
+        {
+            try
+            {
+                if (job != null)
+                {
+                    job.Status = JobStatus.Active;
+
+                    await JobService.UpdateJobAsync(job);
+                }
+                
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error starting job: {ex.Message}";
+            }
+        }
+
+        protected async Task CompleteJob(int jobId)
+        {
+            try
+            {
+                if (job != null)
+                {
+                    job.Status = JobStatus.Completed;
+                    job.EndDate = DateTime.Now;
+
+                    await JobService.UpdateJobAsync(job);
+                }
+
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error completing job: {ex.Message}";
             }
         }
 

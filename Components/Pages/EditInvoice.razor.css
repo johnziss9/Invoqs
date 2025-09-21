@@ -1,4 +1,4 @@
-/* Create Invoice Page Styles */
+/* Edit Invoice Page Styles - Based on CreateInvoice.razor.css */
 
 /* Button and form consistency */
 .btn {
@@ -152,6 +152,13 @@
     border-radius: 8px;
 }
 
+/* Read-only input styling */
+.form-control[readonly] {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+    color: #6c757d;
+}
+
 /* Input Date specific styling for 8px radius */
 input[type="date"].form-control {
     border-radius: 8px;
@@ -190,37 +197,12 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 }
 
 /* Enhanced checked state for button groups */
-.btn-check:checked + .btn {
+.btn-check:checked+.btn {
     background-color: var(--bs-primary) !important;
     border-color: var(--bs-primary) !important;
     color: white !important;
     position: relative;
     z-index: 2;
-}
-
-.input-group .form-control:focus {
-    z-index: 3;
-}
-
-.input-group-text {
-    border-radius: 0;
-    border-left: 0;
-    border-right: 0;
-}
-
-.input-group .form-control:first-child {
-    border-radius: 8px 0 0 8px;
-}
-
-.input-group .form-control:last-child {
-    border-radius: 0 8px 8px 0;
-}
-
-.form-control-sm,
-.form-select-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    border-radius: 8px;
 }
 
 /* Required field indicator */
@@ -231,6 +213,13 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 
 .form-label.required {
     font-weight: 500;
+}
+
+/* Form text styling */
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
 }
 
 /* Buttons */
@@ -260,9 +249,26 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
     color: #58151c;
 }
 
+.alert-success {
+    background-color: #d1e7dd;
+    color: #0a3622;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+
 .alert-info {
     background-color: #d1ecf1;
     color: #0c5460;
+}
+
+/* Special styling for original invoice jobs section */
+.card-header.bg-warning {
+    background-color: #fff3cd !important;
+    color: #664d03 !important;
+    border-bottom: 1px solid #ffecb5;
 }
 
 /* Filter Section - Enhanced for equal field sizing */
@@ -320,14 +326,6 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
     margin-top: 1rem;
 }
 
-/* Customer selection dropdown */
-.customer-dropdown {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 1rem;
-    border-left: 4px solid #ffc107;
-}
-
 /* Form validation styling */
 .form-control.modified:invalid {
     border-color: #dc3545;
@@ -339,6 +337,11 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
     border-color: #198754;
     box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
     border-radius: 8px;
+}
+
+/* Badge styling */
+.badge {
+    border-radius: 6px;
 }
 
 /* Responsive Design */

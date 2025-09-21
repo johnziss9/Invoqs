@@ -5,13 +5,151 @@ namespace Invoqs.Components.UI
 {
     public partial class InvoiceCard : ComponentBase
     {
+        [Inject] private NavigationManager Navigation { get; set; } = default!;
+        
         [Parameter] public InvoiceModel Invoice { get; set; } = new();
         [Parameter] public EventCallback<InvoiceModel> OnView { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnEdit { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnMarkAsSent { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnMarkAsPaid { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnCancel { get; set; }
+        [Parameter] public EventCallback<InvoiceModel> OnDelete { get; set; }
 
+        private bool showSendConfirmation = false;
+        private bool isSending = false;
+        private bool showDeleteConfirmation = false;
+        private bool isDeleting = false;
+        private bool showCancelConfirmation = false;
+        private bool isCancelling = false;
+        private string cancellationReason = "";
+        private string customCancellationReason = "";
+        private bool showMarkAsPaidConfirmation = false;
+        private bool isMarkingPaid = false;
+        private DateTime paymentDate = DateTime.Today;
+        private string paymentMethod = "Bank Transfer";
+        private string paymentReference = "";
+
+        private void ShowSendConfirmation()
+        {
+            showSendConfirmation = true;
+            StateHasChanged();
+        }
+
+        private void HideSendConfirmation()
+        {
+            showSendConfirmation = false;
+            StateHasChanged();
+        }
+
+        private async Task ConfirmSend()
+        {
+            isSending = true;
+            StateHasChanged();
+
+            try
+            {
+                await OnMarkAsSent.InvokeAsync(Invoice);
+                showSendConfirmation = false;
+            }
+            finally
+            {
+                isSending = false;
+                StateHasChanged();
+            }
+        }
+
+        private void ShowDeleteConfirmation()
+        {
+            showDeleteConfirmation = true;
+            StateHasChanged();
+        }
+
+        private void HideDeleteConfirmation()
+        {
+            showDeleteConfirmation = false;
+            StateHasChanged();
+        }
+
+        private async Task ConfirmDelete()
+        {
+            isDeleting = true;
+            StateHasChanged();
+
+            try
+            {
+                await OnDelete.InvokeAsync(Invoice);
+                showDeleteConfirmation = false;
+            }
+            finally
+            {
+                isDeleting = false;
+                StateHasChanged();
+            }
+        }
+
+        private void ShowCancelConfirmation()
+        {
+            showCancelConfirmation = true;
+            cancellationReason = "";
+            customCancellationReason = "";
+            StateHasChanged();
+        }
+
+        private void HideCancelConfirmation()
+        {
+            showCancelConfirmation = false;
+            StateHasChanged();
+        }
+
+        private async Task ConfirmCancel()
+        {
+            isCancelling = true;
+            StateHasChanged();
+
+            try
+            {
+                await OnCancel.InvokeAsync(Invoice);
+                showCancelConfirmation = false;
+            }
+            finally
+            {
+                isCancelling = false;
+                StateHasChanged();
+            }
+        }
+
+        private void ShowMarkAsPaidConfirmation()
+        {
+            showMarkAsPaidConfirmation = true;
+            paymentDate = DateTime.Today;
+            paymentMethod = "Bank Transfer";
+            paymentReference = "";
+            StateHasChanged();
+        }
+
+        private void HideMarkAsPaidConfirmation()
+        {
+            showMarkAsPaidConfirmation = false;
+            StateHasChanged();
+        }
+
+        private async Task ConfirmMarkAsPaid()
+        {
+            isMarkingPaid = true;
+            StateHasChanged();
+
+            try
+            {
+                await OnMarkAsPaid.InvokeAsync(Invoice);
+                showMarkAsPaidConfirmation = false;
+            }
+            finally
+            {
+                isMarkingPaid = false;
+                StateHasChanged();
+            }
+        }
+        
         protected string GetCustomerInitials()
         {
             if (Invoice.Customer == null || string.IsNullOrWhiteSpace(Invoice.Customer.Name))

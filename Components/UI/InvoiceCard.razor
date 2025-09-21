@@ -6,20 +6,75 @@
         <div class="d-flex justify-content-between align-items-start mb-3">
             <div class="invoice-number">
                 <h6 class="text-primary mb-1 fw-bold">@Invoice.InvoiceNumber</h6>
-                <small class="text-muted">ID: @Invoice.Id</small>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <span class="badge @Invoice.StatusBadgeClass">
-                    <i class="@Invoice.StatusIcon me-1"></i>
-                    @Invoice.Status
-                </span>
-                @if (Invoice.IsOverdue)
-                {
-                    <span class="badge bg-danger">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        Overdue
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge @Invoice.StatusBadgeClass">
+                        <i class="@Invoice.StatusIcon me-1"></i>
+                        @Invoice.Status
                     </span>
-                }
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <!-- Edit Action (if draft) -->
+                        @if (Invoice.Status == InvoiceStatus.Draft)
+                        {
+                            <li>
+                                <a class="dropdown-item" href="/invoice/@Invoice.Id/edit?returnUrl=@Uri.EscapeDataString(Navigation.Uri)">
+                                    <i class="bi bi-pencil me-2"></i>
+                                    Edit Invoice
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                        }
+
+                        <!-- Status Change Actions -->                        
+                        @if (Invoice.Status == InvoiceStatus.Draft)
+                        {
+                            <li><button class="dropdown-item text-success" @onclick="ShowSendConfirmation"
+                                    @onclick:preventDefault="true">
+                                    <i class="bi bi-send me-2"></i>Send Invoice
+                                </button></li>
+                        }
+                        else if (Invoice.Status == InvoiceStatus.Sent || Invoice.Status == InvoiceStatus.Overdue)
+                        {
+                            <li><button class="dropdown-item text-success" @onclick="ShowMarkAsPaidConfirmation"
+                                    @onclick:preventDefault="true">
+                                    <i class="bi bi-check-circle me-2"></i>Mark as Paid
+                                </button></li>
+                            <li><button class="dropdown-item text-warning" @onclick="ShowCancelConfirmation"
+                                    @onclick:preventDefault="true">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel Invoice
+                                </button></li>
+                        }
+                        else if (Invoice.Status == InvoiceStatus.Paid)
+                        {
+                            <li><span class="dropdown-item-text text-muted">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Paid@(string.IsNullOrEmpty(Invoice.PaymentMethod) ? "" : $" via {Invoice.PaymentMethod}")
+                                </span></li>
+                        }
+                        else if (Invoice.Status == InvoiceStatus.Cancelled)
+                        {
+                            <li><span class="dropdown-item-text text-muted">
+                                    <i class="bi bi-x-circle me-2"></i>Invoice Cancelled
+                                </span></li>
+                        }
+
+                        @if (Invoice.Status == InvoiceStatus.Draft)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <!-- Danger Zone -->
+                            <li><button class="dropdown-item text-danger" @onclick="ShowDeleteConfirmation"
+                                    @onclick:preventDefault="true">
+                                    <i class="bi bi-trash me-2"></i>Delete Draft
+                                </button></li>
+                        }
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -44,7 +99,7 @@
                     Created: @Invoice.CreatedDate.ToString("dd/MM/yyyy")
                 </span>
             </div>
-            
+
             <div class="detail-item mb-2">
                 <i class="bi bi-calendar-event text-muted me-2"></i>
                 <span class="text-muted small @(Invoice.IsOverdue ? "text-danger fw-bold" : "")">
@@ -98,7 +153,8 @@
 
         <!-- Due Date Display -->
         <div class="due-date-display mb-3 text-center">
-            <div class="@(Invoice.IsOverdue ? "text-danger" : Invoice.DaysUntilDue <= 7 ? "text-warning" : "text-muted")">
+            <div
+                class="@(Invoice.IsOverdue ? "text-danger" : Invoice.DaysUntilDue <= 7 ? "text-warning" : "text-muted")">
                 <i class="@(Invoice.IsOverdue ? "bi-exclamation-triangle" : "bi-calendar-event") me-1"></i>
                 <small>@Invoice.DueDateDisplay</small>
             </div>
@@ -106,65 +162,236 @@
 
         <!-- Action Buttons -->
         <div class="mt-auto">
-            <div class="d-flex gap-2 mb-2">
-                <button class="btn btn-primary btn-sm flex-fill" @onclick="() => OnView.InvokeAsync(Invoice)">
-                    <i class="bi bi-eye me-1"></i>
-                    View
-                </button>
-                
-                @if (Invoice.Status == InvoiceStatus.Draft)
-                {
-                    <button class="btn btn-outline-secondary btn-sm flex-fill" @onclick="() => OnEdit.InvokeAsync(Invoice)">
-                        <i class="bi bi-pencil me-1"></i>
-                        Edit
-                    </button>
-                }
-            </div>
-            
             <div class="d-flex gap-2">
-                @if (Invoice.Status == InvoiceStatus.Draft)
-                {
-                    <button class="btn btn-success btn-sm flex-fill" @onclick="() => OnMarkAsSent.InvokeAsync(Invoice)">
-                        <i class="bi bi-send me-1"></i>
-                        Send
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm flex-fill" @onclick="() => OnCancel.InvokeAsync(Invoice)">
-                        <i class="bi bi-x-circle me-1"></i>
-                        Cancel
-                    </button>
-                }
-                else if (Invoice.Status == InvoiceStatus.Sent || Invoice.Status == InvoiceStatus.Overdue)
-                {
-                    <button class="btn btn-success btn-sm flex-fill" @onclick="() => OnMarkAsPaid.InvokeAsync(Invoice)">
-                        <i class="bi bi-check-circle me-1"></i>
-                        Mark Paid
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm flex-fill" disabled title="Cannot edit sent invoice">
-                        <i class="bi bi-lock me-1"></i>
-                        Sent
-                    </button>
-                }
-                else if (Invoice.Status == InvoiceStatus.Paid)
-                {
-                    <button class="btn btn-outline-success btn-sm flex-fill" disabled>
-                        <i class="bi bi-check-circle me-1"></i>
-                        Paid
-                    </button>
-                    @if (!string.IsNullOrEmpty(Invoice.PaymentMethod))
-                    {
-                        <small class="text-muted text-center flex-fill align-self-center">
-                            via @Invoice.PaymentMethod
-                        </small>
-                    }
-                }
-                else if (Invoice.Status == InvoiceStatus.Cancelled)
-                {
-                    <button class="btn btn-outline-dark btn-sm flex-fill" disabled>
-                        <i class="bi bi-x-circle me-1"></i>
-                        Cancelled
-                    </button>
-                }
+                <a href="/invoice/@Invoice.Id" class="btn btn-primary btn-sm flex-fill">
+                    <i class="bi bi-eye me-1"></i>
+                    View Details
+                </a>
             </div>
         </div>
     </div>
 </div>
+
+@* Send Confirmation Modal *@
+@if (showSendConfirmation)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Send Invoice</h5>
+                    <button type="button" class="btn-close" @onclick="HideSendConfirmation"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-envelope text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Send Invoice?</h5>
+                        <p class="text-muted">
+                            This will send invoice <strong>@Invoice.InvoiceNumber</strong> to the customer.
+                            The invoice status will be changed to "Sent".
+                        </p>
+                        @if (Invoice.Status == InvoiceStatus.Draft)
+                        {
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                This invoice is currently in draft status. Sending will finalize the invoice.
+                            </div>
+                        }
+                        @if (Invoice.Total > 1000)
+                        {
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong>High Value Invoice:</strong> This invoice is for £@Invoice.Total.ToString("N2"). Please
+                                verify all details are correct.
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideSendConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-success" @onclick="ConfirmSend" disabled="@isSending">
+                        @if (isSending)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-send me-1"></i>
+                        }
+                        @(isSending ? "Sending..." : "Send Invoice")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Delete Confirmation Modal (for Draft invoices) *@
+@if (showDeleteConfirmation)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Draft Invoice</h5>
+                    <button type="button" class="btn-close" @onclick="HideDeleteConfirmation"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Delete this draft invoice?</h5>
+                        <p class="text-muted">
+                            This will permanently delete draft invoice <strong>@Invoice.InvoiceNumber</strong>.
+                            The associated jobs will be available for re-invoicing.
+                        </p>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            This invoice is still in draft status and has not been sent to the customer.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Keep Draft</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
+                        @if (isDeleting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-trash me-1"></i>
+                        }
+                        @(isDeleting ? "Deleting..." : "Delete Draft")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Cancel Confirmation Modal (for Sent/Overdue invoices) *@
+@if (showCancelConfirmation)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancel Invoice</h5>
+                    <button type="button" class="btn-close" @onclick="HideCancelConfirmation"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-x-circle text-warning" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Cancel this invoice?</h5>
+                        <p class="text-muted">
+                            This will cancel invoice <strong>@Invoice.InvoiceNumber</strong> and mark it as no longer valid.
+                            The associated jobs will be available for re-invoicing.
+                        </p>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Notice:</strong> This invoice has already been sent to the customer.
+                            A cancellation notification will be sent automatically.
+                        </div>
+                    </div>
+
+                    <!-- Cancellation Reason -->
+                    <div class="mt-3">
+                        <label class="form-label">Reason for cancellation:</label>
+                        <select class="form-select" @bind="cancellationReason">
+                            <option value="">Select a reason...</option>
+                            <option value="Customer Request">Customer Request</option>
+                            <option value="Service Not Completed">Service Not Completed</option>
+                            <option value="Pricing Error">Pricing Error</option>
+                            <option value="Duplicate Invoice">Duplicate Invoice</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        @if (cancellationReason == "Other")
+                        {
+                            <textarea class="form-control mt-2" @bind="customCancellationReason"
+                                placeholder="Please specify the reason..." rows="3"></textarea>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideCancelConfirmation">Keep Invoice</button>
+                    <button type="button" class="btn btn-warning" @onclick="ConfirmCancel"
+                        disabled="@(isCancelling || string.IsNullOrEmpty(cancellationReason))">
+                        @if (isCancelling)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-x-circle me-1"></i>
+                        }
+                        @(isCancelling ? "Cancelling..." : "Cancel Invoice")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Mark as Paid Confirmation Modal *@
+@if (showMarkAsPaidConfirmation)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Mark Invoice as Paid</h5>
+                    <button type="button" class="btn-close" @onclick="HideMarkAsPaidConfirmation"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Mark as Paid?</h5>
+                        <p class="text-muted">
+                            This will mark invoice <strong>@Invoice.InvoiceNumber</strong> as paid.
+                            Total amount: <strong>£@Invoice.Total.ToString("N2")</strong>
+                        </p>
+                    </div>
+
+                    <!-- Payment Details -->
+                    <div class="mt-3">
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label">Payment Date:</label>
+                                <input type="date" class="form-control" @bind="paymentDate" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Payment Method:</label>
+                                <select class="form-select" @bind="paymentMethod">
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Check">Check</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <label class="form-label">Payment Reference (optional):</label>
+                            <input type="text" class="form-control" @bind="paymentReference"
+                                placeholder="Transaction ID, check number, etc." />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideMarkAsPaidConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-success" @onclick="ConfirmMarkAsPaid" disabled="@isMarkingPaid">
+                        @if (isMarkingPaid)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-check-circle me-1"></i>
+                        }
+                        @(isMarkingPaid ? "Processing..." : "Mark as Paid")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

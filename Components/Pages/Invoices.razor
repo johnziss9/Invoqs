@@ -25,10 +25,6 @@
                     <p class="text-muted mb-0">Manage all customer invoices</p>
                 </div>
                 <div class="d-flex gap-2 mt-2 mt-md-0">
-                    <button class="btn btn-outline-secondary" @onclick="RefreshData">
-                        <i class="bi bi-arrow-clockwise me-1"></i>
-                        Refresh
-                    </button>
                     <a href="/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" class="btn btn-primary">
                         <i class="bi bi-plus-lg me-1"></i>
                         Create Invoice
@@ -130,7 +126,9 @@
                             <label class="form-label small text-muted">Search Invoices</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control" @bind="searchTerm" @bind:after="FilterInvoices"
+                                <input type="text" class="form-control" 
+                                    @bind="searchTerm" 
+                                    @bind:event="oninput"
                                     placeholder="Search by invoice number or customer...">
                             </div>
                         </div>
@@ -262,7 +260,8 @@
                                 OnEdit="HandleEditInvoice"
                                 OnMarkAsSent="HandleMarkAsSent"
                                 OnMarkAsPaid="HandleMarkAsPaid"
-                                OnCancel="HandleCancelInvoice" />
+                                OnCancel="HandleCancelInvoice"
+                                OnDelete="HandleDeleteInvoice" />
                 </div>
             }
         </div>
@@ -290,7 +289,6 @@
                                 <tr>
                                     <td>
                                         <div class="fw-medium">@invoice.InvoiceNumber</div>
-                                        <small class="text-muted">ID: @invoice.Id</small>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
@@ -324,28 +322,33 @@
                                         <small class="text-muted">@invoice.VatRate% VAT</small>
                                     </td>
                                     <td class="text-center">
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" @onclick="() => HandleViewInvoice(invoice)" title="View Invoice">
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <!-- View Button (always show) -->
+                                            <button class="btn btn-outline-primary btn-sm" @onclick="() => HandleViewInvoice(invoice)" title="View Invoice">
                                                 <i class="bi bi-eye"></i>
                                             </button>
+                                            
+                                            <!-- Status-specific action buttons -->
                                             @if (invoice.Status == InvoiceStatus.Draft)
                                             {
-                                                <button class="btn btn-outline-secondary" @onclick="() => HandleEditInvoice(invoice)" title="Edit Invoice">
+                                                <button class="btn btn-outline-secondary btn-sm" @onclick="() => HandleEditInvoice(invoice)" title="Edit Invoice">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
-                                                <button class="btn btn-outline-success" @onclick="() => HandleMarkAsSent(invoice)" title="Mark as Sent">
+                                                <button class="btn btn-outline-success btn-sm" @onclick="() => HandleMarkAsSent(invoice)" title="Send Invoice">
                                                     <i class="bi bi-send"></i>
                                                 </button>
                                             }
-                                            else if (invoice.Status == InvoiceStatus.Sent)
+                                            else if (invoice.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Overdue)
                                             {
-                                                <button class="btn btn-outline-success" @onclick="() => HandleMarkAsPaid(invoice)" title="Mark as Paid">
-                                                    <i class="bi bi-check"></i>
+                                                <button class="btn btn-outline-success btn-sm" @onclick="() => HandleMarkAsPaid(invoice)" title="Mark as Paid">
+                                                    <i class="bi bi-check-circle"></i>
                                                 </button>
                                             }
+                                            
+                                            <!-- Dropdown menu -->
                                             <div class="dropdown">
-                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                    <i class="bi bi-three-dots"></i>
+                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-three-dots-vertical"></i>
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><button class="dropdown-item" @onclick="() => HandleViewInvoice(invoice)">
@@ -357,7 +360,19 @@
                                                             <i class="bi bi-pencil me-2"></i>Edit Invoice
                                                         </button></li>
                                                         <li><hr class="dropdown-divider"></li>
-                                                        <li><button class="dropdown-item text-danger" @onclick="() => HandleCancelInvoice(invoice)">
+                                                        <li><button class="dropdown-item text-success" @onclick="() => HandleMarkAsSent(invoice)">
+                                                            <i class="bi bi-send me-2"></i>Send Invoice
+                                                        </button></li>
+                                                        <li><button class="dropdown-item text-danger" @onclick="() => HandleDeleteInvoice(invoice)">
+                                                            <i class="bi bi-trash me-2"></i>Delete Draft
+                                                        </button></li>
+                                                    }
+                                                    else if (invoice.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Overdue)
+                                                    {
+                                                        <li><button class="dropdown-item text-success" @onclick="() => HandleMarkAsPaid(invoice)">
+                                                            <i class="bi bi-check-circle me-2"></i>Mark as Paid
+                                                        </button></li>
+                                                        <li><button class="dropdown-item text-warning" @onclick="() => HandleCancelInvoice(invoice)">
                                                             <i class="bi bi-x-circle me-2"></i>Cancel Invoice
                                                         </button></li>
                                                     }

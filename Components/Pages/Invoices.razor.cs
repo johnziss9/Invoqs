@@ -145,13 +145,13 @@ namespace Invoqs.Components.Pages
 
         protected Task HandleViewInvoice(InvoiceModel invoice)
         {
-            Navigation.NavigateTo($"/invoice/{invoice.Id}");
+            Navigation.NavigateTo($"/invoice/{invoice.Id}", true);
             return Task.CompletedTask;
         }
 
         protected Task HandleEditInvoice(InvoiceModel invoice)
         {
-            Navigation.NavigateTo($"/invoice/{invoice.Id}/edit");
+            Navigation.NavigateTo($"/invoice/{invoice.Id}/edit", true);
             return Task.CompletedTask;
         }
 
@@ -230,9 +230,41 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        protected async Task RefreshData()
+        protected async Task HandleDeleteInvoice(InvoiceModel invoice)
         {
-            await LoadData();
+            try
+            {
+                if (invoice.Status != InvoiceStatus.Draft)
+                {
+                    errorMessage = "Only draft invoices can be deleted";
+                    StateHasChanged();
+                    return;
+                }
+
+                var success = await InvoiceService.DeleteInvoiceAsync(invoice.Id);
+
+                if (success)
+                {
+                    invoices.Remove(invoice);
+                    
+                    // Recalculate outstanding total
+                    totalOutstanding = invoices
+                        .Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Overdue)
+                        .Sum(i => i.Total);
+                        
+                    StateHasChanged();
+                }
+                else
+                {
+                    errorMessage = "Failed to delete invoice";
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error deleting invoice: {ex.Message}";
+                StateHasChanged();
+            }
         }
         
         protected void SetViewMode(string mode)

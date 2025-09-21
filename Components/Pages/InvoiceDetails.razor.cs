@@ -21,9 +21,15 @@ public partial class InvoiceDetails
     private bool EditMode = false;
     private string successMessage = string.Empty;
     private string errorMessage = string.Empty;
-    private bool showPaymentModal = false;
     private bool showCancelModal = false;
-    private PaymentInfo paymentInfo = new();
+    private bool showSendConfirmation = false;
+    private bool showMarkAsPaidConfirmation = false;
+    private bool isMarkingPaid = false;
+    private DateTime paymentDate = DateTime.Today;
+    private string paymentMethod = "Bank Transfer";
+    private string paymentReference = string.Empty;
+    private bool showDeleteModal = false;
+    private bool isDeleting = false;
 
     private string currentUser = "Demo User"; // This should come from authentication service when implemented
 
@@ -123,29 +129,29 @@ public partial class InvoiceDetails
         }
     }
 
-    private async Task RecordPayment()
+    private async Task ConfirmMarkAsPaid()
     {
         if (invoice == null) return;
 
         try
         {
-            isProcessing = true;
+            isMarkingPaid = true;
 
             var success = await InvoiceService.MarkInvoiceAsPaidAsync(
                 invoice.Id,
-                paymentInfo.PaymentDate,
-                paymentInfo.PaymentMethod,
-                paymentInfo.PaymentReference);
+                paymentDate,
+                paymentMethod,
+                paymentReference);
 
             if (success)
             {
                 invoice.Status = InvoiceStatus.Paid;
-                invoice.PaidDate = paymentInfo.PaymentDate;
-                invoice.PaymentMethod = paymentInfo.PaymentMethod;
-                invoice.PaymentReference = paymentInfo.PaymentReference;
+                invoice.PaidDate = paymentDate;
+                invoice.PaymentMethod = paymentMethod;
+                invoice.PaymentReference = paymentReference;
 
-                showPaymentModal = false;
-                successMessage = "Payment recorded successfully.";
+                showMarkAsPaidConfirmation = false;
+                successMessage = "Invoice marked as paid successfully.";
 
                 // Clear the message after 3 seconds
                 _ = Task.Delay(3000).ContinueWith(_ =>
@@ -156,18 +162,28 @@ public partial class InvoiceDetails
             }
             else
             {
-                errorMessage = "Failed to record payment.";
+                errorMessage = "Failed to mark invoice as paid.";
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"Error recording payment: {ex.Message}";
+            errorMessage = $"Error marking invoice as paid: {ex.Message}";
         }
         finally
         {
-            isProcessing = false;
+            isMarkingPaid = false;
             StateHasChanged();
         }
+    }
+
+    private void HideMarkAsPaidConfirmation()
+    {
+        showMarkAsPaidConfirmation = false;
+        // Reset payment details
+        paymentDate = DateTime.Today;
+        paymentMethod = "Bank Transfer";
+        paymentReference = string.Empty;
+        StateHasChanged();
     }
 
     private async Task CancelInvoice()
@@ -222,7 +238,7 @@ public partial class InvoiceDetails
         }
     }
 
-    private async Task DownloadPdf()
+    private void DownloadPdf()
     {
         try
         {
@@ -243,40 +259,47 @@ public partial class InvoiceDetails
         }
     }
 
-    private void ResetPaymentInfo()
+    private async Task ConfirmSend()
     {
-        paymentInfo = new PaymentInfo
-        {
-            PaymentDate = DateTime.Today
-        };
+        showSendConfirmation = false;
+        await MarkAsSent();
     }
 
-    protected async Task HandleLogout()
+    protected void HandleLogout()
     {
         // This should integrate with your authentication system when implemented
         // For now, redirect to login or home page
         Navigation.NavigateTo("/");
     }
 
-    protected override void OnParametersSet()
+    private async Task DeleteInvoice()
     {
-        if (showPaymentModal && invoice != null)
+        if (invoice == null) return;
+
+        try
         {
-            ResetPaymentInfo();
+            isDeleting = true;
+            
+            var success = await InvoiceService.DeleteInvoiceAsync(invoice.Id);
+            
+            if (success)
+            {
+                Navigation.NavigateTo("/invoices", true);
+            }
+            else
+            {
+                errorMessage = "Failed to delete invoice.";
+            }
         }
-    }
-
-    public class PaymentInfo
-    {
-        [Required(ErrorMessage = "Payment date is required")]
-        public DateTime PaymentDate { get; set; } = DateTime.Today;
-
-        [Required(ErrorMessage = "Payment method is required")]
-        public string PaymentMethod { get; set; } = string.Empty;
-
-        [StringLength(200, ErrorMessage = "Payment reference cannot exceed 200 characters")]
-        public string? PaymentReference { get; set; }
-
-        public string? Notes { get; set; }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error deleting invoice: {ex.Message}";
+        }
+        finally
+        {
+            isDeleting = false;
+            showDeleteModal = false;
+            StateHasChanged();
+        }
     }
 }

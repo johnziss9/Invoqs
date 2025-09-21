@@ -13,7 +13,10 @@
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="/customer/@Customer.Id"><i class="bi bi-eye me-2"></i>View Details</a></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/jobs"><i class="bi bi-calendar-check me-2"></i>Customer Jobs</a></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/invoices"><i class="bi bi-file-earmark-text me-2"></i>Customer Invoices</a></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)"><i class="bi bi-receipt me-2"></i>Create Invoice</a></li>
+                    <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" @onclick="() => EditCustomer(Customer.Id)"><i class="bi bi-pencil me-2"></i>Edit</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><button class="dropdown-item text-danger" @onclick="ShowDeleteConfirmation">
@@ -54,21 +57,11 @@
         </div>
 
         <div class="mt-auto">
-            <div class="d-grid gap-2">
-                <div class="row g-2">
-                    <div class="col-6">
-                        <a href="/customer/@Customer.Id/jobs" class="btn btn-primary btn-sm w-100">
-                            <i class="bi bi-calendar-check me-1"></i>
-                            View Jobs
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a href="/customer/@Customer.Id/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" class="btn btn-outline-primary btn-sm w-100">
-                            <i class="bi bi-receipt me-1"></i>
-                            Create Invoice
-                        </a>
-                    </div>
-                </div>
+            <div class="d-grid">
+                <a href="/customer/@Customer.Id" class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye me-1"></i>
+                    View Details
+                </a>
             </div>
         </div>
     </div>

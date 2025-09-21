@@ -202,6 +202,26 @@
 
             <!-- Sidebar -->
             <div class="col-lg-4">
+                <!-- Customer Actions -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0">Customer Actions</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/customer/@CustomerId/edit?returnUrl=@Uri.EscapeDataString($"/customer/{CustomerId}")" class="btn btn-primary btn-sm">
+                                <i class="bi bi-pencil me-1"></i>
+                                Edit Customer
+                            </a>
+                            <hr class="my-2">
+                            <button class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteConfirmation">
+                                <i class="bi bi-trash me-1"></i>
+                                Delete Customer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Customer Stats -->
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white py-3">
@@ -269,7 +289,7 @@
                             </a>
                             <a href="/customer/@CustomerId/jobs" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-calendar-check me-1"></i>
-                                View All Jobs
+                                Customer Jobs
                             </a>
                             <a href="/customer/@CustomerId/invoice/new" class="btn btn-outline-info btn-sm">
                                 <i class="bi bi-receipt me-1"></i>
@@ -277,12 +297,7 @@
                             </a>
                             <a href="/customer/@customer.Id/invoices" class="btn btn-outline-dark btn-sm">
                                 <i class="bi bi-receipt me-1"></i>
-                                View Invoices
-                            </a>
-                            <hr class="my-2">
-                            <a href="/customer/@CustomerId/edit?returnUrl=@Uri.EscapeDataString($"/customer/{CustomerId}")" class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-pencil me-1"></i>
-                                Edit Customer
+                                Customer Invoices
                             </a>
                         </div>
                     </div>
@@ -291,3 +306,49 @@
         </div>
     }
 </div>
+
+@* Delete Confirmation Modal *@
+@if (showDeleteConfirmation)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Customer</h5>
+                    <button type="button" class="btn-close" @onclick="HideDeleteConfirmation"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Are you sure?</h5>
+                        <p class="text-muted">
+                            This will permanently delete <strong>@customer?.Name</strong> and all associated data.
+                            This action cannot be undone.
+                        </p>
+                        @if (customerStats.ActiveJobs > 0 || customerStats.CompletedJobs > 0)
+                        {
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                This customer has @(customerStats.ActiveJobs + customerStats.CompletedJobs) associated jobs which will remain in the system.
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
+                        @if (isDeleting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-trash me-1"></i>
+                        }
+                        @(isDeleting ? "Deleting..." : "Delete Customer")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -4,9 +4,9 @@ using Invoqs.Services;
 
 namespace Invoqs.Components.Pages
 {
-    public partial class CreateInvoice : ComponentBase
+    public partial class EditInvoice : ComponentBase
     {
-        [Parameter] public int CustomerId { get; set; } = 0;
+        [Parameter] public int InvoiceId { get; set; }
 
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
         [Inject] private IJobService JobService { get; set; } = default!;
@@ -14,16 +14,15 @@ namespace Invoqs.Components.Pages
         [Inject] private NavigationManager Navigation { get; set; } = default!;
 
         [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
-        [SupplyParameterFromQuery] public int? PreselectedJobId { get; set; }
 
         // Component state
         protected string currentUser = "John Doe";
         protected CustomerModel? selectedCustomer;
-        protected List<CustomerModel> customers = new();
+        protected InvoiceModel? invoice;
         protected List<JobModel> availableJobs = new();
         protected List<JobModel> filteredJobs = new();
+        protected List<JobModel> originalSelectedJobs = new();
         protected HashSet<int> selectedJobIds = new();
-        protected InvoiceModel newInvoice = new();
 
         // Filter state
         protected DateTime? filterStartDate;
@@ -35,28 +34,10 @@ namespace Invoqs.Components.Pages
         protected bool isLoading = true;
         protected bool isSaving = false;
         protected string errorMessage = "";
+        protected string successMessage = "";
 
         protected override async Task OnInitializedAsync()
         {
-            InitializeInvoice();
-            await LoadData();
-
-            // Handle job preselection
-            if (PreselectedJobId.HasValue && availableJobs.Any())
-            {
-                var jobToPreselect = availableJobs.FirstOrDefault(j => j.Id == PreselectedJobId.Value);
-                if (jobToPreselect != null && jobToPreselect.CanBeInvoiced)
-                {
-                    selectedJobIds.Add(PreselectedJobId.Value);
-                    RecalculateTotals();
-                    StateHasChanged();
-                }
-            }
-        }
-
-        protected override async Task OnParametersSetAsync()
-        {
-            // Only reload if CustomerId changes
             await LoadData();
         }
 
@@ -67,21 +48,46 @@ namespace Invoqs.Components.Pages
                 isLoading = true;
                 errorMessage = "";
 
-                // Load all customers
-                customers = await CustomerService.GetAllCustomersAsync();
-
-                // Load selected customer if CustomerId is provided
-                await LoadSelectedCustomer();
-
-                // Load jobs if customer is selected
-                if (selectedCustomer != null)
+                // Load existing invoice
+                invoice = await InvoiceService.GetInvoiceByIdAsync(InvoiceId);
+                if (invoice == null)
                 {
-                    await LoadCustomerJobs();
+                    errorMessage = "Invoice not found.";
+                    return;
                 }
+
+                // Check if invoice can be edited
+                if (invoice.Status != InvoiceStatus.Draft)
+                {
+                    return; // Let the UI handle the warning
+                }
+
+                // Load customer
+                selectedCustomer = await CustomerService.GetCustomerByIdAsync(invoice.CustomerId);
+                if (selectedCustomer == null)
+                {
+                    errorMessage = "Customer not found.";
+                    return;
+                }
+
+                // Load jobs that were originally in the invoice
+                await LoadOriginalInvoiceJobs();
+
+                // Load available jobs for this customer (completed and uninvoiced)
+                await LoadAvailableJobs();
+
+                // Pre-select jobs from original invoice
+                foreach (var lineItem in invoice.LineItems)
+                {
+                    selectedJobIds.Add(lineItem.JobId);
+                }
+
+                // Apply initial filters
+                FilterJobs();
             }
             catch (Exception ex)
             {
-                errorMessage = $"Error loading data: {ex.Message}";
+                errorMessage = $"Error loading invoice: {ex.Message}";
             }
             finally
             {
@@ -90,71 +96,35 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        private async Task LoadSelectedCustomer()
+        private async Task LoadOriginalInvoiceJobs()
         {
-            if (CustomerId > 0)
+            if (invoice!.LineItems.Any())
             {
-                selectedCustomer = await CustomerService.GetCustomerByIdAsync(CustomerId);
-                if (selectedCustomer != null)
-                {
-                    newInvoice.CustomerId = CustomerId;
-                }
+                // Use existing method to get jobs by invoice ID
+                originalSelectedJobs = await JobService.GetJobsByInvoiceIdAsync(invoice.Id);
             }
         }
 
-        private async Task LoadCustomerJobs()
+        private async Task LoadAvailableJobs()
         {
-            var customerId = selectedCustomer?.Id ?? newInvoice.CustomerId;
-            if (customerId > 0)
-            {
-                availableJobs = await JobService.GetCompletedUninvoicedJobsByCustomerAsync(customerId);
-                filteredJobs = availableJobs.ToList();
-                FilterJobs(); // Apply any existing filters
-            }
+            // Get completed uninvoiced jobs for the customer
+            var uninvoicedJobs = await JobService.GetCompletedUninvoicedJobsByCustomerAsync(selectedCustomer!.Id);
+            
+            // Combine with original invoice jobs (in case they need to be removed)
+            availableJobs = uninvoicedJobs.Union(originalSelectedJobs).ToList();
+            filteredJobs = availableJobs.ToList();
         }
 
         private string GetReturnUrl()
         {
-            return !string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : "/invoices";
-        }
-
-        protected async void OnCustomerChanged()
-        {
-            selectedCustomer = customers.FirstOrDefault(c => c.Id == newInvoice.CustomerId);
-            selectedJobIds.Clear(); // Clear any previously selected jobs
-            filterAddress = "";  // Clear address filter when customer changes
-
-            if (selectedCustomer != null)
-            {
-                await LoadCustomerJobs();
-            }
-            else
-            {
-                availableJobs.Clear();
-                filteredJobs.Clear();
-            }
-
-            RecalculateTotals();
-            StateHasChanged();
-        }
-
-        private void InitializeInvoice()
-        {
-            newInvoice = new InvoiceModel
-            {
-                CustomerId = CustomerId > 0 ? CustomerId : 0,
-                DueDate = DateTime.Now.AddDays(30), // 30 days from now
-                Status = InvoiceStatus.Draft,
-                PaymentTermsDays = 30,
-                VatRate = 5m, // Default to skip rental rate
-                InvoiceNumber = $"TEMP-{DateTime.Now:yyyyMMddHHmmss}"
-            };
+            return !string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : $"/invoice/{InvoiceId}";
         }
 
         protected void FilterJobs()
         {
             filteredJobs = availableJobs.ToList();
 
+            // Apply date range filter
             if (filterStartDate.HasValue)
             {
                 filteredJobs = filteredJobs.Where(j => j.StartDate.Date >= filterStartDate.Value.Date).ToList();
@@ -165,11 +135,13 @@ namespace Invoqs.Components.Pages
                 filteredJobs = filteredJobs.Where(j => j.StartDate.Date <= filterEndDate.Value.Date).ToList();
             }
 
+            // Apply job type filter
             if (!string.IsNullOrEmpty(filterJobType) && Enum.TryParse<JobType>(filterJobType, out var jobType))
             {
                 filteredJobs = filteredJobs.Where(j => j.Type == jobType).ToList();
             }
 
+            // Apply address filter
             if (!string.IsNullOrEmpty(filterAddress))
             {
                 filteredJobs = filteredJobs.Where(j => j.Address == filterAddress).ToList();
@@ -213,23 +185,29 @@ namespace Invoqs.Components.Pages
 
         protected void RecalculateTotals()
         {
+            if (invoice == null) return;
+
             if (!selectedJobIds.Any())
             {
-                newInvoice.Subtotal = 0;
+                invoice.Subtotal = 0;
+                invoice.LineItems.Clear();
                 return;
             }
 
-            var selectedJobs = availableJobs.Where(j => selectedJobIds.Contains(j.Id)).ToList();
+            // Get all selected jobs (from both available and original lists)
+            var allJobs = availableJobs.Union(originalSelectedJobs).ToList();
+            var selectedJobs = allJobs.Where(j => selectedJobIds.Contains(j.Id)).ToList();
 
             // Calculate subtotal
-            newInvoice.Subtotal = selectedJobs.Sum(j => j.Price);
+            invoice.Subtotal = selectedJobs.Sum(j => j.Price);
 
-            // Create temporary line items for VAT calculation
-            newInvoice.LineItems.Clear();
+            // Update line items
+            invoice.LineItems.Clear();
             foreach (var job in selectedJobs)
             {
-                newInvoice.LineItems.Add(new InvoiceLineItemModel
+                invoice.LineItems.Add(new InvoiceLineItemModel
                 {
+                    InvoiceId = invoice.Id,
                     JobId = job.Id,
                     Job = job,
                     Description = job.GetInvoiceDescription(),
@@ -239,51 +217,56 @@ namespace Invoqs.Components.Pages
             }
 
             // Calculate VAT rate based on selected jobs
-            newInvoice.CalculateVatRate();
+            invoice.CalculateVatRate();
         }
 
-        private async Task HandleCreateInvoice()
+        private async Task HandleUpdateInvoice()
         {
             try
             {
                 isSaving = true;
                 errorMessage = "";
+                successMessage = "";
 
                 if (!selectedJobIds.Any())
                 {
-                    errorMessage = "Please select at least one job to invoice.";
+                    errorMessage = "Please select at least one job for the invoice.";
                     return;
                 }
 
-                // Verify jobs can still be invoiced
-                var canInvoice = await JobService.CanJobsBeInvoicedAsync(selectedJobIds.ToList());
-                if (!canInvoice)
+                // Verify jobs can still be invoiced (for newly added jobs)
+                var newJobIds = selectedJobIds.Except(originalSelectedJobs.Select(j => j.Id)).ToList();
+                if (newJobIds.Any())
                 {
-                    errorMessage = "One or more selected jobs cannot be invoiced. Please refresh and try again.";
+                    var canInvoice = await JobService.CanJobsBeInvoicedAsync(newJobIds);
+                    if (!canInvoice)
+                    {
+                        errorMessage = "One or more newly selected jobs cannot be invoiced. Please refresh and try again.";
+                        return;
+                    }
+                }
+
+                // Update the invoice
+                var updatedInvoice = await InvoiceService.UpdateInvoiceAsync(invoice!);
+                if (updatedInvoice == null)
+                {
+                    errorMessage = "Failed to update invoice.";
                     return;
                 }
 
-                // Create invoice through service
-                var customerId = selectedCustomer?.Id ?? newInvoice.CustomerId;
-                var createdInvoice = await InvoiceService.CreateInvoiceFromJobsAsync(
-                    customerId,
-                    selectedJobIds.ToList(),
-                    newInvoice.DueDate
-                );
+                // Update job invoice status
+                await UpdateJobInvoiceStatus();
 
-                // Update the created invoice with any custom notes
-                if (!string.IsNullOrWhiteSpace(newInvoice.Notes))
-                {
-                    createdInvoice.Notes = newInvoice.Notes;
-                    await InvoiceService.UpdateInvoiceAsync(createdInvoice);
-                }
+                successMessage = "Invoice updated successfully!";
+                StateHasChanged();
 
-                // Navigate to invoice details or customer jobs page
-                Navigation.NavigateTo($"/invoice/{createdInvoice.Id}", true);
+                // Navigate back after showing success message
+                await Task.Delay(1500);
+                Navigation.NavigateTo($"/invoice/{invoice?.Id}", forceLoad: true);
             }
             catch (Exception ex)
             {
-                errorMessage = $"Error creating invoice: {ex.Message}";
+                errorMessage = $"Error updating invoice: {ex.Message}";
             }
             finally
             {
@@ -292,9 +275,35 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        private async Task UpdateJobInvoiceStatus()
+        {
+            if (invoice == null) return;
+
+            // Get originally invoiced job IDs
+            var originalJobIds = originalSelectedJobs.Select(j => j.Id).ToHashSet();
+            
+            // Get currently selected job IDs
+            var currentJobIds = selectedJobIds.ToHashSet();
+
+            // Jobs to remove from invoice (were originally selected but no longer selected)
+            var jobsToRemove = originalJobIds.Except(currentJobIds).ToList();
+            if (jobsToRemove.Any())
+            {
+                await JobService.RemoveJobsFromInvoiceAsync(jobsToRemove);
+            }
+
+            // Jobs to add to invoice (newly selected)
+            var jobsToAdd = currentJobIds.Except(originalJobIds).ToList();
+            if (jobsToAdd.Any())
+            {
+                await JobService.MarkJobsAsInvoicedAsync(jobsToAdd, invoice.Id);
+            }
+        }
+
         private void HandleInvalidSubmit()
         {
             errorMessage = "Please check the form for errors and try again.";
+            successMessage = "";
             StateHasChanged();
         }
 

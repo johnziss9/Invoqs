@@ -21,6 +21,9 @@ namespace Invoqs.Components.Pages
         protected bool isLoading = true;
         protected string errorMessage = string.Empty;
 
+        private bool showDeleteConfirmation = false;
+        private bool isDeleting = false;
+
         protected override async Task OnInitializedAsync()
         {
             await LoadCustomerData();
@@ -43,12 +46,12 @@ namespace Invoqs.Components.Pages
 
                 // Load customer
                 customer = await CustomerService.GetCustomerByIdAsync(CustomerId);
-                
+
                 if (customer != null)
                 {
                     // Load customer's jobs
                     var allCustomerJobs = await JobService.GetJobsByCustomerIdAsync(CustomerId);
-                    
+
                     // Get recent jobs (last 10, ordered by date)
                     recentJobs = allCustomerJobs
                         .OrderByDescending(j => j.StartDate)
@@ -100,6 +103,52 @@ namespace Invoqs.Components.Pages
             Console.WriteLine("Logout clicked");
             return Task.CompletedTask;
         }
+        
+        private void ShowDeleteConfirmation()
+        {
+            showDeleteConfirmation = true;
+            StateHasChanged();
+        }
+
+        private void HideDeleteConfirmation()
+        {
+            showDeleteConfirmation = false;
+            StateHasChanged();
+        }
+
+        private async Task ConfirmDelete()
+        {
+            if (customer == null) return;
+
+            try
+            {
+                isDeleting = true;
+                StateHasChanged();
+
+                var success = await CustomerService.DeleteCustomerAsync(customer.Id);
+                
+                if (success)
+                {
+                    Navigation.NavigateTo("/customers", true);
+                }
+                else
+                {
+                    errorMessage = "Failed to delete customer.";
+                    showDeleteConfirmation = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error deleting customer: {ex.Message}";
+                showDeleteConfirmation = false;
+            }
+            finally
+            {
+                isDeleting = false;
+                StateHasChanged();
+            }
+        }
+
     }
 
     public class CustomerStats
