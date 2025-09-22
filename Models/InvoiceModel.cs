@@ -106,14 +106,14 @@ namespace Invoqs.Models
             if (!LineItems.Any()) return;
 
             // If all jobs are skip rentals, use 5%
-            // If all jobs are sand delivery or fort cliff, use 19%  
+            // If all jobs are sand delivery or fork lift, use 19%  
             // If mixed, use the higher rate (19%) for safety
             var hasSkipRentals = LineItems.Any(li => li.Job?.Type == JobType.SkipRental);
-            var hasOtherServices = LineItems.Any(li => li.Job?.Type == JobType.SandDelivery || li.Job?.Type == JobType.FortCliffService);
+            var hasOtherServices = LineItems.Any(li => li.Job?.Type == JobType.SandDelivery || li.Job?.Type == JobType.ForkLiftService);
 
             if (hasOtherServices)
             {
-                VatRate = 19; // Higher rate for sand delivery and fort cliff
+                VatRate = 19; // Higher rate for sand delivery and fork lift
             }
             else if (hasSkipRentals)
             {

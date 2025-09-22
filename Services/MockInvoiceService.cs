@@ -79,9 +79,9 @@ namespace Invoqs.Services
                     DueDate = DateTime.Now.AddDays(27),
                     Status = InvoiceStatus.Draft,
                     Subtotal = 1250.00m,
-                    VatRate = 19m, // Fort cliff service
+                    VatRate = 19m, // Fork lift service
                     PaymentTermsDays = 30,
-                    Notes = "Fort cliff service - multiple locations"
+                    Notes = "Fork lift service - multiple locations"
                 },
                 new InvoiceModel
                 {
@@ -106,7 +106,7 @@ namespace Invoqs.Services
                     Subtotal = 1540.00m,
                     VatRate = 19m, // Mixed services
                     PaymentTermsDays = 30,
-                    Notes = "Multiple services - sand delivery and fort cliff"
+                    Notes = "Multiple services - sand delivery and fork lift"
                 }
             };
 

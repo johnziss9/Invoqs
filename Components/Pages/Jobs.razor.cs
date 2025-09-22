@@ -107,7 +107,7 @@ namespace Invoqs.Components.Pages
                     {
                         "skip" => JobType.SkipRental,
                         "sand" => JobType.SandDelivery,
-                        "cliff" => JobType.FortCliffService,
+                        "cliff" => JobType.ForkLiftService,
                         _ => JobType.SkipRental
                     };
                     filtered = filtered.Where(j => j.Type == type);

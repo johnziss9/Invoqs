@@ -37,7 +37,7 @@ namespace Invoqs.Components.Pages
                 var activeJobs = jobs.Where(j => j.Status == JobStatus.Active).ToList();
                 var skipRentals = activeJobs.Count(j => j.Type == JobType.SkipRental);
                 var sandDeliveries = activeJobs.Count(j => j.Type == JobType.SandDelivery);
-                var fortCliffServices = activeJobs.Count(j => j.Type == JobType.FortCliffService);
+                var forkLiftServices = activeJobs.Count(j => j.Type == JobType.ForkLiftService);
 
                 // Calculate jobs scheduled today
                 var today = DateTime.Today;
@@ -61,7 +61,7 @@ namespace Invoqs.Components.Pages
                     JobsScheduledToday = jobsToday,
                     SkipRentals = skipRentals,
                     SandDeliveries = sandDeliveries,
-                    FortCliffServices = fortCliffServices,
+                    ForkLiftServices = forkLiftServices,
 
                     // Customer metrics
                     TotalCustomers = customers.Count,

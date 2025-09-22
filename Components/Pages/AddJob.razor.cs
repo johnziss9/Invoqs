@@ -112,7 +112,7 @@ namespace Invoqs.Components.Pages
             {
                 JobType.SkipRental => "icon-skip",
                 JobType.SandDelivery => "icon-delivery-truck",
-                JobType.FortCliffService => "icon-cliff",
+                JobType.ForkLiftService => "icon-cliff",
                 _ => ""
             };
 
@@ -120,7 +120,7 @@ namespace Invoqs.Components.Pages
             {
                 JobType.SkipRental => "Skip Rental",
                 JobType.SandDelivery => "Sand Delivery",
-                JobType.FortCliffService => "Fort Cliff Service",
+                JobType.ForkLiftService => "Fork Lift Service",
                 _ => ""
             };
         }

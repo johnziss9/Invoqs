@@ -14,7 +14,7 @@ namespace Invoqs.Models
     {
         SkipRental = 0,
         SandDelivery = 1,
-        FortCliffService = 2
+        ForkLiftService = 2
     }
 
     public class JobModel
@@ -91,7 +91,7 @@ namespace Invoqs.Models
         {
             JobType.SkipRental => "/images/icons/skip.png",
             JobType.SandDelivery => "/images/icons/sand.png", 
-            JobType.FortCliffService => "/images/icons/forklift.png",
+            JobType.ForkLiftService => "/images/icons/forklift.png",
             _ => "bi-building"
         };
 
@@ -99,7 +99,7 @@ namespace Invoqs.Models
         {
             JobType.SkipRental => "Skip Rental",
             JobType.SandDelivery => "Sand Delivery",
-            JobType.FortCliffService => "Fort Cliff Service",
+            JobType.ForkLiftService => "Fork Lift Service",
             _ => "Unknown"
         };
 
@@ -112,7 +112,7 @@ namespace Invoqs.Models
         {
             JobType.SkipRental => 5m,
             JobType.SandDelivery => 19m,
-            JobType.FortCliffService => 19m,
+            JobType.ForkLiftService => 19m,
             _ => 5m // Default to lower rate
         };
 

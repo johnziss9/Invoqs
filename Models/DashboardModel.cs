@@ -11,7 +11,7 @@ namespace Invoqs.Models
         public int JobsScheduledToday { get; set; }
         public int SkipRentals { get; set; }
         public int SandDeliveries { get; set; }
-        public int FortCliffServices { get; set; }
+        public int ForkLiftServices { get; set; }
 
         // Customer metrics
         public int TotalCustomers { get; set; }
