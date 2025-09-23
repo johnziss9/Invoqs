@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Invoqs.Models;
-using Invoqs.Services;
+using Invoqs.Interfaces;
 
 namespace Invoqs.Components.Pages
 {

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Invoqs.Models;
-using Invoqs.Services;
+using Invoqs.Interfaces;
 
 namespace Invoqs.Components.Pages
 {

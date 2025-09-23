@@ -1,6 +1,6 @@
 using Invoqs.Models;
 
-namespace Invoqs.Services
+namespace Invoqs.Interfaces
 {
     public interface ICustomerService
     {

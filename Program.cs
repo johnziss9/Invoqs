@@ -1,4 +1,5 @@
 using Invoqs.Components;
+using Invoqs.Interfaces;
 using Invoqs.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpClient("InvoiceAPI", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7001/api/"); // TODO Update with API URL later
+    client.BaseAddress = new Uri("http://localhost:5126/api/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
@@ -20,9 +21,9 @@ builder.Services.AddScoped(sp =>
     return clientFactory.CreateClient("InvoiceAPI");
 });
 
-builder.Services.AddScoped<ICustomerService, MockCustomerService>();
-builder.Services.AddScoped<IJobService, MockJobService>();
-builder.Services.AddScoped<IInvoiceService, MockInvoiceService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
 var app = builder.Build();
 

@@ -1,6 +1,6 @@
 using Invoqs.Models;
 
-namespace Invoqs.Services
+namespace Invoqs.Interfaces
 {
     public interface IInvoiceService
     {
@@ -65,7 +65,7 @@ namespace Invoqs.Services
 
         // Validation helpers
         Task<bool> CanJobsBeInvoicedAsync(List<int> jobIds);
-        Task<List<JobModel>> GetUninvoicedCompletedJobsByCustomerAsync(int customerId);
-        Task<List<JobModel>> GetUninvoicedCompletedJobsByAddressAsync(int customerId, string address);
+        Task<List<JobModel>> GetUnInvoicedCompletedJobsByCustomerAsync(int customerId);
+        Task<List<JobModel>> GetUnInvoicedCompletedJobsByAddressAsync(int customerId, string address);
     }
 }
