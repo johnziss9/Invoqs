@@ -1,0 +1,93 @@
+@rendermode InteractiveServer
+@page "/login"
+@using Invoqs.Models
+@using Invoqs.Services
+
+<PageTitle>Login - Invoqs</PageTitle>
+
+<div class="login-container">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100 py-5">
+            <div class="col-md-6 col-lg-5 col-xl-4">
+                <div class="login-card">
+                    <!-- Logo and Branding -->
+                    <div class="text-center mb-4">
+                        <div class="logo-text mb-3">
+                            <h1 class="text-primary mb-0">Invoqs</h1>
+                        </div>
+                        <p class="text-muted mb-0">Professional Invoice Management</p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <EditForm Model="loginModel" OnValidSubmit="HandleLogin" OnInvalidSubmit="HandleInvalidSubmit">
+                                <DataAnnotationsValidator />
+
+                                <!-- Email Field -->
+                                <div class="mb-3">
+                                    <label class="form-label required">Email Address</label>
+                                    <InputText @bind-Value="loginModel.Email" 
+                                              class="form-control form-control-lg" 
+                                              type="email" 
+                                              placeholder="Enter your email" 
+                                              autocomplete="email"
+                                              disabled="@isLoggingIn" />
+                                    <ValidationMessage For="@(() => loginModel.Email)" class="text-danger small" />
+                                </div>
+
+                                <!-- Password Field -->
+                                <div class="mb-4">
+                                    <label class="form-label required">Password</label>
+                                    <InputText @bind-Value="loginModel.Password" 
+                                              class="form-control form-control-lg" 
+                                              type="password" 
+                                              placeholder="Enter your password"
+                                              autocomplete="current-password"
+                                              disabled="@isLoggingIn" />
+                                    <ValidationMessage For="@(() => loginModel.Password)" class="text-danger small" />
+                                </div>
+
+                                <!-- Error Message -->
+                                @if (!string.IsNullOrEmpty(errorMessage))
+                                {
+                                    <div class="alert alert-danger mb-3" role="alert">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        @errorMessage
+                                    </div>
+                                }
+
+                                <!-- Login Button -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg" disabled="@isLoggingIn">
+                                        @if (isLoggingIn)
+                                        {
+                                            <span>
+                                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                Signing In...
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span>
+                                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                                Sign In
+                                            </span>
+                                        }
+                                    </button>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            &copy; @DateTime.Now.Year Invoqs. Professional business solutions.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

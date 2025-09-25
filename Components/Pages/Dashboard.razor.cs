@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Invoqs.Models;
 using Invoqs.Interfaces;
+using Microsoft.JSInterop;
 
 namespace Invoqs.Components.Pages
 {
@@ -10,16 +11,27 @@ namespace Invoqs.Components.Pages
         [Inject] private IJobService JobService { get; set; } = default!;
         [Inject] private IInvoiceService InvoiceService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
-        // [Inject] private IJobService JobService { get; set; } = default!;
-        // [Inject] private IInvoiceService InvoiceService { get; set; } = default!;
+        [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
         protected string currentUser = "John Doe";
         protected bool isLoading = true;
         protected DashboardDataModel dashboardData = new();
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await LoadDashboardData();
+            if (firstRender)
+            {
+                var token = await GetStoredTokenAsync();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    Navigation.NavigateTo("/login", true);
+                    return;
+                }
+
+                await LoadDashboardData();
+                StateHasChanged();
+            }
         }
 
         private async Task LoadDashboardData()
@@ -85,6 +97,19 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        private async Task<string?> GetStoredTokenAsync()
+        {
+            try
+            {
+                return await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "authToken");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving auth token: {ex.Message}");
+                return null;
+            }
+        }
+
         protected string GetTimeOfDay()
         {
             var hour = DateTime.Now.Hour;
@@ -120,10 +145,20 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        protected Task HandleLogout()
+        protected async Task HandleLogout()
         {
-            Console.WriteLine("Logout clicked");
-            return Task.CompletedTask;
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
+            }
+
+            // Always redirect to login, even if localStorage clearing fails
+            Navigation.NavigateTo("/login", true);
         }
 
         // Method to refresh dashboard data
