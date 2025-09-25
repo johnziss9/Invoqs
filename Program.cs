@@ -21,6 +21,7 @@ builder.Services.AddScoped(sp =>
     return clientFactory.CreateClient("InvoiceAPI");
 });
 
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();

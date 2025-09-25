@@ -7,11 +7,13 @@ namespace Invoqs.Services
     public class InvoiceService : IInvoiceService
     {
         private readonly HttpClient _httpClient;
+        private readonly IAuthService _authService;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public InvoiceService(HttpClient httpClient)
+        public InvoiceService(HttpClient httpClient, IAuthService authService)
         {
             _httpClient = httpClient;
+            _authService = authService;
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -23,7 +25,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync("invoices");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return new List<InvoiceModel>();
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var invoices = await response.Content.ReadFromJsonAsync<List<InvoiceModel>>(_jsonOptions);
@@ -40,7 +52,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync($"invoices/{id}");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return null;
+                }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     return null;
 
@@ -58,7 +80,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.PostAsJsonAsync("invoices", invoice);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    throw new UnauthorizedAccessException("Authentication required");
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var createdInvoice = await response.Content.ReadFromJsonAsync<InvoiceModel>(_jsonOptions);
@@ -74,7 +106,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.PutAsJsonAsync($"invoices/{invoice.Id}", invoice);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    throw new UnauthorizedAccessException("Authentication required");
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var updatedInvoice = await response.Content.ReadFromJsonAsync<InvoiceModel>(_jsonOptions);
@@ -90,7 +132,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.DeleteAsync($"invoices/{id}");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException ex)
@@ -119,7 +171,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync($"invoices/customer/{customerId}");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return new List<InvoiceModel>();
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var invoices = await response.Content.ReadFromJsonAsync<List<InvoiceModel>>(_jsonOptions);
@@ -224,6 +286,9 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var request = new
                 {
                     CustomerId = customerId,
@@ -234,6 +299,13 @@ namespace Invoqs.Services
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("invoices", request);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    throw new UnauthorizedAccessException("Authentication required");
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var createdInvoice = await response.Content.ReadFromJsonAsync<InvoiceModel>(_jsonOptions);
@@ -249,7 +321,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.PostAsync($"invoices/{invoiceId}/send", null);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException ex)
@@ -263,6 +345,9 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var request = new
                 {
                     PaymentDate = paidDate,
@@ -271,6 +356,13 @@ namespace Invoqs.Services
                 };
 
                 var response = await _httpClient.PostAsJsonAsync($"invoices/{invoiceId}/payment", request);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException ex)
@@ -291,7 +383,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.PostAsync($"invoices/{invoiceId}/cancel", null);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException ex)
@@ -386,7 +488,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync("invoices/outstanding");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return 0;
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 return await response.Content.ReadFromJsonAsync<decimal>(_jsonOptions);

@@ -7,11 +7,13 @@ namespace Invoqs.Services
     public class JobService : IJobService
     {
         private readonly HttpClient _httpClient;
+        private readonly IAuthService _authService;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public JobService(HttpClient httpClient)
+        public JobService(HttpClient httpClient, IAuthService authService)
         {
             _httpClient = httpClient;
+            _authService = authService;
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -22,7 +24,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync("jobs");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return new List<JobModel>();
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var jobs = await response.Content.ReadFromJsonAsync<List<JobModel>>(_jsonOptions);
@@ -39,7 +51,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync($"jobs/customer/{customerId}");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return new List<JobModel>();
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var jobs = await response.Content.ReadFromJsonAsync<List<JobModel>>(_jsonOptions);
@@ -56,7 +78,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync($"jobs/{jobId}");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return null;
+                }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     return null;
 
@@ -74,7 +106,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.PostAsJsonAsync("jobs", job);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    throw new UnauthorizedAccessException("Authentication required");
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var createdJob = await response.Content.ReadFromJsonAsync<JobModel>(_jsonOptions);
@@ -90,7 +132,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.PutAsJsonAsync($"jobs/{job.Id}", job);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException ex)
@@ -104,7 +156,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.DeleteAsync($"jobs/{jobId}");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException ex)
@@ -202,7 +264,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync($"jobs/customer/{customerId}/grouped-by-address");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return new List<AddressJobGroup>();
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var groupedJobs = await response.Content.ReadFromJsonAsync<Dictionary<string, List<JobModel>>>(_jsonOptions);
@@ -273,7 +345,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync($"jobs/customer/{customerId}/uninvoiced");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return new List<JobModel>();
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var jobs = await response.Content.ReadFromJsonAsync<List<JobModel>>(_jsonOptions);
@@ -304,7 +386,17 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var response = await _httpClient.GetAsync($"jobs/invoice/{invoiceId}");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return new List<JobModel>();
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var jobs = await response.Content.ReadFromJsonAsync<List<JobModel>>(_jsonOptions);
@@ -321,8 +413,18 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var request = new { JobIds = jobIds, InvoiceId = invoiceId };
                 var response = await _httpClient.PostAsJsonAsync("jobs/mark-as-invoiced", request);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException ex)
@@ -336,8 +438,18 @@ namespace Invoqs.Services
         {
             try
             {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
                 var request = new { JobIds = jobIds };
                 var response = await _httpClient.PostAsJsonAsync("jobs/remove-from-invoice", request);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException ex)
