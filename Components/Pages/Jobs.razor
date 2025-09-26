@@ -176,21 +176,6 @@
                                 <option value="price">Price</option>
                             </select>
                         </div>
-                        <div class="col-md-1">
-                            <div class="d-flex justify-content-end align-items-center">
-                                <div class="btn-group" role="group">
-                                    <input type="radio" class="btn-check" name="viewMode" id="gridView" 
-                                        @onchange="@(e => viewMode = "grid")" 
-                                        checked="@(viewMode == "grid")">
-                                    <label class="btn btn-outline-secondary" for="gridView"><i class="bi bi-grid-3x3-gap"></i></label>
-                                    
-                                    <input type="radio" class="btn-check" name="viewMode" id="listView" 
-                                        @onchange="@(e => viewMode = "list")" 
-                                        checked="@(viewMode == "list")">
-                                    <label class="btn btn-outline-secondary" for="listView"><i class="bi bi-list"></i></label>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-12">
@@ -208,121 +193,20 @@
         </div>
     </div>
 
-    <!-- Job Cards/List -->
-    @if (viewMode == "grid")
-    {
-        <div class="row">
-            @foreach (var job in filteredJobs)
-            {
-                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-                    <JobCard Job="job" 
-                            Customer="@customers.FirstOrDefault(c => c.Id == job.CustomerId)"
-                            OnStatusChange="@(async (tuple) => await HandleStatusChange(tuple.job, tuple.status))"
-                            OnEdit="@(async (job) => await HandleEditJob(job))"
-                            OnDelete="@(async (job) => await HandleDeleteJob(job))"
-                            OnGenerateInvoice="@(async (job) => await HandleGenerateInvoice(job))" />
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Customer</th>
-                                <th>Job Details</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                                <th>Dates</th>
-                                <th class="text-end">Price</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var job in filteredJobs)
-                            {
-                                var customer = customers.FirstOrDefault(c => c.Id == job.CustomerId);
-                                <tr>
-                                    <td>
-                                        <div>
-                                            <button class="btn btn-link p-0 text-start fw-medium text-decoration-none" 
-                                                    @onclick="@(() => Navigation.NavigateTo($"/customer/{job.CustomerId}/jobs"))">
-                                                @(customer?.Name ?? "Unknown Customer")
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <div class="fw-medium">@job.Title</div>
-                                            <small class="text-muted">
-                                                <i class="bi bi-geo-alt me-1"></i>@job.ShortAddress
-                                            </small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark">
-                                            <i class="@job.TypeIcon me-1"></i>
-                                            @job.TypeDisplayName
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-@job.StatusColor">
-                                            <i class="@job.StatusIcon me-1"></i>
-                                            @job.Status
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="small">
-                                            <div>Start: @job.StartDate.ToString("MMM dd, yyyy")</div>
-                                            @if (job.EndDate.HasValue)
-                                            {
-                                                <div class="text-muted">End: @job.EndDate.Value.ToString("MMM dd, yyyy")</div>
-                                            }
-                                        </div>
-                                    </td>
-                                    <td class="text-end">
-                                        <div class="fw-medium">£@job.Price.ToString("N2")</div>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group btn-group-sm">
-                                            @if (job.Status == JobStatus.New)
-                                            {
-                                                <button class="btn btn-primary btn-sm" @onclick="() => HandleStatusChange(job, JobStatus.Active)" title="Start Job">
-                                                    <i class="bi bi-play"></i>
-                                                </button>
-                                            }
-                                            else if (job.Status == JobStatus.Active)
-                                            {
-                                                <button class="btn btn-success btn-sm" @onclick="() => HandleStatusChange(job, JobStatus.Completed)" title="Complete Job">
-                                                    <i class="bi bi-check"></i>
-                                                </button>
-                                            }
-                                            else if (job.Status == JobStatus.Completed)
-                                            {
-                                                <button class="btn btn-outline-success btn-sm" @onclick="() => HandleGenerateInvoice(job)" title="Generate Invoice">
-                                                    <i class="bi bi-file-earmark-text"></i>
-                                                </button>
-                                            }
-                                            <button class="btn btn-outline-primary btn-sm" @onclick="() => HandleEditJob(job)" title="Edit Job">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-outline-secondary btn-sm" @onclick="@(() => Navigation.NavigateTo($"/customer/{job.CustomerId}/jobs"))" title="View Customer Jobs">
-                                                <i class="bi bi-person"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+    <!-- Job Cards -->
+    <div class="row">
+        @foreach (var job in filteredJobs)
+        {
+            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                <JobCard Job="job" 
+                        Customer="@customers.FirstOrDefault(c => c.Id == job.CustomerId)"
+                        OnStatusChange="@(async (tuple) => await HandleStatusChange(tuple.job, tuple.status))"
+                        OnEdit="@(async (job) => await HandleEditJob(job))"
+                        OnDelete="@(async (job) => await HandleDeleteJob(job))"
+                        OnGenerateInvoice="@(async (job) => await HandleGenerateInvoice(job))" />
             </div>
-        </div>
-    }
+        }
+    </div>
 
     @if (!filteredJobs.Any())
     {

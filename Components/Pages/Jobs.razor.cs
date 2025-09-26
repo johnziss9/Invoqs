@@ -17,7 +17,6 @@ namespace Invoqs.Components.Pages
         protected string statusFilter = "all";
         protected string typeFilter = "all";
         protected string sortBy = "startDate";
-        protected string viewMode = "grid";
         protected bool isLoading = true;
         protected string errorMessage = "";
 
@@ -225,23 +224,11 @@ namespace Invoqs.Components.Pages
             return Task.CompletedTask;
         }
 
-        protected Task HandleViewCustomer(JobModel job)
-        {
-            Navigation.NavigateTo($"/customer/{job.CustomerId}/jobs");
-            return Task.CompletedTask;
-        }
-
         protected Task ShowAddJobModal()
         {
             var currentUrl = Navigation.Uri;
             Navigation.NavigateTo($"/job/new?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
             return Task.CompletedTask;
-        }
-
-        // Method to refresh data
-        protected async Task RefreshData()
-        {
-            await LoadData();
         }
     }
 }
