@@ -19,22 +19,12 @@ namespace Invoqs.Components.Pages
         protected string statusFilter = "all";
         protected string typeFilter = "all";
         protected string sortBy = "startDate";
-        protected string viewMode = "grid";
         protected bool isLoading = true;
         protected string errorMessage = "";
 
         protected CustomerModel? customer;
         protected string customerName = "Loading...";
         protected List<JobModel> jobs = new();
-
-        protected override async Task OnInitializedAsync()
-        {
-            // Decode the address parameter
-            Address = Uri.UnescapeDataString(Address);
-
-            await LoadCustomerData();
-            await LoadJobs();
-        }
 
         protected override async Task OnParametersSetAsync()
         {
@@ -230,19 +220,6 @@ namespace Invoqs.Components.Pages
             var returnUrl = Uri.EscapeDataString(currentUrl);
             Navigation.NavigateTo($"/customer/{CustomerId}/invoice/new?preselectedJobId={job.Id}&returnUrl={returnUrl}", true);
             return Task.CompletedTask;
-        }
-
-        protected void OnFilterChanged()
-        {
-            // Trigger re-evaluation of filteredJobs
-            StateHasChanged();
-        }
-
-        // Method to refresh data
-        protected async Task RefreshData()
-        {
-            await LoadCustomerData();
-            await LoadJobs();
         }
 
         protected void ClearFilters()

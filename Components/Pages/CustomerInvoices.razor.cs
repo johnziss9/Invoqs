@@ -29,7 +29,6 @@ namespace Invoqs.Components.Pages
         protected string statusFilter = "";
         protected string dateFilter = "all";
         protected string sortBy = "created";
-        protected string viewMode = "grid";
 
         protected override async Task OnInitializedAsync()
         {
@@ -235,17 +234,6 @@ namespace Invoqs.Components.Pages
                 errorMessage = $"Error cancelling invoice: {ex.Message}";
                 StateHasChanged();
             }
-        }
-
-        protected async Task RefreshData()
-        {
-            await LoadData();
-        }
-
-        protected void SetViewMode(string mode)
-        {
-            viewMode = mode;
-            StateHasChanged();
         }
     }
 }

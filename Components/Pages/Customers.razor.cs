@@ -14,7 +14,6 @@ namespace Invoqs.Components.Pages
         protected string searchTerm = "";
         protected string sortBy = "name";
         protected string filterBy = "all";
-        protected string viewMode = "grid";
         protected bool isLoading = true;
         protected string errorMessage = "";
 
@@ -82,43 +81,6 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        protected string GetInitials(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return "?";
-
-            var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length == 1)
-                return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
-
-            return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
-        }
-
-        // Event handlers with StateHasChanged to force re-render
-        protected void OnSearchChanged(ChangeEventArgs e)
-        {
-            searchTerm = e.Value?.ToString() ?? "";
-            StateHasChanged();
-        }
-
-        protected void OnSortChanged(ChangeEventArgs e)
-        {
-            sortBy = e.Value?.ToString() ?? "name";
-            StateHasChanged();
-        }
-
-        protected void OnFilterChanged(ChangeEventArgs e)
-        {
-            filterBy = e.Value?.ToString() ?? "all";
-            StateHasChanged();
-        }
-
-        protected void OnViewModeChanged(string newMode)
-        {
-            viewMode = newMode;
-            StateHasChanged();
-        }
-
         protected Task HandleLogout()
         {
             // Implement logout logic
@@ -131,14 +93,6 @@ namespace Invoqs.Components.Pages
             // Navigate to customer jobs page
             Console.WriteLine($"View jobs for {customer.Name}");
             Navigation.NavigateTo($"/customer/{customer.Id}/jobs");
-            return Task.CompletedTask;
-        }
-
-        protected Task HandleEditCustomer(CustomerModel customer)
-        {
-            // Navigate to edit customer page
-            Console.WriteLine($"Edit customer {customer.Name}");
-            Navigation.NavigateTo($"/customer/{customer.Id}/edit");
             return Task.CompletedTask;
         }
 

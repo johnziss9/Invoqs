@@ -64,21 +64,6 @@
                                 <option value="inactive">No Active Jobs</option>
                             </select>
                         </div>
-                        <div class="col-md-12 col-lg-4">
-                            <div class="d-flex justify-content-end align-items-center">
-                                <div class="btn-group" role="group">
-                                    <input type="radio" class="btn-check" name="viewMode" id="gridView" 
-                                        @onchange="@(e => viewMode = "grid")" 
-                                        checked="@(viewMode == "grid")">
-                                    <label class="btn btn-outline-secondary" for="gridView"><i class="bi bi-grid-3x3-gap"></i></label>
-                                    
-                                    <input type="radio" class="btn-check" name="viewMode" id="listView" 
-                                        @onchange="@(e => viewMode = "list")" 
-                                        checked="@(viewMode == "list")">
-                                    <label class="btn btn-outline-secondary" for="listView"><i class="bi bi-list"></i></label>
-                                </div>
-                            </div>
-                        </div>
                         <div class="row mt-3">
                             <div class="col-12">
                                 <small class="text-muted">
@@ -148,81 +133,17 @@
         </div>
     </div>
 
-    <!-- Customer Cards/List -->
-    @if (viewMode == "grid")
-    {
-        <div class="row">
-            @foreach (var customer in filteredCustomers)
-            {
-                <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                    <CustomerCard Customer="customer" 
-                                OnViewJobs="HandleViewJobs" 
-                                OnDelete="HandleDeleteCustomer" />
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Customer</th>
-                                <th>Contact</th>
-                                <th class="text-center">Jobs</th>
-                                <th class="text-center">Revenue</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var customer in filteredCustomers)
-                            {
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-circle bg-primary text-white me-3">
-                                                @GetInitials(customer.Name)
-                                            </div>
-                                            <div>
-                                                <div class="fw-medium">@customer.Name</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>@customer.Email</div>
-                                        <small class="text-muted">@customer.Phone</small>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-success">@customer.ActiveJobs</span>
-                                        <span class="badge bg-secondary">@customer.CompletedJobs</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="fw-medium">£@customer.TotalRevenue.ToString("N0")</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" @onclick="() => HandleViewJobs(customer)">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                            <button class="btn btn-outline-secondary" @onclick="() => HandleEditCustomer(customer)">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-outline-danger" @onclick="() => HandleDeleteCustomer(customer)">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+    <!-- Customer Cards -->
+    <div class="row">
+        @foreach (var customer in filteredCustomers)
+        {
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <CustomerCard Customer="customer" 
+                            OnViewJobs="HandleViewJobs" 
+                            OnDelete="HandleDeleteCustomer" />
             </div>
-        </div>
-    }
+        }
+    </div>
 
     @if (!filteredCustomers.Any())
     {

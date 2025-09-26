@@ -12,8 +12,17 @@ namespace Invoqs.Models
 
         [Required(ErrorMessage = "Customer is required")]
         public int CustomerId { get; set; }
+        public string? CustomerName { get; set; }
+        public string? CustomerEmail { get; set; }
+        public string? CustomerPhone { get; set; }
 
-        public CustomerModel? Customer { get; set; }
+        public CustomerModel? Customer => string.IsNullOrEmpty(CustomerName) ? null : new CustomerModel
+        {
+            Id = CustomerId,
+            Name = CustomerName,
+            Email = CustomerEmail ?? "",
+            Phone = CustomerPhone ?? ""
+        };
 
         [Required]
         public DateTime CreatedDate { get; set; } = DateTime.Now;

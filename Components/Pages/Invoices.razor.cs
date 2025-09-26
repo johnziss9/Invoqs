@@ -26,7 +26,6 @@ namespace Invoqs.Components.Pages
         protected string statusFilter = "";
         protected string dateFilter = "all";
         protected string sortBy = "created";
-        protected string viewMode = "grid";
 
         protected override async Task OnInitializedAsync()
         {
@@ -122,18 +121,6 @@ namespace Invoqs.Components.Pages
         protected void FilterInvoices()
         {
             StateHasChanged();
-        }
-
-        protected string GetCustomerInitials(string customerName)
-        {
-            if (string.IsNullOrWhiteSpace(customerName))
-                return "?";
-
-            var parts = customerName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length == 1)
-                return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
-
-            return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
         }
 
         // Event handlers
@@ -265,12 +252,6 @@ namespace Invoqs.Components.Pages
                 errorMessage = $"Error deleting invoice: {ex.Message}";
                 StateHasChanged();
             }
-        }
-        
-        protected void SetViewMode(string mode)
-        {
-            viewMode = mode;
-            StateHasChanged();
         }
     }
 }
