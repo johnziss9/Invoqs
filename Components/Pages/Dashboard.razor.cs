@@ -21,16 +21,28 @@ namespace Invoqs.Components.Pages
         {
             if (firstRender)
             {
-                var token = await GetStoredTokenAsync();
-
-                if (string.IsNullOrEmpty(token))
+                try
                 {
-                    Navigation.NavigateTo("/login", true);
-                    return;
-                }
+                    var token = await GetStoredTokenAsync();
 
-                await LoadDashboardData();
-                StateHasChanged();
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        Navigation.NavigateTo("/login", true);
+                        return;
+                    }
+
+                    await LoadDashboardData();
+                    StateHasChanged();
+                }
+                catch (JSDisconnectedException)
+                {
+                    // Circuit disconnected, ignore
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error during dashboard initialization: {ex.Message}");
+                    Navigation.NavigateTo("/login", true);
+                }
             }
         }
 
@@ -151,6 +163,14 @@ namespace Invoqs.Components.Pages
             {
                 await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
                 await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit disconnected, ignore
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
+            {
+                // Prerendering, ignore localStorage calls
             }
             catch (Exception ex)
             {
