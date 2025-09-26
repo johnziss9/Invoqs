@@ -20,6 +20,16 @@ namespace Invoqs.Services
             {
                 return await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", "authToken");
             }
+            catch (JSDisconnectedException)
+            {
+                // Circuit disconnected, return null
+                return null;
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
+            {
+                // Prerendering or component being disposed, return null
+                return null;
+            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error retrieving auth token: {ex.Message}");
@@ -39,6 +49,14 @@ namespace Invoqs.Services
             {
                 await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
                 await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit disconnected, ignore
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
+            {
+                // Prerendering or component being disposed, ignore localStorage calls
             }
             catch (Exception ex)
             {
