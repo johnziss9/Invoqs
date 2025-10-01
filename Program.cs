@@ -8,9 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+var apiBaseUrl = builder.Configuration["API_BASE_URL"] ?? "http://localhost:5126";
 builder.Services.AddHttpClient("InvoiceAPI", client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5126/api/");
+    client.BaseAddress = new Uri($"{apiBaseUrl}/api/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
