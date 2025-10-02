@@ -29,14 +29,19 @@ namespace Invoqs.Models
         public string? Notes { get; set; }
 
         public int ActiveJobs { get; set; }
+        public int NewJobs { get; set; }
         public int CompletedJobs { get; set; }
+        public int CancelledJobs { get; set; }
         public decimal TotalRevenue { get; set; }
+        public int UninvoicedJobs { get; set; }  // Completed jobs without invoices
+        public int UnpaidInvoices { get; set; }   // Invoices that are Sent or Overdue
+        public decimal OutstandingAmount { get; set; }  // Total amount owed
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public bool IsDeleted { get; set; } = false;
 
         // Computed properties
-        public int TotalJobs => ActiveJobs + CompletedJobs;
-        public string Status => ActiveJobs > 0 ? "Active" : "Inactive";
+        public int TotalJobs => ActiveJobs + NewJobs + CompletedJobs + CancelledJobs;
+        public bool HasActiveWork => ActiveJobs > 0 || NewJobs > 0; 
     }
 }

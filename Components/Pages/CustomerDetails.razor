@@ -24,12 +24,6 @@
                 <div>
                     <div>
                         <h2 class="text-primary mb-1">@(customer?.Name ?? "Loading...")</h2>
-                        @if (customer != null)
-                        {
-                            <span class="badge @(customer.Status == "Active" ? "bg-success" : "bg-secondary") badge-sm">
-                                @customer.Status
-                            </span>
-                        }
                     </div>
                     @if (customer != null)
                     {
@@ -232,13 +226,25 @@
                             <div class="col-6">
                                 <div class="border rounded p-2">
                                     <div class="h4 text-primary mb-1">@customerStats.ActiveJobs</div>
-                                    <small class="text-muted">Active Jobs</small>
+                                    <small class="text-muted">Active</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded p-2">
+                                    <div class="h4 text-secondary mb-1">@customerStats.NewJobs</div>
+                                    <small class="text-muted">Scheduled</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="border rounded p-2">
                                     <div class="h4 text-success mb-1">@customerStats.CompletedJobs</div>
                                     <small class="text-muted">Completed</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded p-2">
+                                    <div class="h4 text-danger mb-1">@customerStats.CancelledJobs</div>
+                                    <small class="text-muted">Cancelled</small>
                                 </div>
                             </div>
                             <div class="col-12">
@@ -262,16 +268,62 @@
                                 <span class="text-muted">Created:</span>
                                 <span class="fw-medium">@customer.CreatedDate.ToString("dd/MM/yyyy")</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
+                            <div class="d-flex justify-content-between mb-3">
                                 <span class="text-muted">Last Updated:</span>
                                 <span class="fw-medium">@((customer.UpdatedDate ?? customer.CreatedDate).ToString("dd/MM/yyyy"))</span>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted">Status:</span>
-                                <span class="badge @(customer.Status == "Active" ? "bg-success" : "bg-secondary") ms-2">
-                                    @customer.Status
-                                </span>
+                            
+                            <!-- Work Status -->
+                            <div class="pb-2 border-bottom mb-2">
+                                @if (customer.HasActiveWork)
+                                {
+                                    <div class="mb-1">
+                                        <span class="text-success">
+                                            <i class="bi bi-briefcase me-1"></i>
+                                            @((customer.ActiveJobs + customer.NewJobs)) ongoing jobs
+                                        </span>
+                                    </div>
+                                }
+                                else if (customer.CompletedJobs > 0)
+                                {
+                                    <div class="mb-1">
+                                        <span class="text-muted">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Last job completed
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="mb-1">
+                                        <span class="text-muted">
+                                            <i class="bi bi-clock-history me-1"></i>
+                                            No jobs yet
+                                        </span>
+                                    </div>
+                                }
                             </div>
+                            
+                            <!-- Financial Status -->
+                            @if (customer.UninvoicedJobs > 0)
+                            {
+                                <div class="mb-1">
+                                    <span class="text-warning">
+                                        <i class="bi bi-exclamation-circle me-1"></i>
+                                        @customer.UninvoicedJobs uninvoiced jobs
+                                    </span>
+                                </div>
+                            }
+                            
+                            @if (customer.UnpaidInvoices > 0)
+                            {
+                                <div>
+                                    <span class="text-danger">
+                                        <i class="bi bi-currency-pound me-1"></i>
+                                        @customer.UnpaidInvoices unpaid (@customer.OutstandingAmount.ToString("C"))
+                                    </span>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -286,10 +338,6 @@
                             <a href="/customer/@CustomerId/job/new?returnUrl=@Uri.EscapeDataString($"/customer/{CustomerId}")" class="btn btn-outline-success btn-sm">
                                 <i class="bi bi-plus-lg me-1"></i>
                                 Create New Job
-                            </a>
-                            <a href="/customer/@CustomerId/jobs" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-calendar-check me-1"></i>
-                                Customer Jobs
                             </a>
                             <a href="/customer/@CustomerId/invoice/new" class="btn btn-outline-info btn-sm">
                                 <i class="bi bi-receipt me-1"></i>

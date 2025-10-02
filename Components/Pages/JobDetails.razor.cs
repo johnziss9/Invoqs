@@ -195,7 +195,7 @@ namespace Invoqs.Components.Pages
         {
             if (invoiceId.HasValue)
             {
-                Navigation.NavigateTo($"/invoice/{invoiceId.Value}");
+                Navigation.NavigateTo($"/invoice/{invoiceId.Value}", true);
             }
         }
 

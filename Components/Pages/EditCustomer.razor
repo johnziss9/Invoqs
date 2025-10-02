@@ -120,73 +120,130 @@
                                             @successMessage
                                         </div>
                                     }
-                            </div>
-                            <div class="d-flex gap-2">
-                                <a href="@GetReturnUrl()" class="btn btn-outline-secondary">
-                                    Cancel
-                                </a>
-                                <button type="submit" class="btn btn-primary" disabled="@isSaving">
-                                    @(isSaving ? "Saving..." : "Save Changes")
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Customer Stats -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="mb-0">Customer Statistics</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center g-3">
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <div class="h4 text-primary mb-1">@customer.ActiveJobs</div>
-                                    <small class="text-muted">Active Jobs</small>
                                 </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <div class="h4 text-success mb-1">@customer.CompletedJobs</div>
-                                    <small class="text-muted">Completed</small>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="border rounded p-2">
-                                    <div class="h4 text-warning mb-1">£@customer.TotalRevenue.ToString("N0")</div>
-                                    <small class="text-muted">Total Revenue</small>
+                                <div class="d-flex gap-2">
+                                    <a href="@GetReturnUrl()" class="btn btn-outline-secondary">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary" disabled="@isSaving">
+                                        @(isSaving ? "Saving..." : "Save Changes")
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Customer Details -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="mb-0">Customer Details</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="small">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Created:</span>
-                                <span class="fw-medium">@customer.CreatedDate.ToString("dd/MM/yyyy")</span>
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Customer Stats -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="mb-0">Customer Statistics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center g-3">
+                                <div class="col-6">
+                                    <div class="border rounded p-2">
+                                        <div class="h4 text-primary mb-1">@customer.ActiveJobs</div>
+                                        <small class="text-muted">Active</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded p-2">
+                                        <div class="h4 text-secondary mb-1">@customer.NewJobs</div>
+                                        <small class="text-muted">Scheduled</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded p-2">
+                                        <div class="h4 text-success mb-1">@customer.CompletedJobs</div>
+                                        <small class="text-muted">Completed</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded p-2">
+                                        <div class="h4 text-danger mb-1">@customer.CancelledJobs</div>
+                                        <small class="text-muted">Cancelled</small>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="border rounded p-2">
+                                        <div class="h4 text-warning mb-1">£@customer.TotalRevenue.ToString("N0")</div>
+                                        <small class="text-muted">Total Revenue</small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Last Updated:</span>
-                                <span class="fw-medium">@((customer.UpdatedDate ??
-                                                                        customer.CreatedDate).ToString("dd/MM/yyyy"))</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Details -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="mb-0">Customer Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="small">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Created:</span>
+                                    <span class="fw-medium">@customer.CreatedDate.ToString("dd/MM/yyyy")</span>
                                 </div>
-                                <div class="d-flex justify-content-between">
-                                    <span class="text-muted">Status:</span>
-                                    <span class="badge @(customer.ActiveJobs > 0 ? "bg-success" : "bg-secondary")">
-                                        @(customer.ActiveJobs > 0 ? "Active" : "Inactive")
-                                    </span>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">Last Updated:</span>
+                                    <span class="fw-medium">@((customer.UpdatedDate ?? customer.CreatedDate).ToString("dd/MM/yyyy"))</span>
                                 </div>
+                                
+                                <!-- Work Status -->
+                                <div class="pb-2 border-bottom mb-2">
+                                    @if (customer.HasActiveWork)
+                                    {
+                                        <div class="mb-1">
+                                            <span class="text-success">
+                                                <i class="bi bi-briefcase me-1"></i>
+                                                @((customer.ActiveJobs + customer.NewJobs)) ongoing jobs
+                                            </span>
+                                        </div>
+                                    }
+                                    else if (customer.CompletedJobs > 0)
+                                    {
+                                        <div class="mb-1">
+                                            <span class="text-muted">
+                                                <i class="bi bi-check-circle me-1"></i>
+                                                Last job completed
+                                            </span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="mb-1">
+                                            <span class="text-muted">
+                                                <i class="bi bi-clock-history me-1"></i>
+                                                No jobs yet
+                                            </span>
+                                        </div>
+                                    }
+                                </div>
+                                
+                                <!-- Financial Status -->
+                                @if (customer.UninvoicedJobs > 0)
+                                {
+                                    <div class="mb-1">
+                                        <span class="text-warning">
+                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                            @customer.UninvoicedJobs uninvoiced jobs
+                                        </span>
+                                    </div>
+                                }
+                                
+                                @if (customer.UnpaidInvoices > 0)
+                                {
+                                    <div>
+                                        <span class="text-danger">
+                                            <i class="bi bi-currency-pound me-1"></i>
+                                            @customer.UnpaidInvoices unpaid (@customer.OutstandingAmount.ToString("C"))
+                                        </span>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

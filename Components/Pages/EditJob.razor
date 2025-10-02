@@ -240,12 +240,58 @@
                                         <span class="text-muted">Last Updated:</span>
                                         <span class="fw-medium">@((customer.UpdatedDate ?? customer.CreatedDate).ToString("dd/MM/yyyy"))</span>
                                     </div>
-                                    <div class="d-flex justify-content-between">
-                                        <span class="text-muted">Status:</span>
-                                        <span class="badge @(customer.Status == "Active" ? "bg-success" : "bg-secondary") ms-2">
-                                            @customer.Status
-                                        </span>
+
+                                    <!-- Work Status -->
+                                    <div class="pb-2 border-bottom mb-2">
+                                        @if (customer.HasActiveWork)
+                                        {
+                                            <div class="mb-1">
+                                                <span class="text-success">
+                                                    <i class="bi bi-briefcase me-1"></i>
+                                                    @((customer.ActiveJobs + customer.NewJobs)) ongoing jobs
+                                                </span>
+                                            </div>
+                                        }
+                                        else if (customer.CompletedJobs > 0)
+                                        {
+                                            <div class="mb-1">
+                                                <span class="text-muted">
+                                                    <i class="bi bi-check-circle me-1"></i>
+                                                    Last job completed
+                                                </span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="mb-1">
+                                                <span class="text-muted">
+                                                    <i class="bi bi-clock-history me-1"></i>
+                                                    No jobs yet
+                                                </span>
+                                            </div>
+                                        }
                                     </div>
+
+                                    <!-- Financial Status -->
+                                    @if (customer.UninvoicedJobs > 0)
+                                    {
+                                        <div class="mb-1">
+                                            <span class="text-warning">
+                                                <i class="bi bi-exclamation-circle me-1"></i>
+                                                @customer.UninvoicedJobs uninvoiced jobs
+                                            </span>
+                                        </div>
+                                    }
+
+                                    @if (customer.UnpaidInvoices > 0)
+                                    {
+                                        <div>
+                                            <span class="text-danger">
+                                                <i class="bi bi-currency-pound me-1"></i>
+                                                @customer.UnpaidInvoices unpaid (@customer.OutstandingAmount.ToString("C"))
+                                            </span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
