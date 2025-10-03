@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
+using Invoqs.Models;
 
 namespace Invoqs.Components.Pages
 {
@@ -142,15 +143,6 @@ namespace Invoqs.Components.Pages
         {
             public string Token { get; set; } = "";
             public UserInfo User { get; set; } = new();
-        }
-
-        public class UserInfo
-        {
-            public int Id { get; set; }
-            public string Email { get; set; } = "";
-            public string FirstName { get; set; } = "";
-            public string LastName { get; set; } = "";
-            public string FullName { get; set; } = "";
         }
     }
 }

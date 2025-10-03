@@ -13,7 +13,7 @@ namespace Invoqs.Components.Pages
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
-        protected string currentUser = "John Doe";
+        protected string currentUser = "User";
         protected bool isLoading = true;
         protected DashboardDataModel dashboardData = new();
 
@@ -30,6 +30,8 @@ namespace Invoqs.Components.Pages
                         Navigation.NavigateTo("/login", true);
                         return;
                     }
+
+                    await LoadCurrentUserAsync();
 
                     await LoadDashboardData();
                     StateHasChanged();
@@ -106,6 +108,29 @@ namespace Invoqs.Components.Pages
             {
                 isLoading = false;
                 StateHasChanged();
+            }
+        }
+
+        private async Task LoadCurrentUserAsync()
+        {
+            try
+            {
+                var storedUserJson = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "currentUser");
+                
+                if (!string.IsNullOrEmpty(storedUserJson))
+                {
+                    var userInfo = System.Text.Json.JsonSerializer.Deserialize<UserInfo>(storedUserJson);
+                    
+                    if (userInfo != null && !string.IsNullOrEmpty(userInfo.FirstName))
+                    {
+                        currentUser = userInfo.FirstName;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading current user: {ex.Message}");
+                currentUser = "User";
             }
         }
 
