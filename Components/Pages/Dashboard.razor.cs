@@ -76,11 +76,34 @@ namespace Invoqs.Components.Pages
                 // Calculate pending invoices and amount
                 var pendingInvoices = invoices.Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Overdue).ToList();
 
+                // Calculate this week's revenue
+                var twoWeeksAgo = DateTime.Now.AddDays(-14);
+
+                var thisWeekInvoices = invoices.Where(i => 
+                    i.Status == InvoiceStatus.Paid && 
+                    i.PaidDate.HasValue && 
+                    i.PaidDate >= oneWeekAgo).ToList();
+
+                var lastWeekInvoices = invoices.Where(i => 
+                    i.Status == InvoiceStatus.Paid && 
+                    i.PaidDate.HasValue && 
+                    i.PaidDate >= twoWeeksAgo && 
+                    i.PaidDate < oneWeekAgo).ToList();
+
+                var weekRevenue = thisWeekInvoices.Sum(i => i.Total);
+                var lastWeekRevenue = lastWeekInvoices.Sum(i => i.Total);
+
+                // Calculate growth percentage
+                decimal revenueGrowth = 0;
+                if (lastWeekRevenue > 0)
+                {
+                    revenueGrowth = ((weekRevenue - lastWeekRevenue) / lastWeekRevenue) * 100;
+                }
+
                 dashboardData = new DashboardDataModel
                 {
-                    // Revenue metrics - get from invoice service
-                    WeekRevenue = await InvoiceService.GetWeeklyRevenueAsync(),
-                    RevenueGrowth = 12.5m, // Calculate vs previous week if needed
+                    WeekRevenue = weekRevenue,
+                    RevenueGrowth = revenueGrowth,
 
                     // Job metrics
                     ActiveJobs = activeJobs.Count,

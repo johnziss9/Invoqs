@@ -147,7 +147,7 @@ namespace Invoqs.Components.Pages
                 Status = InvoiceStatus.Draft,
                 PaymentTermsDays = 30,
                 VatRate = 5m, // Default to skip rental rate
-                InvoiceNumber = $"TEMP-{DateTime.Now:yyyyMMddHHmmss}"
+                InvoiceNumber = string.Empty
             };
         }
 
