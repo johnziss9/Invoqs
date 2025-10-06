@@ -176,90 +176,6 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<List<JobModel>> GetJobsByStatusAsync(JobStatus status)
-        {
-            try
-            {
-                var allJobs = await GetAllJobsAsync();
-                return allJobs.Where(j => j.Status == status).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error filtering jobs by status: {ex.Message}");
-                return new List<JobModel>();
-            }
-        }
-
-        public async Task<List<JobModel>> GetJobsByTypeAsync(JobType type)
-        {
-            try
-            {
-                var allJobs = await GetAllJobsAsync();
-                return allJobs.Where(j => j.Type == type).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error filtering jobs by type: {ex.Message}");
-                return new List<JobModel>();
-            }
-        }
-
-        public async Task<List<JobModel>> GetJobsByDateRangeAsync(DateTime startDate, DateTime endDate)
-        {
-            try
-            {
-                var allJobs = await GetAllJobsAsync();
-                return allJobs.Where(j => j.StartDate >= startDate && j.StartDate <= endDate).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error filtering jobs by date range: {ex.Message}");
-                return new List<JobModel>();
-            }
-        }
-
-        public async Task<decimal> GetTotalRevenueByCustomerAsync(int customerId)
-        {
-            try
-            {
-                var jobs = await GetJobsByCustomerIdAsync(customerId);
-                return jobs.Where(j => j.Status == JobStatus.Completed).Sum(j => j.Price);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error calculating revenue for customer {customerId}: {ex.Message}");
-                return 0;
-            }
-        }
-
-        public async Task<int> GetActiveJobCountByCustomerAsync(int customerId)
-        {
-            try
-            {
-                var jobs = await GetJobsByCustomerIdAsync(customerId);
-                return jobs.Count(j => j.Status == JobStatus.Active);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error counting active jobs for customer {customerId}: {ex.Message}");
-                return 0;
-            }
-        }
-
-        public async Task<int> GetCompletedJobCountByCustomerAsync(int customerId)
-        {
-            try
-            {
-                var jobs = await GetJobsByCustomerIdAsync(customerId);
-                return jobs.Count(j => j.Status == JobStatus.Completed);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error counting completed jobs for customer {customerId}: {ex.Message}");
-                return 0;
-            }
-        }
-
         public async Task<List<AddressJobGroup>> GetJobsGroupedByAddressAsync(int customerId)
         {
             try
@@ -306,41 +222,7 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<AddressJobGroup?> GetAddressJobGroupAsync(int customerId, string address)
-        {
-            try
-            {
-                var jobs = await GetJobsByAddressAsync(customerId, address);
-                if (!jobs.Any()) return null;
-
-                return new AddressJobGroup
-                {
-                    Address = address,
-                    Jobs = jobs
-                };
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error creating address job group: {ex.Message}");
-                return null;
-            }
-        }
-
         // Invoice integration methods
-        public async Task<List<JobModel>> GetCompletedUninvoicedJobsAsync()
-        {
-            try
-            {
-                var allJobs = await GetAllJobsAsync();
-                return allJobs.Where(j => j.CanBeInvoiced).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error fetching completed uninvoiced jobs: {ex.Message}");
-                return new List<JobModel>();
-            }
-        }
-
         public async Task<List<JobModel>> GetCompletedUninvoicedJobsByCustomerAsync(int customerId)
         {
             try
@@ -364,20 +246,6 @@ namespace Invoqs.Services
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"Error fetching uninvoiced jobs for customer {customerId}: {ex.Message}");
-                return new List<JobModel>();
-            }
-        }
-
-        public async Task<List<JobModel>> GetCompletedUninvoicedJobsByAddressAsync(int customerId, string address)
-        {
-            try
-            {
-                var jobs = await GetCompletedUninvoicedJobsByCustomerAsync(customerId);
-                return jobs.Where(j => j.Address.Equals(address, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error fetching uninvoiced jobs by address: {ex.Message}");
                 return new List<JobModel>();
             }
         }
@@ -488,50 +356,6 @@ namespace Invoqs.Services
             {
                 Console.WriteLine($"Error checking if jobs can be invoiced: {ex.Message}");
                 return false;
-            }
-        }
-
-        public async Task<List<AddressJobGroup>> GetUninvoicedJobsGroupedByAddressAsync(int customerId)
-        {
-            try
-            {
-                var jobs = await GetCompletedUninvoicedJobsByCustomerAsync(customerId);
-                var groupedJobs = jobs.GroupBy(j => j.Address)
-                    .Select(g => new AddressJobGroup
-                    {
-                        Address = g.Key,
-                        Jobs = g.ToList()
-                    })
-                    .Where(g => g.HasJobsToInvoice)
-                    .OrderBy(g => g.Address)
-                    .ToList();
-
-                return groupedJobs;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error fetching uninvoiced jobs grouped by address: {ex.Message}");
-                return new List<AddressJobGroup>();
-            }
-        }
-
-        public async Task<AddressJobGroup?> GetUninvoicedAddressJobGroupAsync(int customerId, string address)
-        {
-            try
-            {
-                var jobs = await GetCompletedUninvoicedJobsByAddressAsync(customerId, address);
-                if (!jobs.Any()) return null;
-
-                return new AddressJobGroup
-                {
-                    Address = address,
-                    Jobs = jobs
-                };
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error creating uninvoiced address job group: {ex.Message}");
-                return null;
             }
         }
     }
