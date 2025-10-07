@@ -60,6 +60,19 @@ namespace Invoqs.Models
         public int? InvoiceId { get; set; }
         public DateTime? InvoicedDate { get; set; }
 
+        // ===== JOB TYPE SPECIFIC FIELDS =====
+        
+        // Skip Rental specific fields
+        public string? SkipType { get; set; }
+        public string? SkipNumber { get; set; }
+        
+        // Sand Delivery specific fields
+        public string? SandMaterialType { get; set; }
+        public string? SandDeliveryMethod { get; set; }
+        
+        // Forklift Service specific fields
+        public string? ForkliftSize { get; set; }
+
         // Navigation properties
         public CustomerModel? Customer { get; set; }
         public InvoiceModel? Invoice { get; set; }
@@ -101,6 +114,39 @@ namespace Invoqs.Models
             JobType.SandDelivery => "Sand Delivery",
             JobType.ForkLiftService => "Fork Lift Service",
             _ => "Unknown"
+        };
+
+        // ===== JOB TYPE SPECIFIC DISPLAY HELPERS =====
+        
+        public string SkipTypeDisplay => SkipType switch
+        {
+            "SmallSkip" => "Small Skip",
+            "LargeSkip" => "Large Skip",
+            "Hook" => "Hook",
+            _ => ""
+        };
+        
+        public string SandMaterialTypeDisplay => SandMaterialType switch
+        {
+            "Sand" => "Sand",
+            "CrushedStone" => "Crushed Stone",
+            "SandMixedWithCrushedStone" => "Sand Mixed with Crushed Stone",
+            "Soil" => "Soil",
+            _ => ""
+        };
+        
+        public string SandDeliveryMethodDisplay => SandDeliveryMethod switch
+        {
+            "InBags" => "In Bags",
+            "ByTruck" => "By Truck",
+            _ => ""
+        };
+        
+        public string ForkliftSizeDisplay => ForkliftSize switch
+        {
+            "17m" => "17m",
+            "25m" => "25m",
+            _ => ""
         };
 
         public string ShortAddress => Address.Length > 50 ? Address.Substring(0, 47) + "..." : Address;

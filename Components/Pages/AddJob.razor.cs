@@ -123,7 +123,32 @@ namespace Invoqs.Components.Pages
                 JobType.ForkLiftService => "Fork Lift Service",
                 _ => ""
             };
+
+            // Clear type-specific fields when job type changes
+            ClearTypeSpecificFields();
+            StateHasChanged();
         }
+
+        private void OnSkipTypeChanged()
+        {
+            // Clear skip number if switching to Hook
+            if (newJob.SkipType == "Hook")
+            {
+                newJob.SkipNumber = null;
+            }
+            StateHasChanged();
+        }
+
+        private void ClearTypeSpecificFields()
+        {
+            // Clear all type-specific fields when type changes
+            newJob.SkipType = null;
+            newJob.SkipNumber = null;
+            newJob.SandMaterialType = null;
+            newJob.SandDeliveryMethod = null;
+            newJob.ForkliftSize = null;
+        }
+
 
         private async Task HandleValidSubmit()
         {

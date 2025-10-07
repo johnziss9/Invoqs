@@ -71,7 +71,7 @@
                                 <!-- Job Type and Status -->
                                 <div class="col-md-6">
                                     <label class="form-label required">Job Type</label>
-                                    <InputSelect @bind-Value="job.Type" class="form-select">
+                                    <InputSelect @bind-Value="job.Type" class="form-select" @bind-Value:after="OnJobTypeChanged">
                                         <option value="@JobType.SkipRental">Skip Rental</option>
                                         <option value="@JobType.SandDelivery">Sand Delivery</option>
                                         <option value="@JobType.ForkLiftService">Fork Lift Service</option>
@@ -88,6 +88,95 @@
                                     </InputSelect>
                                     <ValidationMessage For="@(() => job.Status)" class="text-danger small" />
                                 </div>
+
+                                <!-- ===== CONDITIONAL TYPE-SPECIFIC FIELDS ===== -->
+
+                                <!-- SKIP RENTAL FIELDS -->
+                                @if (job.Type == JobType.SkipRental)
+                                {
+                                    <div class="col-12">
+                                        <div class="alert alert-info py-2">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <strong>Skip Rental Details</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Skip Type</label>
+                                        <InputSelect @bind-Value="job.SkipType" class="form-select" @bind-Value:after="OnSkipTypeChanged">
+                                            <option value="">-- Select Skip Type --</option>
+                                            <option value="SmallSkip">Small Skip</option>
+                                            <option value="LargeSkip">Large Skip</option>
+                                            <option value="Hook">Hook</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => job.SkipType)" class="text-danger small" />
+                                    </div>
+
+                                    @if (job.SkipType == "SmallSkip" || job.SkipType == "LargeSkip")
+                                    {
+                                        <div class="col-md-6">
+                                            <label class="form-label required">Skip Number</label>
+                                            <InputText @bind-Value="job.SkipNumber" class="form-control" 
+                                                      placeholder="e.g., SK-001" />
+                                            <div class="form-text">Enter the skip identification number</div>
+                                            <ValidationMessage For="@(() => job.SkipNumber)" class="text-danger small" />
+                                        </div>
+                                    }
+                                }
+
+                                <!-- SAND DELIVERY FIELDS -->
+                                @if (job.Type == JobType.SandDelivery)
+                                {
+                                    <div class="col-12">
+                                        <div class="alert alert-info py-2">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <strong>Sand Delivery Details</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Material Type</label>
+                                        <InputSelect @bind-Value="job.SandMaterialType" class="form-select">
+                                            <option value="">-- Select Material --</option>
+                                            <option value="Sand">Sand</option>
+                                            <option value="CrushedStone">Crushed Stone</option>
+                                            <option value="SandMixedWithCrushedStone">Sand Mixed with Crushed Stone</option>
+                                            <option value="Soil">Soil</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => job.SandMaterialType)" class="text-danger small" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Delivery Method</label>
+                                        <InputSelect @bind-Value="job.SandDeliveryMethod" class="form-select">
+                                            <option value="">-- Select Method --</option>
+                                            <option value="InBags">In Bags</option>
+                                            <option value="ByTruck">By Truck</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => job.SandDeliveryMethod)" class="text-danger small" />
+                                    </div>
+                                }
+
+                                <!-- FORKLIFT SERVICE FIELDS -->
+                                @if (job.Type == JobType.ForkLiftService)
+                                {
+                                    <div class="col-12">
+                                        <div class="alert alert-info py-2">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <strong>Forklift Service Details</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Forklift Size</label>
+                                        <InputSelect @bind-Value="job.ForkliftSize" class="form-select">
+                                            <option value="">-- Select Size --</option>
+                                            <option value="17m">17m</option>
+                                            <option value="25m">25m</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => job.ForkliftSize)" class="text-danger small" />
+                                    </div>
+                                }
 
                                 <!-- Address -->
                                 <div class="col-12">
