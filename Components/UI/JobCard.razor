@@ -139,6 +139,32 @@
                     </small>
                 </div>
             }
+
+            <!-- ===== TYPE-SPECIFIC INFO BADGES ===== -->
+            @if (Job.Type == JobType.SkipRental && !string.IsNullOrEmpty(Job.SkipNumber))
+            {
+                <div class="mt-2">
+                    <small class="badge bg-secondary">
+                        #@Job.SkipNumber
+                    </small>
+                </div>
+            }
+            @if (Job.Type == JobType.SandDelivery && !string.IsNullOrEmpty(Job.SandMaterialType))
+            {
+                <div class="mt-2">
+                    <small class="badge bg-secondary">
+                        @Job.SandMaterialTypeDisplay
+                    </small>
+                </div>
+            }
+            @if (Job.Type == JobType.ForkLiftService && !string.IsNullOrEmpty(Job.ForkliftSize))
+            {
+                <div class="mt-2">
+                    <small class="badge bg-secondary">
+                        @Job.ForkliftSizeDisplay
+                    </small>
+                </div>
+            }
         </div>
 
         <!-- Job Details -->

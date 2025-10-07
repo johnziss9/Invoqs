@@ -68,6 +68,32 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        private void OnSkipTypeChanged()
+        {
+            if (job == null) return;
+            
+            // Clear skip number if switching to Hook
+            if (job.SkipType == "Hook")
+            {
+                job.SkipNumber = null;
+            }
+            StateHasChanged();
+        }
+
+        private void OnJobTypeChanged()
+        {
+            if (job == null) return;
+            
+            // Clear ALL type-specific fields when job type changes
+            job.SkipType = null;
+            job.SkipNumber = null;
+            job.SandMaterialType = null;
+            job.SandDeliveryMethod = null;
+            job.ForkliftSize = null;
+            
+            StateHasChanged();
+        }
+
         private async Task HandleValidSubmit()
         {
             if (job == null) return;

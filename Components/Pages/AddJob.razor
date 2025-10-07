@@ -110,6 +110,95 @@
                                     <ValidationMessage For="@(() => newJob.Status)" class="text-danger small" />
                                 </div>
 
+                                <!-- ===== CONDITIONAL TYPE-SPECIFIC FIELDS ===== -->
+
+                                <!-- SKIP RENTAL FIELDS -->
+                                @if (newJob.Type == JobType.SkipRental)
+                                {
+                                    <div class="col-12">
+                                        <div class="alert alert-info py-2">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <strong>Skip Rental Details</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Skip Type</label>
+                                        <InputSelect @bind-Value="newJob.SkipType" class="form-select" @bind-Value:after="OnSkipTypeChanged">
+                                            <option value="">-- Select Skip Type --</option>
+                                            <option value="SmallSkip">Small Skip</option>
+                                            <option value="LargeSkip">Large Skip</option>
+                                            <option value="Hook">Hook</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => newJob.SkipType)" class="text-danger small" />
+                                    </div>
+
+                                    @if (newJob.SkipType == "SmallSkip" || newJob.SkipType == "LargeSkip")
+                                    {
+                                        <div class="col-md-6">
+                                            <label class="form-label required">Skip Number</label>
+                                            <InputText @bind-Value="newJob.SkipNumber" class="form-control" 
+                                                      placeholder="e.g., SK-001" />
+                                            <div class="form-text">Enter the skip identification number</div>
+                                            <ValidationMessage For="@(() => newJob.SkipNumber)" class="text-danger small" />
+                                        </div>
+                                    }
+                                }
+
+                                <!-- SAND DELIVERY FIELDS -->
+                                @if (newJob.Type == JobType.SandDelivery)
+                                {
+                                    <div class="col-12">
+                                        <div class="alert alert-info py-2">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <strong>Sand Delivery Details</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Material Type</label>
+                                        <InputSelect @bind-Value="newJob.SandMaterialType" class="form-select">
+                                            <option value="">-- Select Material --</option>
+                                            <option value="Sand">Sand</option>
+                                            <option value="CrushedStone">Crushed Stone</option>
+                                            <option value="SandMixedWithCrushedStone">Sand Mixed with Crushed Stone</option>
+                                            <option value="Soil">Soil</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => newJob.SandMaterialType)" class="text-danger small" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Delivery Method</label>
+                                        <InputSelect @bind-Value="newJob.SandDeliveryMethod" class="form-select">
+                                            <option value="">-- Select Method --</option>
+                                            <option value="InBags">In Bags</option>
+                                            <option value="ByTruck">By Truck</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => newJob.SandDeliveryMethod)" class="text-danger small" />
+                                    </div>
+                                }
+
+                                <!-- FORKLIFT SERVICE FIELDS -->
+                                @if (newJob.Type == JobType.ForkLiftService)
+                                {
+                                    <div class="col-12">
+                                        <div class="alert alert-info py-2">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <strong>Forklift Service Details</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Forklift Size</label>
+                                        <InputSelect @bind-Value="newJob.ForkliftSize" class="form-select">
+                                            <option value="">-- Select Size --</option>
+                                            <option value="17m">17m</option>
+                                            <option value="25m">25m</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => newJob.ForkliftSize)" class="text-danger small" />
+                                    </div>
+                                }
+
                                 <!-- Address -->
                                 <div class="col-12">
                                     <label class="form-label required">Service Address</label>
@@ -261,6 +350,62 @@
                                         £@newJob.Price.ToString("N2")
                                     </div>
                                 </div>
+
+                                <!-- ===== TYPE-SPECIFIC PREVIEW FIELDS ===== -->
+
+                                @if (newJob.Type == JobType.SkipRental && !string.IsNullOrEmpty(newJob.SkipType))
+                                {
+                                    <div class="mb-2">
+                                        <small class="text-muted d-block">Skip Type:</small>
+                                        <div class="small">
+                                            @newJob.SkipTypeDisplay
+                                        </div>
+                                    </div>
+                                    
+                                    @if (!string.IsNullOrEmpty(newJob.SkipNumber))
+                                    {
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block">Skip Number:</small>
+                                            <div class="small">
+                                                <i class="bi bi-hash me-1"></i>
+                                                @newJob.SkipNumber
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                @if (newJob.Type == JobType.SandDelivery)
+                                {
+                                    @if (!string.IsNullOrEmpty(newJob.SandMaterialType))
+                                    {
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block">Material Type:</small>
+                                            <div class="small">
+                                                @newJob.SandMaterialTypeDisplay
+                                            </div>
+                                        </div>
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(newJob.SandDeliveryMethod))
+                                    {
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block">Delivery Method:</small>
+                                            <div class="small">
+                                                @newJob.SandDeliveryMethodDisplay
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                @if (newJob.Type == JobType.ForkLiftService && !string.IsNullOrEmpty(newJob.ForkliftSize))
+                                {
+                                    <div class="mb-2">
+                                        <small class="text-muted d-block">Forklift Size:</small>
+                                        <div class="small">
+                                            @newJob.ForkliftSizeDisplay
+                                        </div>
+                                    </div>
+                                }
 
                                 @if (!string.IsNullOrWhiteSpace(newJob.Description))
                                 {

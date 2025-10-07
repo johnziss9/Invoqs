@@ -129,6 +129,69 @@
                                     @job.DurationDays days
                                 </div>
                             </div>
+
+                            <!-- ===== TYPE-SPECIFIC FIELDS DISPLAY ===== -->
+
+                            @if (job.Type == JobType.SkipRental)
+                            {
+                                @if (!string.IsNullOrEmpty(job.SkipType))
+                                {
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-medium">Skip Type</label>
+                                        <div class="form-control-plaintext">
+                                            <i class="bi bi-box me-2"></i>
+                                            @job.SkipTypeDisplay
+                                        </div>
+                                    </div>
+                                }
+                                
+                                @if (!string.IsNullOrEmpty(job.SkipNumber))
+                                {
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-medium">Skip Number</label>
+                                        <div class="form-control-plaintext">
+                                            <i class="bi bi-hash me-2"></i>
+                                            @job.SkipNumber
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            @if (job.Type == JobType.SandDelivery)
+                            {
+                                @if (!string.IsNullOrEmpty(job.SandMaterialType))
+                                {
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-medium">Material Type</label>
+                                        <div class="form-control-plaintext">
+                                            <i class="bi bi-box-seam me-2"></i>
+                                            @job.SandMaterialTypeDisplay
+                                        </div>
+                                    </div>
+                                }
+                                
+                                @if (!string.IsNullOrEmpty(job.SandDeliveryMethod))
+                                {
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-medium">Delivery Method</label>
+                                        <div class="form-control-plaintext">
+                                            <i class="bi bi-truck me-2"></i>
+                                            @job.SandDeliveryMethodDisplay
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            @if (job.Type == JobType.ForkLiftService && !string.IsNullOrEmpty(job.ForkliftSize))
+                            {
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Forklift Size</label>
+                                    <div class="form-control-plaintext">
+                                        <i class="bi bi-rulers me-2"></i>
+                                        @job.ForkliftSizeDisplay
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
