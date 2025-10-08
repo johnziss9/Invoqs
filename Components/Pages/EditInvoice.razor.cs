@@ -35,6 +35,8 @@ namespace Invoqs.Components.Pages
         protected bool isSaving = false;
         protected string errorMessage = "";
         protected string successMessage = "";
+        
+        private ApiValidationError? validationErrors;
 
         protected override async Task OnInitializedAsync()
         {
@@ -227,6 +229,7 @@ namespace Invoqs.Components.Pages
                 isSaving = true;
                 errorMessage = "";
                 successMessage = "";
+                validationErrors = null;
 
                 if (!selectedJobIds.Any())
                 {
@@ -247,10 +250,18 @@ namespace Invoqs.Components.Pages
                 }
 
                 // Update the invoice
-                var updatedInvoice = await InvoiceService.UpdateInvoiceAsync(invoice!);
+                var (updatedInvoice, errors) = await InvoiceService.UpdateInvoiceAsync(invoice!);
                 if (updatedInvoice == null)
                 {
-                    errorMessage = "Failed to update invoice.";
+                    if (errors != null)
+                    {
+                        validationErrors = errors;
+                        errorMessage = "Please correct the validation errors below.";
+                    }
+                    else
+                    {
+                        errorMessage = "Failed to update invoice.";
+                    }
                     return;
                 }
 
@@ -305,6 +316,13 @@ namespace Invoqs.Components.Pages
             errorMessage = "Please check the form for errors and try again.";
             successMessage = "";
             StateHasChanged();
+        }
+
+        private string GetFieldErrorClass(string fieldName)
+        {
+            if (validationErrors?.GetFieldErrors(fieldName).Any() == true)
+                return "form-control is-invalid";
+            return "form-control";
         }
 
         protected string GetCustomerInitials()

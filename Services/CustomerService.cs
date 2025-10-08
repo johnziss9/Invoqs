@@ -74,7 +74,7 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<CustomerModel> CreateCustomerAsync(CustomerModel customer)
+        public async Task<(CustomerModel? Customer, ApiValidationError? ValidationErrors)> CreateCustomerAsync(CustomerModel customer)
         {
             try
             {
@@ -89,10 +89,18 @@ namespace Invoqs.Services
                     throw new UnauthorizedAccessException("Authentication required");
                 }
 
+                // Handle validation errors
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var validationErrors = JsonSerializer.Deserialize<ApiValidationError>(errorContent, _jsonOptions);
+                    return (null, validationErrors);
+                }
+
                 response.EnsureSuccessStatusCode();
-                
+
                 var createdCustomer = await response.Content.ReadFromJsonAsync<CustomerModel>(_jsonOptions);
-                return createdCustomer!;
+                return (createdCustomer, null);
             }
             catch (HttpRequestException ex)
             {
@@ -100,7 +108,7 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<CustomerModel> UpdateCustomerAsync(CustomerModel customer)
+        public async Task<(CustomerModel? Customer, ApiValidationError? ValidationErrors)> UpdateCustomerAsync(CustomerModel customer)
         {
             try
             {
@@ -115,10 +123,18 @@ namespace Invoqs.Services
                     throw new UnauthorizedAccessException("Authentication required");
                 }
 
+                // Handle validation errors
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var validationErrors = JsonSerializer.Deserialize<ApiValidationError>(errorContent, _jsonOptions);
+                    return (null, validationErrors);
+                }
+
                 response.EnsureSuccessStatusCode();
-                
+
                 var updatedCustomer = await response.Content.ReadFromJsonAsync<CustomerModel>(_jsonOptions);
-                return updatedCustomer!;
+                return (updatedCustomer, null);
             }
             catch (HttpRequestException ex)
             {

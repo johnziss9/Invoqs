@@ -8,8 +8,8 @@ namespace Invoqs.Interfaces
         Task<List<JobModel>> GetAllJobsAsync();
         Task<List<JobModel>> GetJobsByCustomerIdAsync(int customerId);
         Task<JobModel?> GetJobByIdAsync(int jobId);
-        Task<JobModel> CreateJobAsync(JobModel job);
-        Task<bool> UpdateJobAsync(JobModel job);
+        Task<(JobModel? Job, ApiValidationError? ValidationErrors)> CreateJobAsync(JobModel job);
+        Task<(bool Success, ApiValidationError? ValidationErrors)> UpdateJobAsync(JobModel job);
         Task<bool> DeleteJobAsync(int jobId);
 
         // Existing address grouping methods

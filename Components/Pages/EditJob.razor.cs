@@ -26,6 +26,8 @@ namespace Invoqs.Components.Pages
         protected string errorMessage = "";
         protected string successMessage = "";
 
+        private ApiValidationError? validationErrors;
+
         protected override async Task OnInitializedAsync()
         {
             await LoadJob();
@@ -103,6 +105,7 @@ namespace Invoqs.Components.Pages
                 isSaving = true;
                 errorMessage = "";
                 successMessage = "";
+                validationErrors = null;
 
                 // Auto-set end date when marking as completed
                 if (job.Status == JobStatus.Completed && !job.EndDate.HasValue)
@@ -115,7 +118,7 @@ namespace Invoqs.Components.Pages
                     job.EndDate = null;
                 }
 
-                var success = await JobService.UpdateJobAsync(job);
+                var (success, errors) = await JobService.UpdateJobAsync(job);
 
                 if (success)
                 {
@@ -124,6 +127,11 @@ namespace Invoqs.Components.Pages
 
                     await Task.Delay(1500);
                     Navigation.NavigateTo($"/job/{job.Id}", forceLoad: true);
+                }
+                else if (errors != null)
+                {
+                    validationErrors = errors;
+                    errorMessage = "Please correct the validation errors below.";
                 }
                 else
                 {
@@ -162,7 +170,7 @@ namespace Invoqs.Components.Pages
                     job.EndDate = DateTime.Now;
                 }
 
-                var success = await JobService.UpdateJobAsync(job);
+                var (success, errors) = await JobService.UpdateJobAsync(job);
 
                 if (success)
                 {
@@ -175,6 +183,11 @@ namespace Invoqs.Components.Pages
                         successMessage = "";
                         await InvokeAsync(StateHasChanged);
                     });
+                }
+                else if (errors != null)
+                {
+                    validationErrors = errors;
+                    errorMessage = "Validation error occurred while updating status.";
                 }
                 else
                 {
@@ -265,6 +278,13 @@ namespace Invoqs.Components.Pages
         private string GetReturnUrl()
         {
             return !string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : "/jobs";
+        }
+
+        private string GetFieldErrorClass(string fieldName)
+        {
+            if (validationErrors?.GetFieldErrors(fieldName).Any() == true)
+                return "form-control is-invalid";
+            return "form-control";
         }
 
         private void GenerateInvoice()

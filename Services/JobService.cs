@@ -102,7 +102,7 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<JobModel> CreateJobAsync(JobModel job)
+        public async Task<(JobModel? Job, ApiValidationError? ValidationErrors)> CreateJobAsync(JobModel job)
         {
             try
             {
@@ -117,10 +117,18 @@ namespace Invoqs.Services
                     throw new UnauthorizedAccessException("Authentication required");
                 }
 
+                // Handle validation errors
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var validationErrors = JsonSerializer.Deserialize<ApiValidationError>(errorContent, _jsonOptions);
+                    return (null, validationErrors);
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var createdJob = await response.Content.ReadFromJsonAsync<JobModel>(_jsonOptions);
-                return createdJob!;
+                return (createdJob, null);
             }
             catch (HttpRequestException ex)
             {
@@ -128,7 +136,7 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<bool> UpdateJobAsync(JobModel job)
+        public async Task<(bool Success, ApiValidationError? ValidationErrors)> UpdateJobAsync(JobModel job)
         {
             try
             {
@@ -140,15 +148,23 @@ namespace Invoqs.Services
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
-                    return false;
+                    return (false, null);
                 }
 
-                return response.IsSuccessStatusCode;
+                // Handle validation errors
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var validationErrors = JsonSerializer.Deserialize<ApiValidationError>(errorContent, _jsonOptions);
+                    return (false, validationErrors);
+                }
+
+                return (response.IsSuccessStatusCode, null);
             }
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"Error updating job: {ex.Message}");
-                return false;
+                return (false, null);
             }
         }
 

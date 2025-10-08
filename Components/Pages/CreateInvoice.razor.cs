@@ -35,6 +35,8 @@ namespace Invoqs.Components.Pages
         protected bool isLoading = true;
         protected bool isSaving = false;
         protected string errorMessage = "";
+        
+        private ApiValidationError? validationErrors;
 
         protected override async Task OnInitializedAsync()
         {
@@ -248,6 +250,7 @@ namespace Invoqs.Components.Pages
             {
                 isSaving = true;
                 errorMessage = "";
+                validationErrors = null;
 
                 if (!selectedJobIds.Any())
                 {
@@ -265,21 +268,33 @@ namespace Invoqs.Components.Pages
 
                 // Create invoice through service
                 var customerId = selectedCustomer?.Id ?? newInvoice.CustomerId;
-                var createdInvoice = await InvoiceService.CreateInvoiceFromJobsAsync(
+                var (createdInvoice, errors) = await InvoiceService.CreateInvoiceFromJobsAsync(
                     customerId,
                     selectedJobIds.ToList(),
                     newInvoice.DueDate
                 );
 
-                // Update the created invoice with any custom notes
-                if (!string.IsNullOrWhiteSpace(newInvoice.Notes))
+                if (createdInvoice != null)
                 {
-                    createdInvoice.Notes = newInvoice.Notes;
-                    await InvoiceService.UpdateInvoiceAsync(createdInvoice);
-                }
+                    // Update the created invoice with any custom notes
+                    if (!string.IsNullOrWhiteSpace(newInvoice.Notes))
+                    {
+                        createdInvoice.Notes = newInvoice.Notes;
+                        await InvoiceService.UpdateInvoiceAsync(createdInvoice);
+                    }
 
-                // Navigate to invoice details or customer jobs page
-                Navigation.NavigateTo($"/invoice/{createdInvoice.Id}", true);
+                    // Navigate to invoice details or customer jobs page
+                    Navigation.NavigateTo($"/invoice/{createdInvoice.Id}", true);
+                }
+                else if (errors != null)
+                {
+                    validationErrors = errors;
+                    errorMessage = "Please correct the validation errors below.";
+                }
+                else
+                {
+                    errorMessage = "Failed to create invoice.";
+                }
             }
             catch (Exception ex)
             {
@@ -296,6 +311,13 @@ namespace Invoqs.Components.Pages
         {
             errorMessage = "Please check the form for errors and try again.";
             StateHasChanged();
+        }
+
+        private string GetFieldErrorClass(string fieldName)
+        {
+            if (validationErrors?.GetFieldErrors(fieldName).Any() == true)
+                return "form-control is-invalid";
+            return "form-control";
         }
 
         protected string GetCustomerInitials()

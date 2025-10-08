@@ -92,7 +92,7 @@
                                 {
                                     <div class="col-12">
                                         <label class="form-label required">Customer</label>
-                                        <InputSelect @bind-Value="newInvoice.CustomerId" class="form-select"
+                                        <InputSelect @bind-Value="newInvoice.CustomerId" class="@(validationErrors?.GetFieldErrors("CustomerId").Any() == true ? "form-select is-invalid" : "form-select")"
                                             @bind-Value:after="OnCustomerChanged">
                                             <option value="0">-- Select Customer --</option>
                                             @foreach (var customer in customers)
@@ -101,24 +101,52 @@
                                             }
                                         </InputSelect>
                                         <ValidationMessage For="@(() => newInvoice.CustomerId)" class="text-danger small" />
+                                        @if (validationErrors?.GetFieldErrors("CustomerId").Any() == true)
+                                        {
+                                            @foreach (var error in validationErrors.GetFieldErrors("CustomerId"))
+                                            {
+                                                <div class="text-danger small">@error</div>
+                                            }
+                                        }
                                     </div>
                                 }
 
                                 <div class="col-md-6">
                                     <label class="form-label">Due Date</label>
-                                    <InputDate @bind-Value="newInvoice.DueDate" class="form-control" />
+                                    <InputDate @bind-Value="newInvoice.DueDate" class="@GetFieldErrorClass("DueDate")" />
                                     <ValidationMessage For="@(() => newInvoice.DueDate)" class="text-danger small" />
+                                    @if (validationErrors?.GetFieldErrors("DueDate").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("DueDate"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">VAT Rate (%)</label>
                                     <InputNumber @bind-Value="newInvoice.VatRate" @bind-Value:after="RecalculateTotals"
-                                        class="form-control" step="0.01" />
+                                        class="@GetFieldErrorClass("VatRate")" step="0.01" />
+                                    @if (validationErrors?.GetFieldErrors("VatRate").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("VatRate"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                     <div class="form-text">Rate automatically set based on job types</div>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label">Notes</label>
-                                    <InputTextArea @bind-Value="newInvoice.Notes" class="form-control" rows="3"
+                                    <InputTextArea @bind-Value="newInvoice.Notes" class="@GetFieldErrorClass("Notes")" rows="3"
                                         placeholder="Any additional notes for this invoice..." />
+                                    @if (validationErrors?.GetFieldErrors("Notes").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("Notes"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                 </div>
                             </div>
                         </div>

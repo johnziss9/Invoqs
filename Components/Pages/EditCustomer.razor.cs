@@ -23,6 +23,8 @@ namespace Invoqs.Components.Pages
         protected bool showDeleteConfirmation = false;
         protected string errorMessage = "";
         protected string successMessage = "";
+        
+        private ApiValidationError? validationErrors;
 
         protected override async Task OnInitializedAsync()
         {
@@ -76,15 +78,29 @@ namespace Invoqs.Components.Pages
                 isSaving = true;
                 errorMessage = "";
                 successMessage = "";
+                validationErrors = null;
 
-                var updatedCustomer = await CustomerService.UpdateCustomerAsync(customer);
-                customer = updatedCustomer;
+                var (updatedCustomer, errors) = await CustomerService.UpdateCustomerAsync(customer);
 
-                successMessage = "Customer updated successfully!";
-                StateHasChanged();
+                if (updatedCustomer != null)
+                {
+                    customer = updatedCustomer;
 
-                await Task.Delay(1500);
-                Navigation.NavigateTo($"/customer/{customer.Id}", forceLoad: true);
+                    successMessage = "Customer updated successfully!";
+                    StateHasChanged();
+
+                    await Task.Delay(1500);
+                    Navigation.NavigateTo($"/customer/{customer.Id}", forceLoad: true);
+                }
+                else if (errors != null)
+                {
+                    validationErrors = errors;
+                    errorMessage = "Please correct the validation errors below.";
+                }
+                else
+                {
+                    errorMessage = "Failed to update customer.";
+                }
             }
             catch (Exception ex)
             {
@@ -153,6 +169,13 @@ namespace Invoqs.Components.Pages
         {
             Console.WriteLine("Logout clicked");
             return Task.CompletedTask;
+        }
+
+        private string GetFieldErrorClass(string fieldName)
+        {
+            if (validationErrors?.GetFieldErrors(fieldName).Any() == true)
+                return "form-control is-invalid";
+            return "form-control";
         }
 
         private void CreateNewJob()
