@@ -6,8 +6,8 @@ namespace Invoqs.Interfaces
     {
         Task<List<CustomerModel>> GetAllCustomersAsync();
         Task<CustomerModel?> GetCustomerByIdAsync(int id);
-        Task<CustomerModel> CreateCustomerAsync(CustomerModel customer);
-        Task<CustomerModel> UpdateCustomerAsync(CustomerModel customer);
+        Task<(CustomerModel? Customer, ApiValidationError? ValidationErrors)> CreateCustomerAsync(CustomerModel customer);
+        Task<(CustomerModel? Customer, ApiValidationError? ValidationErrors)> UpdateCustomerAsync(CustomerModel customer);
         Task<bool> DeleteCustomerAsync(int id);
     }
 }

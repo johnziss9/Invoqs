@@ -45,8 +45,15 @@
                             <div class="col-12">
                                 <label class="form-label required">Customer Name</label>
                                 <InputText @bind-Value="newCustomer.Name" @bind-Value:after="UpdatePreview" 
-                                          class="form-control" placeholder="Enter customer or company name" />
+                                          class="@GetFieldErrorClass("Name")" placeholder="Enter customer or company name" />
                                 <ValidationMessage For="@(() => newCustomer.Name)" class="text-danger small" />
+                                @if (validationErrors?.GetFieldErrors("Name").Any() == true)
+                                {
+                                    @foreach (var error in validationErrors.GetFieldErrors("Name"))
+                                    {
+                                        <div class="text-danger small">@error</div>
+                                    }
+                                }
                                 <div class="form-text">Enter the full business name or individual customer name</div>
                             </div>
 
@@ -54,27 +61,55 @@
                             <div class="col-md-6">
                                 <label class="form-label required">Email Address</label>
                                 <InputText @bind-Value="newCustomer.Email" @bind-Value:after="UpdatePreview" 
-                                          class="form-control" type="email" placeholder="customer@example.com" />
+                                          class="@GetFieldErrorClass("Email")" type="email" placeholder="customer@example.com" />
                                 <ValidationMessage For="@(() => newCustomer.Email)" class="text-danger small" />
+                                @if (validationErrors?.GetFieldErrors("Email").Any() == true)
+                                {
+                                    @foreach (var error in validationErrors.GetFieldErrors("Email"))
+                                    {
+                                        <div class="text-danger small">@error</div>
+                                    }
+                                }
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label required">Phone Number</label>
                                 <InputText @bind-Value="newCustomer.Phone" @bind-Value:after="UpdatePreview" 
-                                          class="form-control" placeholder="01234 567890" />
+                                          class="@GetFieldErrorClass("Phone")" placeholder="01234 567890" />
                                 <ValidationMessage For="@(() => newCustomer.Phone)" class="text-danger small" />
+                                @if (validationErrors?.GetFieldErrors("Phone").Any() == true)
+                                {
+                                    @foreach (var error in validationErrors.GetFieldErrors("Phone"))
+                                    {
+                                        <div class="text-danger small">@error</div>
+                                    }
+                                }
                             </div>
 
                             <!-- Business Details -->
                             <div class="col-md-6">
                                 <label class="form-label">Company Registration Number</label>
                                 <InputText @bind-Value="newCustomer.CompanyRegistrationNumber" @bind-Value:after="UpdatePreview" 
-                                          class="form-control" placeholder="Optional" />
+                                          class="@GetFieldErrorClass("CompanyRegistrationNumber")" placeholder="Optional" />
+                                @if (validationErrors?.GetFieldErrors("CompanyRegistrationNumber").Any() == true)
+                                {
+                                    @foreach (var error in validationErrors.GetFieldErrors("CompanyRegistrationNumber"))
+                                    {
+                                        <div class="text-danger small">@error</div>
+                                    }
+                                }
                                 <div class="form-text">For limited companies only</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">VAT Number</label>
                                 <InputText @bind-Value="newCustomer.VatNumber" @bind-Value:after="UpdatePreview" 
-                                          class="form-control" placeholder="GB123456789" />
+                                          class="@GetFieldErrorClass("VatNumber")" placeholder="GB123456789" />
+                                @if (validationErrors?.GetFieldErrors("VatNumber").Any() == true)
+                                {
+                                    @foreach (var error in validationErrors.GetFieldErrors("VatNumber"))
+                                    {
+                                        <div class="text-danger small">@error</div>
+                                    }
+                                }
                                 <div class="form-text">If VAT registered</div>
                             </div>
 
@@ -82,8 +117,15 @@
                             <div class="col-12">
                                 <label class="form-label">Notes</label>
                                 <InputTextArea @bind-Value="newCustomer.Notes" @bind-Value:after="UpdatePreview" 
-                                              class="form-control" rows="4" 
+                                              class="@GetFieldErrorClass("Notes")" rows="4" 
                                               placeholder="Any additional notes about this customer..." />
+                                @if (validationErrors?.GetFieldErrors("Notes").Any() == true)
+                                {
+                                    @foreach (var error in validationErrors.GetFieldErrors("Notes"))
+                                    {
+                                        <div class="text-danger small">@error</div>
+                                    }
+                                }
                                 <div class="form-text">Special requirements, preferences, or important information</div>
                             </div>
                         </div>

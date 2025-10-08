@@ -16,6 +16,8 @@ namespace Invoqs.Components.Pages
         protected bool isSaving = false;
         protected string errorMessage = "";
         protected string successMessage = "";
+        
+        private ApiValidationError? validationErrors;
 
         protected override void OnInitialized()
         {
@@ -42,15 +44,28 @@ namespace Invoqs.Components.Pages
                 isSaving = true;
                 errorMessage = "";
                 successMessage = "";
+                validationErrors = null;
 
-                var createdCustomer = await CustomerService.CreateCustomerAsync(newCustomer);
+                var (createdCustomer, errors) = await CustomerService.CreateCustomerAsync(newCustomer);
 
-                successMessage = $"Customer '{createdCustomer.Name}' created successfully!";
-                StateHasChanged();
+                if (createdCustomer != null)
+                {
+                    successMessage = $"Customer '{createdCustomer.Name}' created successfully!";
+                    StateHasChanged();
 
-                // Show success message briefly, then navigate to customer details
-                await Task.Delay(1500);
-                Navigation.NavigateTo($"/customer/{createdCustomer.Id}", forceLoad: true);
+                    // Show success message briefly, then navigate to customer details
+                    await Task.Delay(1500);
+                    Navigation.NavigateTo($"/customer/{createdCustomer.Id}", forceLoad: true);
+                }
+                else if (errors != null)
+                {
+                    validationErrors = errors;
+                    errorMessage = "Please correct the validation errors below.";
+                }
+                else
+                {
+                    errorMessage = "Failed to create customer.";
+                }
             }
             catch (Exception ex)
             {
@@ -68,6 +83,13 @@ namespace Invoqs.Components.Pages
             errorMessage = "Please check the form for errors and try again.";
             successMessage = "";
             StateHasChanged();
+        }
+
+        private string GetFieldErrorClass(string fieldName)
+        {
+            if (validationErrors?.GetFieldErrors(fieldName).Any() == true)
+                return "form-control is-invalid";
+            return "form-control";
         }
 
         protected string GetReturnUrl()

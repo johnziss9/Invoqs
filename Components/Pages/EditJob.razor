@@ -64,19 +64,34 @@
                                 <!-- Job Title -->
                                 <div class="col-12">
                                     <label class="form-label required">Job Title</label>
-                                    <InputText @bind-Value="job.Title" class="form-control" placeholder="Enter job title" />
+                                    <InputText @bind-Value="job.Title" class="@GetFieldErrorClass("Title")" placeholder="Enter job title" />
                                     <ValidationMessage For="@(() => job.Title)" class="text-danger small" />
+                                    @if (validationErrors?.GetFieldErrors("Title").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("Title"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                 </div>
 
                                 <!-- Job Type and Status -->
                                 <div class="col-md-6">
                                     <label class="form-label required">Job Type</label>
-                                    <InputSelect @bind-Value="job.Type" class="form-select" @bind-Value:after="OnJobTypeChanged">
+                                    <InputSelect @bind-Value="job.Type" class="@(validationErrors?.GetFieldErrors("Type").Any() == true ? "form-select is-invalid" : "form-select")" @bind-Value:after="OnJobTypeChanged">
+                                        <option value="">-- Select Job Type --</option>
                                         <option value="@JobType.SkipRental">Skip Rental</option>
                                         <option value="@JobType.SandDelivery">Sand Delivery</option>
                                         <option value="@JobType.ForkLiftService">Fork Lift Service</option>
                                     </InputSelect>
                                     <ValidationMessage For="@(() => job.Type)" class="text-danger small" />
+                                    @if (validationErrors?.GetFieldErrors("Type").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("Type"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label required">Status</label>
@@ -103,23 +118,37 @@
 
                                     <div class="col-md-6">
                                         <label class="form-label required">Skip Type</label>
-                                        <InputSelect @bind-Value="job.SkipType" class="form-select" @bind-Value:after="OnSkipTypeChanged">
+                                        <InputSelect @bind-Value="job.SkipType" class="@(validationErrors?.GetFieldErrors("SkipType").Any() == true ? "form-select is-invalid" : "form-select")" @bind-Value:after="OnSkipTypeChanged">
                                             <option value="">-- Select Skip Type --</option>
                                             <option value="SmallSkip">Small Skip</option>
                                             <option value="LargeSkip">Large Skip</option>
                                             <option value="Hook">Hook</option>
                                         </InputSelect>
                                         <ValidationMessage For="@(() => job.SkipType)" class="text-danger small" />
+                                        @if (validationErrors?.GetFieldErrors("SkipType").Any() == true)
+                                        {
+                                            @foreach (var error in validationErrors.GetFieldErrors("SkipType"))
+                                            {
+                                                <div class="text-danger small">@error</div>
+                                            }
+                                        }
                                     </div>
 
                                     @if (job.SkipType == "SmallSkip" || job.SkipType == "LargeSkip")
                                     {
                                         <div class="col-md-6">
                                             <label class="form-label required">Skip Number</label>
-                                            <InputText @bind-Value="job.SkipNumber" class="form-control" 
-                                                      placeholder="e.g., SK-001" />
+                                            <InputText @bind-Value="job.SkipNumber" class="@GetFieldErrorClass("SkipNumber")" 
+                                                    placeholder="e.g., SK-001" />
                                             <div class="form-text">Enter the skip identification number</div>
                                             <ValidationMessage For="@(() => job.SkipNumber)" class="text-danger small" />
+                                            @if (validationErrors?.GetFieldErrors("SkipNumber").Any() == true)
+                                            {
+                                                @foreach (var error in validationErrors.GetFieldErrors("SkipNumber"))
+                                                {
+                                                    <div class="text-danger small">@error</div>
+                                                }
+                                            }
                                         </div>
                                     }
                                 }
@@ -136,7 +165,7 @@
 
                                     <div class="col-md-6">
                                         <label class="form-label required">Material Type</label>
-                                        <InputSelect @bind-Value="job.SandMaterialType" class="form-select">
+                                        <InputSelect @bind-Value="job.SandMaterialType" class="@(validationErrors?.GetFieldErrors("SandMaterialType").Any() == true ? "form-select is-invalid" : "form-select")">
                                             <option value="">-- Select Material --</option>
                                             <option value="Sand">Sand</option>
                                             <option value="CrushedStone">Crushed Stone</option>
@@ -144,16 +173,30 @@
                                             <option value="Soil">Soil</option>
                                         </InputSelect>
                                         <ValidationMessage For="@(() => job.SandMaterialType)" class="text-danger small" />
+                                        @if (validationErrors?.GetFieldErrors("SandMaterialType").Any() == true)
+                                        {
+                                            @foreach (var error in validationErrors.GetFieldErrors("SandMaterialType"))
+                                            {
+                                                <div class="text-danger small">@error</div>
+                                            }
+                                        }
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label required">Delivery Method</label>
-                                        <InputSelect @bind-Value="job.SandDeliveryMethod" class="form-select">
+                                        <InputSelect @bind-Value="job.SandDeliveryMethod" class="@(validationErrors?.GetFieldErrors("SandDeliveryMethod").Any() == true ? "form-select is-invalid" : "form-select")">
                                             <option value="">-- Select Method --</option>
                                             <option value="InBags">In Bags</option>
                                             <option value="ByTruck">By Truck</option>
                                         </InputSelect>
                                         <ValidationMessage For="@(() => job.SandDeliveryMethod)" class="text-danger small" />
+                                        @if (validationErrors?.GetFieldErrors("SandDeliveryMethod").Any() == true)
+                                        {
+                                            @foreach (var error in validationErrors.GetFieldErrors("SandDeliveryMethod"))
+                                            {
+                                                <div class="text-danger small">@error</div>
+                                            }
+                                        }
                                     </div>
                                 }
 
@@ -169,58 +212,92 @@
 
                                     <div class="col-md-6">
                                         <label class="form-label required">Forklift Size</label>
-                                        <InputSelect @bind-Value="job.ForkliftSize" class="form-select">
+                                        <InputSelect @bind-Value="job.ForkliftSize" class="@(validationErrors?.GetFieldErrors("ForkliftSize").Any() == true ? "form-select is-invalid" : "form-select")">
                                             <option value="">-- Select Size --</option>
                                             <option value="17m">17m</option>
                                             <option value="25m">25m</option>
                                         </InputSelect>
                                         <ValidationMessage For="@(() => job.ForkliftSize)" class="text-danger small" />
+                                        @if (validationErrors?.GetFieldErrors("ForkliftSize").Any() == true)
+                                        {
+                                            @foreach (var error in validationErrors.GetFieldErrors("ForkliftSize"))
+                                            {
+                                                <div class="text-danger small">@error</div>
+                                            }
+                                        }
                                     </div>
                                 }
 
                                 <!-- Address -->
                                 <div class="col-12">
                                     <label class="form-label required">Service Address</label>
-                                    <InputText @bind-Value="job.Address" class="form-control" 
-                                              placeholder="Enter the address where the service will be provided" />
+                                    <InputText @bind-Value="job.Address" class="@GetFieldErrorClass("Address")" 
+                                            placeholder="Enter the full address where the service will be provided" />
+                                    <div class="form-text">This will be used for scheduling and invoicing</div>
                                     <ValidationMessage For="@(() => job.Address)" class="text-danger small" />
+                                    @if (validationErrors?.GetFieldErrors("Address").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("Address"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                 </div>
 
-                                <!-- Dates -->
+                                <!-- Start Date and Price -->
                                 <div class="col-md-6">
                                     <label class="form-label required">Start Date</label>
-                                    <InputDate @bind-Value="job.StartDate" class="form-control" />
+                                    <InputDate @bind-Value="job.StartDate" class="@GetFieldErrorClass("StartDate")" />
                                     <ValidationMessage For="@(() => job.StartDate)" class="text-danger small" />
+                                    @if (validationErrors?.GetFieldErrors("StartDate").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("StartDate"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">End Date</label>
-                                    <InputDate @bind-Value="job.EndDate" class="form-control" />
-                                    <div class="form-text">Leave empty if job is not yet completed</div>
-                                    <ValidationMessage For="@(() => job.EndDate)" class="text-danger small" />
-                                </div>
-
-                                <!-- Price -->
                                 <div class="col-md-6">
                                     <label class="form-label required">Price (£)</label>
-                                    <InputNumber @bind-Value="job.Price" class="form-control" 
-                                               placeholder="0.00" step="0.01" />
+                                    <InputNumber @bind-Value="job.Price" class="@GetFieldErrorClass("Price")" 
+                                            placeholder="0.00" step="0.01" />
                                     <ValidationMessage For="@(() => job.Price)" class="text-danger small" />
+                                    @if (validationErrors?.GetFieldErrors("Price").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("Price"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                 </div>
 
                                 <!-- Description -->
                                 <div class="col-12">
                                     <label class="form-label">Description</label>
-                                    <InputTextArea @bind-Value="job.Description" class="form-control" rows="4" 
-                                                  placeholder="Additional details about this job..." />
+                                    <InputTextArea @bind-Value="job.Description" class="@GetFieldErrorClass("Description")" rows="3" 
+                                                placeholder="Additional details about this job (e.g., skip size, sand type, special requirements)..." />
                                     <ValidationMessage For="@(() => job.Description)" class="text-danger small" />
+                                    @if (validationErrors?.GetFieldErrors("Description").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("Description"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                 </div>
 
-                                <!-- Notes -->
                                 <div class="col-12">
                                     <label class="form-label">Internal Notes</label>
-                                    <InputTextArea @bind-Value="job.Notes" class="form-control" rows="3" 
-                                                  placeholder="Internal notes (not visible to customer)..." />
+                                    <InputTextArea @bind-Value="job.Notes" class="@GetFieldErrorClass("Notes")" rows="2" 
+                                                placeholder="Internal notes (not visible to customer)..." />
                                     <ValidationMessage For="@(() => job.Notes)" class="text-danger small" />
+                                    @if (validationErrors?.GetFieldErrors("Notes").Any() == true)
+                                    {
+                                        @foreach (var error in validationErrors.GetFieldErrors("Notes"))
+                                        {
+                                            <div class="text-danger small">@error</div>
+                                        }
+                                    }
                                 </div>
                             </div>
                         </div>

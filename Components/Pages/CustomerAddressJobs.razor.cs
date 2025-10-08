@@ -162,7 +162,7 @@ namespace Invoqs.Components.Pages
                     job.EndDate = null;
                 }
 
-                var success = await JobService.UpdateJobAsync(job);
+                var (success, errors) = await JobService.UpdateJobAsync(job);
 
                 if (success)
                 {
@@ -174,7 +174,16 @@ namespace Invoqs.Components.Pages
                 {
                     // Revert the status change
                     job.Status = originalStatus;
-                    errorMessage = "Failed to update job status";
+                    
+                    if (errors != null)
+                    {
+                        errorMessage = "Validation error: " + string.Join(", ", errors.Errors.SelectMany(e => e.Value));
+                    }
+                    else
+                    {
+                        errorMessage = "Failed to update job status";
+                    }
+                    
                     StateHasChanged();
                 }
             }

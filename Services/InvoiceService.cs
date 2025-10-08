@@ -75,7 +75,7 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<InvoiceModel> UpdateInvoiceAsync(InvoiceModel invoice)
+        public async Task<(InvoiceModel? Invoice, ApiValidationError? ValidationErrors)> UpdateInvoiceAsync(InvoiceModel invoice)
         {
             try
             {
@@ -90,10 +90,18 @@ namespace Invoqs.Services
                     throw new UnauthorizedAccessException("Authentication required");
                 }
 
+                // Handle validation errors
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var validationErrors = JsonSerializer.Deserialize<ApiValidationError>(errorContent, _jsonOptions);
+                    return (null, validationErrors);
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var updatedInvoice = await response.Content.ReadFromJsonAsync<InvoiceModel>(_jsonOptions);
-                return updatedInvoice!;
+                return (updatedInvoice, null);
             }
             catch (HttpRequestException ex)
             {
@@ -152,7 +160,7 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<InvoiceModel> CreateInvoiceFromJobsAsync(int customerId, List<int> jobIds, DateTime? dueDate = null)
+        public async Task<(InvoiceModel? Invoice, ApiValidationError? ValidationErrors)> CreateInvoiceFromJobsAsync(int customerId, List<int> jobIds, DateTime? dueDate = null)
         {
             try
             {
@@ -176,10 +184,18 @@ namespace Invoqs.Services
                     throw new UnauthorizedAccessException("Authentication required");
                 }
 
+                // Handle validation errors
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var validationErrors = JsonSerializer.Deserialize<ApiValidationError>(errorContent, _jsonOptions);
+                    return (null, validationErrors);
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var createdInvoice = await response.Content.ReadFromJsonAsync<InvoiceModel>(_jsonOptions);
-                return createdInvoice!;
+                return (createdInvoice, null);
             }
             catch (HttpRequestException ex)
             {

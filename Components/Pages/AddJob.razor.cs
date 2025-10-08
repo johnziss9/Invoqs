@@ -27,6 +27,8 @@ namespace Invoqs.Components.Pages
         protected string jobTypeIcon = "";
         protected string jobTypeDisplayName = "";
 
+        private ApiValidationError? validationErrors;
+
         protected override async Task OnInitializedAsync()
         {
             await LoadData();
@@ -157,24 +159,28 @@ namespace Invoqs.Components.Pages
                 isSaving = true;
                 errorMessage = "";
                 successMessage = "";
+                validationErrors = null;
 
-                // Validate customer selection
                 if (newJob.CustomerId == 0)
                 {
                     errorMessage = "Please select a customer.";
                     return;
                 }
 
-                var createdJob = await JobService.CreateJobAsync(newJob);
+                var (createdJob, errors) = await JobService.CreateJobAsync(newJob);
 
                 if (createdJob != null)
                 {
                     successMessage = "Job created successfully!";
                     StateHasChanged();
 
-                    // Navigate to job details to show created job
                     await Task.Delay(1500);
                     Navigation.NavigateTo($"/job/{createdJob.Id}", forceLoad: true);
+                }
+                else if (errors != null)
+                {
+                    validationErrors = errors;
+                    errorMessage = "Please correct the validation errors below.";
                 }
                 else
                 {
@@ -209,6 +215,13 @@ namespace Invoqs.Components.Pages
                 return $"/customer/{CustomerId}/jobs";
             else
                 return "/jobs";
+        }
+
+        private string GetFieldErrorClass(string fieldName)
+        {
+            if (validationErrors?.GetFieldErrors(fieldName).Any() == true)
+                return "form-control is-invalid";
+            return "form-control";
         }
 
         private void GoBack()
