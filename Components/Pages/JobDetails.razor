@@ -19,6 +19,16 @@
         </ol>
     </nav>
 
+    <!-- Error Message Alert -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
+
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -309,10 +319,20 @@
                             }
                             
                             <hr class="my-2">
-                            <button class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteJobConfirmation">
-                                <i class="bi bi-trash me-1"></i>
-                                Delete Job
-                            </button>
+                            @if (job.IsInvoiced || job.Status == JobStatus.Active || job.Status == JobStatus.Completed)
+                            {
+                                <button class="btn btn-outline-danger btn-sm" disabled="true" title="@GetDeleteDisabledReason()">
+                                    <i class="bi bi-lock me-1"></i>
+                                    @GetDeleteButtonText()
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteJobConfirmation">
+                                    <i class="bi bi-trash me-1"></i>
+                                    Delete Job
+                                </button>
+                            }
                         </div>
                     </div>
                 </div>
@@ -547,18 +567,12 @@
                             This will permanently delete the job <strong>@job?.Title</strong>.
                             This action cannot be undone.
                         </p>
-                        @if (job!.IsInvoiced)
-                        {
-                            <div class="alert alert-danger">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Warning:</strong> This job has been invoiced. Deleting it may affect invoice records.
-                            </div>
-                        }
-                        else if (job.Status == JobStatus.Active)
+                        @if (job!.Status == JobStatus.Cancelled)
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Notice:</strong> This job is currently active.
+                                <strong>Warning:</strong> This job has been cancelled. 
+                                Deleting will permanently remove it from your records.
                             </div>
                         }
                     </div>

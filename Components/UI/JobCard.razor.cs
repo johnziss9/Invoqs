@@ -23,6 +23,27 @@ namespace Invoqs.Components.UI
 
         private void ShowDeleteConfirmation()
         {
+            if (Job.IsInvoiced)
+            {
+                errorMessage = "Cannot delete a job that has been invoiced. Please remove it from the invoice first.";
+                StateHasChanged();
+                return;
+            }
+            
+            if (Job.Status == JobStatus.Active)
+            {
+                errorMessage = "Cannot delete an active job. Please mark it as cancelled first.";
+                StateHasChanged();
+                return;
+            }
+            
+            if (Job.Status == JobStatus.Completed)
+            {
+                errorMessage = "Cannot delete a completed job. Completed work must be preserved for audit trail and reporting.";
+                StateHasChanged();
+                return;
+            }
+            
             showDeleteConfirmation = true;
             StateHasChanged();
         }
@@ -42,6 +63,11 @@ namespace Invoqs.Components.UI
             {
                 await OnDelete.InvokeAsync(Job);
                 showDeleteConfirmation = false;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error deleting job: {ex.Message}";
+                Logger.LogError(ex, "Error deleting job {JobId}", Job.Id);
             }
             finally
             {
@@ -106,6 +132,30 @@ namespace Invoqs.Components.UI
                 errorMessage = $"Error updating job status: {ex.Message}";
                 StateHasChanged();
             }
+        }
+
+        private string GetDeleteButtonText()
+        {
+            if (Job.IsInvoiced)
+                return "Cannot Delete (Invoiced)";
+            if (Job.Status == JobStatus.Completed)
+                return "Cannot Delete (Completed)";
+            if (Job.Status == JobStatus.Active)
+                return "Cannot Delete (Active)";
+            
+            return "Delete Job";
+        }
+
+        private string GetDeleteDisabledReason()
+        {
+            if (Job.IsInvoiced)
+                return "Cannot delete invoiced jobs. Remove from invoice first.";
+            if (Job.Status == JobStatus.Completed)
+                return "Cannot delete completed jobs. They must be preserved for audit trail.";
+            if (Job.Status == JobStatus.Active)
+                return "Cannot delete active jobs. Mark as cancelled first.";
+            
+            return "";
         }
     }
 }
