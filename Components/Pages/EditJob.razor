@@ -96,10 +96,32 @@
                                 <div class="col-md-6">
                                     <label class="form-label required">Status</label>
                                     <InputSelect @bind-Value="job.Status" class="form-select">
-                                        <option value="@JobStatus.New">New</option>
-                                        <option value="@JobStatus.Active">Active</option>
-                                        <option value="@JobStatus.Completed">Completed</option>
-                                        <option value="@JobStatus.Cancelled">Cancelled</option>
+                                        @{
+                                            var currentStatus = job.Status;
+                                        }
+                                        
+                                        @* Always show current status *@
+                                        <option value="@currentStatus" selected>@currentStatus (Current)</option>
+                                        
+                                        @* Show valid transitions based on current status *@
+                                        @if (currentStatus == JobStatus.New)
+                                        {
+                                            <option value="@JobStatus.Active">Active</option>
+                                            <option value="@JobStatus.Cancelled">Cancelled</option>
+                                        }
+                                        else if (currentStatus == JobStatus.Active)
+                                        {
+                                            <option value="@JobStatus.Completed">Completed</option>
+                                            <option value="@JobStatus.Cancelled">Cancelled</option>
+                                        }
+                                        else if (currentStatus == JobStatus.Completed)
+                                        {
+                                            <option value="@JobStatus.Active">Active (Reopen)</option>
+                                        }
+                                        else if (currentStatus == JobStatus.Cancelled)
+                                        {
+                                            <option value="@JobStatus.New">New (Reactivate)</option>
+                                        }
                                     </InputSelect>
                                     <ValidationMessage For="@(() => job.Status)" class="text-danger small" />
                                 </div>
