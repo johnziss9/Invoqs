@@ -28,7 +28,7 @@ namespace Invoqs.Services
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.GetAsync("invoices");
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
@@ -55,7 +55,7 @@ namespace Invoqs.Services
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.GetAsync($"invoices/{id}");
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
@@ -83,7 +83,7 @@ namespace Invoqs.Services
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.PutAsJsonAsync($"invoices/{invoice.Id}", invoice);
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
@@ -117,7 +117,7 @@ namespace Invoqs.Services
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.DeleteAsync($"invoices/{id}");
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
@@ -141,7 +141,7 @@ namespace Invoqs.Services
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.GetAsync($"invoices/customer/{customerId}");
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
@@ -160,7 +160,10 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<(InvoiceModel? Invoice, ApiValidationError? ValidationErrors)> CreateInvoiceFromJobsAsync(int customerId, List<int> jobIds, DateTime? dueDate = null)
+        public async Task<(InvoiceModel? Invoice, ApiValidationError? ValidationErrors)> CreateInvoiceFromJobsAsync(
+            int customerId,
+            List<int> jobIds,
+            DateTime? dueDate = null)
         {
             try
             {
@@ -176,25 +179,38 @@ namespace Invoqs.Services
                     Notes = (string?)null
                 };
 
-                var response = await _httpClient.PostAsJsonAsync("invoices", request);
-                
+                var response = await _httpClient.PostAsJsonAsync("invoices", request, _jsonOptions);
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
                     throw new UnauthorizedAccessException("Authentication required");
                 }
 
-                // Handle validation errors
                 if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    var validationErrors = JsonSerializer.Deserialize<ApiValidationError>(errorContent, _jsonOptions);
-                    return (null, validationErrors);
+
+                    try
+                    {
+                        var validationErrors = JsonSerializer.Deserialize<ApiValidationError>(errorContent, _jsonOptions);
+                        return (null, validationErrors);
+                    }
+                    catch (JsonException)
+                    {
+                        var fallbackError = new ApiValidationError
+                        {
+                            Error = $"Validation failed: {errorContent}"
+                        };
+                        return (null, fallbackError);
+                    }
                 }
 
                 response.EnsureSuccessStatusCode();
 
-                var createdInvoice = await response.Content.ReadFromJsonAsync<InvoiceModel>(_jsonOptions);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var createdInvoice = JsonSerializer.Deserialize<InvoiceModel>(responseContent, _jsonOptions);
+
                 return (createdInvoice, null);
             }
             catch (HttpRequestException ex)
@@ -211,7 +227,7 @@ namespace Invoqs.Services
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.PostAsync($"invoices/{invoiceId}/send", null);
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
@@ -242,7 +258,7 @@ namespace Invoqs.Services
                 };
 
                 var response = await _httpClient.PostAsJsonAsync($"invoices/{invoiceId}/payment", request);
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
@@ -266,7 +282,7 @@ namespace Invoqs.Services
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.PostAsync($"invoices/{invoiceId}/cancel", null);
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
@@ -290,7 +306,7 @@ namespace Invoqs.Services
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.GetAsync("invoices/outstanding");
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
