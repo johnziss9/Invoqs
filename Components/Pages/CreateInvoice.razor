@@ -74,9 +74,7 @@
     }
     else
     {
-        <EditForm Model="newInvoice" OnValidSubmit="HandleCreateInvoice" OnInvalidSubmit="HandleInvalidSubmit">
-            <DataAnnotationsValidator />
-
+        <EditForm Model="newInvoice" OnSubmit="HandleCreateInvoice">
             <div class="row">
                 <!-- Job Selection Panel -->
                 <div class="col-lg-8">

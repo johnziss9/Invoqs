@@ -35,7 +35,7 @@ namespace Invoqs.Components.Pages
         protected bool isLoading = true;
         protected bool isSaving = false;
         protected string errorMessage = "";
-        
+
         private ApiValidationError? validationErrors;
 
         protected override async Task OnInitializedAsync()
@@ -283,7 +283,6 @@ namespace Invoqs.Components.Pages
                         await InvoiceService.UpdateInvoiceAsync(createdInvoice);
                     }
 
-                    // Navigate to invoice details or customer jobs page
                     Navigation.NavigateTo($"/invoice/{createdInvoice.Id}", true);
                 }
                 else if (errors != null)
@@ -305,12 +304,6 @@ namespace Invoqs.Components.Pages
                 isSaving = false;
                 StateHasChanged();
             }
-        }
-
-        private void HandleInvalidSubmit()
-        {
-            errorMessage = "Please check the form for errors and try again.";
-            StateHasChanged();
         }
 
         private string GetFieldErrorClass(string fieldName)
