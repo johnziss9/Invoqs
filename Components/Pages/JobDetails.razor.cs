@@ -21,6 +21,7 @@ namespace Invoqs.Components.Pages
         protected string? errorMessage;
         protected bool showDeleteJobConfirmation = false;
         protected bool isDeletingJob = false;
+        protected bool canDeleteJob = true;
 
         protected JobModel? job;
         protected CustomerModel? customer;
@@ -55,6 +56,8 @@ namespace Invoqs.Components.Pages
 
                 if (job != null)
                 {
+                    canDeleteJob = job.Status == JobStatus.New || job.Status == JobStatus.Cancelled;
+
                     customer = await CustomerService.GetCustomerByIdAsync(job.CustomerId);
 
                     // Check if customer is soft deleted (when API supports it)
@@ -91,6 +94,29 @@ namespace Invoqs.Components.Pages
 
         protected void ShowDeleteJobConfirmation()
         {
+            if (job == null) return;
+
+            if (job.IsInvoiced)
+            {
+                errorMessage = "Cannot delete a job that has been invoiced. Please remove it from the invoice first.";
+                StateHasChanged();
+                return;
+            }
+
+            if (job.Status == JobStatus.Active)
+            {
+                errorMessage = "Cannot delete an active job. Please mark it as cancelled first.";
+                StateHasChanged();
+                return;
+            }
+
+            if (job.Status == JobStatus.Completed)
+            {
+                errorMessage = "Cannot delete a completed job. Completed work must be preserved for audit trail and reporting.";
+                StateHasChanged();
+                return;
+            }
+
             showDeleteJobConfirmation = true;
             StateHasChanged();
         }
@@ -244,6 +270,34 @@ namespace Invoqs.Components.Pages
 
             // Always redirect to login, even if localStorage clearing fails
             Navigation.NavigateTo("/login", true);
+        }
+
+        protected string GetDeleteButtonText()
+        {
+            if (job == null) return "Delete Job";
+
+            if (job.IsInvoiced)
+                return "Cannot Delete (Invoiced)";
+            if (job.Status == JobStatus.Completed)
+                return "Cannot Delete (Completed)";
+            if (job.Status == JobStatus.Active)
+                return "Cannot Delete (Active)";
+
+            return "Delete Job";
+        }
+
+        protected string GetDeleteDisabledReason()
+        {
+            if (job == null) return "";
+
+            if (job.IsInvoiced)
+                return "Cannot delete invoiced jobs. Remove from invoice first.";
+            if (job.Status == JobStatus.Completed)
+                return "Cannot delete completed jobs. They must be preserved for audit trail.";
+            if (job.Status == JobStatus.Active)
+                return "Cannot delete active jobs. Mark as cancelled first.";
+
+            return "";
         }
     }
 }

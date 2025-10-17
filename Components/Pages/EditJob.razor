@@ -17,6 +17,16 @@
         </ol>
     </nav>
 
+    <!-- Error Message Alert -->
+    @if (!string.IsNullOrEmpty(errorMessage) && !isLoading && job != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
+
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -31,6 +41,15 @@
             </div>
         </div>
     </div>
+
+    @if (job?.Status == JobStatus.Cancelled)
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Warning:</strong> This job has been cancelled. 
+            Deleting will permanently remove it from your records.
+        </div>
+    }
 
     @if (isLoading)
     {
@@ -64,7 +83,7 @@
                                 <!-- Job Title -->
                                 <div class="col-12">
                                     <label class="form-label required">Job Title</label>
-                                    <InputText @bind-Value="job.Title" class="@GetFieldErrorClass("Title")" placeholder="Enter job title" />
+                                    <InputText @bind-Value="job.Title" class="@GetFieldErrorClass("Title")" placeholder="Enter job title" disabled="@isInvoiced" />
                                     <ValidationMessage For="@(() => job.Title)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Title").Any() == true)
                                     {
@@ -78,7 +97,7 @@
                                 <!-- Job Type and Status -->
                                 <div class="col-md-6">
                                     <label class="form-label required">Job Type</label>
-                                    <InputSelect @bind-Value="job.Type" class="@(validationErrors?.GetFieldErrors("Type").Any() == true ? "form-select is-invalid" : "form-select")" @bind-Value:after="OnJobTypeChanged">
+                                    <InputSelect @bind-Value="job.Type" class="@(validationErrors?.GetFieldErrors("Type").Any() == true ? "form-select is-invalid" : "form-select")" @bind-Value:after="OnJobTypeChanged" disabled="@isInvoiced">
                                         <option value="">-- Select Job Type --</option>
                                         <option value="@JobType.SkipRental">Skip Rental</option>
                                         <option value="@JobType.SandDelivery">Sand Delivery</option>
@@ -140,7 +159,7 @@
 
                                     <div class="col-md-6">
                                         <label class="form-label required">Skip Type</label>
-                                        <InputSelect @bind-Value="job.SkipType" class="@(validationErrors?.GetFieldErrors("SkipType").Any() == true ? "form-select is-invalid" : "form-select")" @bind-Value:after="OnSkipTypeChanged">
+                                        <InputSelect @bind-Value="job.SkipType" class="@(validationErrors?.GetFieldErrors("SkipType").Any() == true ? "form-select is-invalid" : "form-select")" @bind-Value:after="OnSkipTypeChanged" disabled="@isInvoiced">
                                             <option value="">-- Select Skip Type --</option>
                                             <option value="SmallSkip">Small Skip</option>
                                             <option value="LargeSkip">Large Skip</option>
@@ -161,7 +180,7 @@
                                         <div class="col-md-6">
                                             <label class="form-label required">Skip Number</label>
                                             <InputText @bind-Value="job.SkipNumber" class="@GetFieldErrorClass("SkipNumber")" 
-                                                    placeholder="e.g., SK-001" />
+                                                    placeholder="e.g., SK-001" disabled="@isInvoiced" />
                                             <div class="form-text">Enter the skip identification number</div>
                                             <ValidationMessage For="@(() => job.SkipNumber)" class="text-danger small" />
                                             @if (validationErrors?.GetFieldErrors("SkipNumber").Any() == true)
@@ -187,7 +206,7 @@
 
                                     <div class="col-md-6">
                                         <label class="form-label required">Material Type</label>
-                                        <InputSelect @bind-Value="job.SandMaterialType" class="@(validationErrors?.GetFieldErrors("SandMaterialType").Any() == true ? "form-select is-invalid" : "form-select")">
+                                        <InputSelect @bind-Value="job.SandMaterialType" class="@(validationErrors?.GetFieldErrors("SandMaterialType").Any() == true ? "form-select is-invalid" : "form-select")" disabled="@isInvoiced">
                                             <option value="">-- Select Material --</option>
                                             <option value="Sand">Sand</option>
                                             <option value="CrushedStone">Crushed Stone</option>
@@ -206,7 +225,7 @@
 
                                     <div class="col-md-6">
                                         <label class="form-label required">Delivery Method</label>
-                                        <InputSelect @bind-Value="job.SandDeliveryMethod" class="@(validationErrors?.GetFieldErrors("SandDeliveryMethod").Any() == true ? "form-select is-invalid" : "form-select")">
+                                        <InputSelect @bind-Value="job.SandDeliveryMethod" class="@(validationErrors?.GetFieldErrors("SandDeliveryMethod").Any() == true ? "form-select is-invalid" : "form-select")" disabled="@isInvoiced">
                                             <option value="">-- Select Method --</option>
                                             <option value="InBags">In Bags</option>
                                             <option value="ByTruck">By Truck</option>
@@ -234,7 +253,7 @@
 
                                     <div class="col-md-6">
                                         <label class="form-label required">Forklift Size</label>
-                                        <InputSelect @bind-Value="job.ForkliftSize" class="@(validationErrors?.GetFieldErrors("ForkliftSize").Any() == true ? "form-select is-invalid" : "form-select")">
+                                        <InputSelect @bind-Value="job.ForkliftSize" class="@(validationErrors?.GetFieldErrors("ForkliftSize").Any() == true ? "form-select is-invalid" : "form-select")" disabled="@isInvoiced">
                                             <option value="">-- Select Size --</option>
                                             <option value="17m">17m</option>
                                             <option value="25m">25m</option>
@@ -254,7 +273,7 @@
                                 <div class="col-12">
                                     <label class="form-label required">Service Address</label>
                                     <InputText @bind-Value="job.Address" class="@GetFieldErrorClass("Address")" 
-                                            placeholder="Enter the full address where the service will be provided" />
+                                            placeholder="Enter the full address where the service will be provided" disabled="@isInvoiced" />
                                     <div class="form-text">This will be used for scheduling and invoicing</div>
                                     <ValidationMessage For="@(() => job.Address)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Address").Any() == true)
@@ -269,7 +288,7 @@
                                 <!-- Start Date and Price -->
                                 <div class="col-md-6">
                                     <label class="form-label required">Start Date</label>
-                                    <InputDate @bind-Value="job.StartDate" class="@GetFieldErrorClass("StartDate")" />
+                                    <InputDate @bind-Value="job.StartDate" class="@GetFieldErrorClass("StartDate")" disabled="@isInvoiced" />
                                     <ValidationMessage For="@(() => job.StartDate)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("StartDate").Any() == true)
                                     {
@@ -282,7 +301,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label required">Price (£)</label>
                                     <InputNumber @bind-Value="job.Price" class="@GetFieldErrorClass("Price")" 
-                                            placeholder="0.00" step="0.01" />
+                                            placeholder="0.00" step="0.01" disabled="@isInvoiced" />
                                     <ValidationMessage For="@(() => job.Price)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Price").Any() == true)
                                     {
@@ -297,7 +316,7 @@
                                 <div class="col-12">
                                     <label class="form-label">Description</label>
                                     <InputTextArea @bind-Value="job.Description" class="@GetFieldErrorClass("Description")" rows="3" 
-                                                placeholder="Additional details about this job (e.g., skip size, sand type, special requirements)..." />
+                                                placeholder="Additional details about this job (e.g., skip size, sand type, special requirements)..." disabled="@isInvoiced" />
                                     <ValidationMessage For="@(() => job.Description)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Description").Any() == true)
                                     {
@@ -349,12 +368,12 @@
                                     <a href="@GetReturnUrl()" class="btn btn-outline-secondary">
                                         Cancel
                                     </a>
-                                    <button type="submit" class="btn btn-primary" disabled="@isSaving">
+                                    <button type="submit" class="btn btn-primary" disabled="@(isSaving || isInvoiced)">
                                         @if (isSaving)
                                         {
                                             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                         }
-                                        @(isSaving ? "Saving..." : "Save Changes")
+                                        @(isSaving ? "Saving..." : isInvoiced ? "Cannot Save (Invoiced)" : "Save Changes")
                                     </button>
                                 </div>
                             </div>
@@ -547,10 +566,21 @@
                                     </button>
                                 }
                                 <hr class="my-2">
-                                <button type="button" class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteConfirmation">
-                                    <i class="bi bi-trash me-1"></i>
-                                    Delete Job
-                                </button>
+                                @if (job.Status == JobStatus.Active || job.Status == JobStatus.Completed || isInvoiced)
+                                {
+                                    <button type="button" class="btn btn-outline-danger btn-sm" disabled="true" 
+                                            title="@GetDeleteDisabledReason()">
+                                        <i class="bi bi-lock me-1"></i>
+                                        @GetDeleteButtonText()
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteConfirmation">
+                                        <i class="bi bi-trash me-1"></i>
+                                        Delete Job
+                                    </button>
+                                }
                             </div>
                         </div>
                     </div>
@@ -578,11 +608,36 @@
                             This will permanently delete the job <strong>@job?.Title</strong>.
                             This action cannot be undone.
                         </p>
-                        @if (job?.Status == JobStatus.Completed)
+                        @if (isInvoiced)
+                        {
+                            <div class="alert alert-danger">
+                                <i class="bi bi-x-circle me-2"></i>
+                                <strong>Cannot Delete:</strong> This job has been invoiced and cannot be deleted. 
+                                Remove it from the invoice first.
+                            </div>
+                        }
+                        else if (job?.Status == JobStatus.Completed)
+                        {
+                            <div class="alert alert-danger">
+                                <i class="bi bi-x-circle me-2"></i>
+                                <strong>Cannot Delete:</strong> Completed jobs cannot be deleted. 
+                                They must be preserved for audit trail and financial reporting.
+                            </div>
+                        }
+                        else if (job?.Status == JobStatus.Active)
+                        {
+                            <div class="alert alert-danger">
+                                <i class="bi bi-x-circle me-2"></i>
+                                <strong>Cannot Delete:</strong> Active jobs cannot be deleted. 
+                                Please mark the job as cancelled first.
+                            </div>
+                        }
+                        else if (job?.Status == JobStatus.Cancelled)
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                This job is completed and may be associated with invoices.
+                                <strong>Warning:</strong> This job has been cancelled. 
+                                Deleting will permanently remove it from your records.
                             </div>
                         }
                     </div>

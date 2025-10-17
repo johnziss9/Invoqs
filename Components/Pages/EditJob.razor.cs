@@ -23,6 +23,8 @@ namespace Invoqs.Components.Pages
         protected bool isSaving = false;
         protected bool isDeleting = false;
         protected bool showDeleteConfirmation = false;
+        protected bool isInvoiced = false;
+        protected bool canDeleteJob = true;
         protected string errorMessage = "";
         protected string successMessage = "";
 
@@ -55,6 +57,14 @@ namespace Invoqs.Components.Pages
                     errorMessage = "Job not found.";
                     return;
                 }
+
+                isInvoiced = job.IsInvoiced;
+                
+                // NEW: Determine if job can be deleted based on status
+                // Can only delete: New jobs
+                // Warn but allow: Cancelled jobs
+                // Cannot delete: Active, Completed, or Invoiced jobs
+                canDeleteJob = job.Status == JobStatus.New || job.Status == JobStatus.Cancelled;
 
                 // Load customer information
                 customer = await CustomerService.GetCustomerByIdAsync(job.CustomerId);
@@ -204,6 +214,30 @@ namespace Invoqs.Components.Pages
 
         private void ShowDeleteConfirmation()
         {
+            if (job == null) return;
+
+            // Validate job can be deleted
+            if (isInvoiced)
+            {
+                errorMessage = "Cannot delete a job that has been invoiced. Please remove it from the invoice first.";
+                StateHasChanged();
+                return;
+            }
+
+            if (job.Status == JobStatus.Active)
+            {
+                errorMessage = "Cannot delete an active job. Please mark it as cancelled first.";
+                StateHasChanged();
+                return;
+            }
+
+            if (job.Status == JobStatus.Completed)
+            {
+                errorMessage = "Cannot delete a completed job. Completed work must be preserved for audit trail and reporting.";
+                StateHasChanged();
+                return;
+            }
+
             showDeleteConfirmation = true;
             StateHasChanged();
         }
@@ -295,6 +329,34 @@ namespace Invoqs.Components.Pages
                 var returnUrl = Uri.EscapeDataString(currentUrl);
                 Navigation.NavigateTo($"/customer/{job.CustomerId}/invoice/new?preselectedJobId={job.Id}&returnUrl={returnUrl}", true);
             }
+        }
+
+        private string GetDeleteButtonText()
+        {
+            if (job == null) return "Delete Job";
+            
+            if (isInvoiced)
+                return "Cannot Delete (Invoiced)";
+            if (job.Status == JobStatus.Completed)
+                return "Cannot Delete (Completed)";
+            if (job.Status == JobStatus.Active)
+                return "Cannot Delete (Active)";
+            
+            return "Delete Job";
+        }
+
+        private string GetDeleteDisabledReason()
+        {
+            if (job == null) return "";
+            
+            if (isInvoiced)
+                return "Cannot delete invoiced jobs. Remove from invoice first.";
+            if (job.Status == JobStatus.Completed)
+                return "Cannot delete completed jobs. They must be preserved for audit trail.";
+            if (job.Status == JobStatus.Active)
+                return "Cannot delete active jobs. Mark as cancelled first.";
+            
+            return "";
         }
 
         protected async Task HandleLogout()
