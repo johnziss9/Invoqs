@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Invoqs.Models;
+using Invoqs.Interfaces;
 
 namespace Invoqs.Components.UI
 {
@@ -13,9 +14,12 @@ namespace Invoqs.Components.UI
         [Parameter] public EventCallback<JobModel> OnGenerateInvoice { get; set; }
 
         [Inject] private NavigationManager Navigation { get; set; } = default!;
+        [Inject] private IJobService JobService { get; set; } = default!;
+        [Inject] private ILogger<JobCard> Logger { get; set; } = default!;
 
         private bool showDeleteConfirmation = false;
         private bool isDeleting = false;
+        private string? errorMessage;
 
         private void ShowDeleteConfirmation()
         {
@@ -63,6 +67,45 @@ namespace Invoqs.Components.UI
         {
             var currentUrl = Navigation.Uri;
             Navigation.NavigateTo($"/job/{jobId}/edit?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
+        }
+
+        private async Task HandleStatusChange(JobStatus newStatus)
+        {
+            try
+            {
+                var oldStatus = Job.Status;
+
+                var result = await JobService.UpdateJobStatusAsync(Job.Id, newStatus);
+
+                if (result.Success)
+                {
+                    Job.Status = newStatus;
+
+                    if (newStatus == JobStatus.Completed && !Job.EndDate.HasValue)
+                    {
+                        Job.EndDate = DateTime.Now;
+                    }
+                    else if (newStatus != JobStatus.Completed && oldStatus == JobStatus.Completed)
+                    {
+                        Job.EndDate = null;
+                    }
+                }
+                else if (result.ValidationErrors != null)
+                {
+                    errorMessage = string.Join(", ", result.ValidationErrors.GetAllErrors());
+                }
+                else
+                {
+                    errorMessage = "Failed to update job status";
+                }
+
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error updating job status: {ex.Message}";
+                StateHasChanged();
+            }
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Invoqs.Components.Pages
                 await LoadJobDetailsAsync();
             }
         }
-        
+
         private string GetReturnUrl()
         {
             return !string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : "/jobs";
@@ -109,7 +109,7 @@ namespace Invoqs.Components.Pages
                 StateHasChanged();
 
                 var success = await JobService.DeleteJobAsync(job.Id);
-                
+
                 if (success)
                 {
                     Navigation.NavigateTo(GetReturnUrl(), true);
@@ -138,12 +138,22 @@ namespace Invoqs.Components.Pages
             {
                 if (job != null)
                 {
-                    job.Status = JobStatus.Active;
+                    var (success, errors) = await JobService.UpdateJobStatusAsync(job.Id, JobStatus.Active);
 
-                    await JobService.UpdateJobAsync(job);
+                    if (success)
+                    {
+                        job.Status = JobStatus.Active;
+                        StateHasChanged();
+                    }
+                    else if (errors != null)
+                    {
+                        errorMessage = string.Join(", ", errors.GetAllErrors());
+                    }
+                    else
+                    {
+                        errorMessage = "Failed to start job";
+                    }
                 }
-                
-                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -157,13 +167,23 @@ namespace Invoqs.Components.Pages
             {
                 if (job != null)
                 {
-                    job.Status = JobStatus.Completed;
-                    job.EndDate = DateTime.Now;
+                    var (success, errors) = await JobService.UpdateJobStatusAsync(job.Id, JobStatus.Completed);
 
-                    await JobService.UpdateJobAsync(job);
+                    if (success)
+                    {
+                        job.Status = JobStatus.Completed;
+                        job.EndDate = DateTime.Now;
+                        StateHasChanged();
+                    }
+                    else if (errors != null)
+                    {
+                        errorMessage = string.Join(", ", errors.GetAllErrors());
+                    }
+                    else
+                    {
+                        errorMessage = "Failed to complete job";
+                    }
                 }
-
-                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -187,7 +207,8 @@ namespace Invoqs.Components.Pages
         {
             if (job != null)
             {
-                Navigation.NavigateTo($"/customer/{job.CustomerId}/invoice/new?preselectedJobId={JobId}");
+                var currentUrl = Navigation.Uri;
+                Navigation.NavigateTo($"/customer/{job.CustomerId}/invoice/new?preselectedJobId={JobId}&returnUrl={Uri.EscapeDataString(currentUrl)}", true);
             }
         }
 

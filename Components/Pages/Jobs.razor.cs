@@ -152,39 +152,35 @@ namespace Invoqs.Components.Pages
             try
             {
                 var originalStatus = job.Status;
-                job.Status = newStatus;
 
-                // Set end date for completed jobs
-                if (newStatus == JobStatus.Completed && !job.EndDate.HasValue)
-                {
-                    job.EndDate = DateTime.Now;
-                }
-                // Clear end date if moving away from completed
-                else if (newStatus != JobStatus.Completed && originalStatus == JobStatus.Completed)
-                {
-                    job.EndDate = null;
-                }
-
-                var (success, errors) = await JobService.UpdateJobAsync(job);
+                var (success, errors) = await JobService.UpdateJobStatusAsync(job.Id, newStatus);
 
                 if (success)
                 {
+                    job.Status = newStatus;
+
+                    if (newStatus == JobStatus.Completed && !job.EndDate.HasValue)
+                    {
+                        job.EndDate = DateTime.Now;
+                    }
+                    else if (newStatus != JobStatus.Completed && originalStatus == JobStatus.Completed)
+                    {
+                        job.EndDate = null;
+                    }
+
                     StateHasChanged();
                 }
                 else
                 {
-                    // Revert the status change
-                    job.Status = originalStatus;
-                    
                     if (errors != null)
                     {
-                        errorMessage = "Validation error: " + string.Join(", ", errors.Errors.SelectMany(e => e.Value));
+                        errorMessage = "Validation error: " + string.Join(", ", errors.GetAllErrors());
                     }
                     else
                     {
                         errorMessage = "Failed to update job status";
                     }
-                    
+
                     StateHasChanged();
                 }
             }

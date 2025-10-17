@@ -33,54 +33,73 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <!-- Status Change Actions -->
-                        <li>
-                            <h6 class="dropdown-header">Change Status</h6>
-                        </li>
-                        @if (Job.Status != JobStatus.New)
-                        {
-                            <li><button class="dropdown-item"
-                                    @onclick="() => OnStatusChange.InvokeAsync((Job, JobStatus.New))"
-                                    @onclick:preventDefault="true">
-                                    <i class="bi bi-clock me-2"></i>Mark as New
-                                </button></li>
-                        }
-                        @if (Job.Status != JobStatus.Active)
-                        {
-                            <li><button class="dropdown-item"
-                                    @onclick="() => OnStatusChange.InvokeAsync((Job, JobStatus.Active))"
-                                    @onclick:preventDefault="true">
-                                    <i class="bi bi-play-circle me-2"></i>Mark as Active
-                                </button></li>
-                        }
-                        @if (Job.Status != JobStatus.Completed)
-                        {
-                            <li><button class="dropdown-item"
-                                    @onclick="() => OnStatusChange.InvokeAsync((Job, JobStatus.Completed))"
-                                    @onclick:preventDefault="true">
-                                    <i class="bi bi-check-circle me-2"></i>Mark as Completed
-                                </button></li>
-                        }
-                        @if (Job.Status != JobStatus.Cancelled)
-                        {
-                            <li><button class="dropdown-item text-danger"
-                                    @onclick="() => OnStatusChange.InvokeAsync((Job, JobStatus.Cancelled))"
-                                    @onclick:preventDefault="true">
-                                    <i class="bi bi-x-circle me-2"></i>Mark as Cancelled
-                                </button></li>
+                        @{
+                            var hasStatusOptions = false;
+                            
+                            var canGoToActive = Job.Status == JobStatus.New || Job.Status == JobStatus.Cancelled;
+                            var canGoToCompleted = Job.Status == JobStatus.Active;
+                            var canGoToCancelled = Job.Status == JobStatus.New || Job.Status == JobStatus.Active;
+                            var canGoToNew = Job.Status == JobStatus.Cancelled;
+                            
+                            hasStatusOptions = canGoToActive || canGoToCompleted || canGoToCancelled || canGoToNew;
                         }
 
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                        @if (hasStatusOptions)
+                        {
+                            <li>
+                                <h6 class="dropdown-header">Change Status</h6>
+                            </li>
+                            
+                            @if (canGoToNew)
+                            {
+                                <li><button class="dropdown-item"
+                                        @onclick="() => HandleStatusChange(JobStatus.New)"
+                                        @onclick:preventDefault="true">
+                                        <i class="bi bi-clock me-2"></i>Mark as New
+                                    </button></li>
+                            }
+                            
+                            @if (canGoToActive)
+                            {
+                                <li><button class="dropdown-item"
+                                        @onclick="() => HandleStatusChange(JobStatus.Active)"
+                                        @onclick:preventDefault="true">
+                                        <i class="bi bi-play-circle me-2"></i>Mark as Active
+                                    </button></li>
+                            }
+                            
+                            @if (canGoToCompleted)
+                            {
+                                <li><button class="dropdown-item"
+                                        @onclick="() => HandleStatusChange(JobStatus.Completed)"
+                                        @onclick:preventDefault="true">
+                                        <i class="bi bi-check-circle me-2"></i>Mark as Completed
+                                    </button></li>
+                            }
+                            
+                            @if (canGoToCancelled)
+                            {
+                                <li><button class="dropdown-item text-danger"
+                                        @onclick="() => HandleStatusChange(JobStatus.Cancelled)"
+                                        @onclick:preventDefault="true">
+                                        <i class="bi bi-x-circle me-2"></i>Mark as Cancelled
+                                    </button></li>
+                            }
+                            
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                        }
 
                         <!-- Job Actions -->
-                        <li><button class="dropdown-item" @onclick="() => HandleEditJob(Job.Id)" @onclick:preventDefault="true">
-                            <i class="bi bi-pencil me-2"></i>Edit Job
-                        </button></li>
+                        <li><button class="dropdown-item" @onclick="() => HandleEditJob(Job.Id)"
+                                @onclick:preventDefault="true">
+                                <i class="bi bi-pencil me-2"></i>Edit Job
+                            </button></li>
                         @if (Job.CanBeInvoiced)
                         {
-                            <li><button class="dropdown-item text-success"
-                                    @onclick="HandleGenerateInvoiceClick" @onclick:preventDefault="true">
+                            <li><button class="dropdown-item text-success" @onclick="HandleGenerateInvoiceClick"
+                                    @onclick:preventDefault="true">
                                     <i class="bi bi-file-earmark-text me-2"></i>Generate Invoice
                                 </button></li>
                         }
@@ -243,7 +262,8 @@
                         {
                             <div class="alert alert-danger">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Warning:</strong> This job has been invoiced. Deleting it may affect your financial records.
+                                <strong>Warning:</strong> This job has been invoiced. Deleting it may affect your financial
+                                records.
                             </div>
                         }
                         else if (Job.Status == JobStatus.Active)
