@@ -236,13 +236,28 @@ public partial class InvoiceDetails
         }
     }
 
-    private void DownloadPdf()
+    private async Task DownloadPdf()
     {
+        if (invoice == null) return;
+
         try
         {
-            // This would typically call an API endpoint to generate and download a PDF
-            // For now, we'll show a placeholder message
-            successMessage = "PDF generation functionality will be implemented with the API.";
+            isProcessing = true;
+            StateHasChanged();
+
+            var pdfBytes = await InvoiceService.DownloadInvoicePdfAsync(invoice.Id);
+
+            if (pdfBytes == null || pdfBytes.Length == 0)
+            {
+                errorMessage = "Failed to generate PDF. Please try again.";
+                return;
+            }
+
+            // Trigger browser download using JavaScript
+            var fileName = $"{invoice.InvoiceNumber}.pdf";
+            await JSRuntime.InvokeVoidAsync("downloadFile", fileName, "application/pdf", pdfBytes);
+
+            successMessage = "PDF downloaded successfully.";
 
             // Clear the message after 3 seconds
             _ = Task.Delay(3000).ContinueWith(_ =>
@@ -254,6 +269,11 @@ public partial class InvoiceDetails
         catch (Exception ex)
         {
             errorMessage = $"Error generating PDF: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
         }
     }
 
