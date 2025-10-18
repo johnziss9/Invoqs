@@ -21,5 +21,8 @@ namespace Invoqs.Interfaces
 
         // Statistics
         Task<decimal> GetTotalOutstandingAsync();
+
+        // PDF Generation
+        Task<byte[]?> DownloadInvoicePdfAsync(int invoiceId);
     }
 }
