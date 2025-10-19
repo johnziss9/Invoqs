@@ -226,7 +226,9 @@ namespace Invoqs.Services
                 var token = await _authService.GetTokenAsync();
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
-                var content = JsonContent.Create(new { SentDate = DateTime.Today });
+                var sentDate = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
+
+                var content = JsonContent.Create(new { SentDate = sentDate });
                 var response = await _httpClient.PostAsync($"invoices/{invoiceId}/send", content);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)

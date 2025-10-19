@@ -3,15 +3,23 @@ using Invoqs.Models;
 
 namespace Invoqs.Components.UI
 {
+    public class MarkAsPaidEventArgs
+    {
+        public InvoiceModel Invoice { get; set; } = new();
+        public DateTime PaymentDate { get; set; }
+        public string PaymentMethod { get; set; } = string.Empty;
+        public string? PaymentReference { get; set; }
+    }
+
     public partial class InvoiceCard : ComponentBase
     {
         [Inject] private NavigationManager Navigation { get; set; } = default!;
-        
+
         [Parameter] public InvoiceModel Invoice { get; set; } = new();
         [Parameter] public EventCallback<InvoiceModel> OnView { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnEdit { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnMarkAsSent { get; set; }
-        [Parameter] public EventCallback<InvoiceModel> OnMarkAsPaid { get; set; }
+        [Parameter] public EventCallback<MarkAsPaidEventArgs> OnMarkAsPaid { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnCancel { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnDelete { get; set; }
 
@@ -140,7 +148,17 @@ namespace Invoqs.Components.UI
 
             try
             {
-                await OnMarkAsPaid.InvokeAsync(Invoice);
+                var utcPaymentDate = DateTime.SpecifyKind(paymentDate.Date, DateTimeKind.Utc);
+
+                var args = new MarkAsPaidEventArgs
+                {
+                    Invoice = Invoice,
+                    PaymentDate = utcPaymentDate,
+                    PaymentMethod = paymentMethod,
+                    PaymentReference = paymentReference
+                };
+
+                await OnMarkAsPaid.InvokeAsync(args);
                 showMarkAsPaidConfirmation = false;
             }
             finally
@@ -149,7 +167,7 @@ namespace Invoqs.Components.UI
                 StateHasChanged();
             }
         }
-        
+
         protected string GetCustomerInitials()
         {
             if (Invoice.Customer == null || string.IsNullOrWhiteSpace(Invoice.Customer.Name))

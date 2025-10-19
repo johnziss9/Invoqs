@@ -135,16 +135,18 @@ public partial class InvoiceDetails
         {
             isMarkingPaid = true;
 
+            var utcPaymentDate = DateTime.SpecifyKind(paymentDate.Date, DateTimeKind.Utc);
+
             var success = await InvoiceService.MarkInvoiceAsPaidAsync(
                 invoice.Id,
-                paymentDate,
+                utcPaymentDate,
                 paymentMethod,
                 paymentReference);
 
             if (success)
             {
                 invoice.Status = InvoiceStatus.Paid;
-                invoice.PaidDate = paymentDate;
+                invoice.PaidDate = utcPaymentDate;
                 invoice.PaymentMethod = paymentMethod;
                 invoice.PaymentReference = paymentReference;
 
