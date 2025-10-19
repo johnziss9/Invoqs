@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Invoqs.Models;
 using Invoqs.Interfaces;
 using Microsoft.JSInterop;
+using Invoqs.Components.UI;
 
 namespace Invoqs.Components.Pages
 {
@@ -203,21 +204,37 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        protected async Task HandleMarkAsPaid(InvoiceModel invoice)
+        protected async Task HandleMarkAsPaid(MarkAsPaidEventArgs args)
         {
             try
             {
-                // In a real app, you'd show a dialog to collect payment details
                 var success = await InvoiceService.MarkInvoiceAsPaidAsync(
-                    invoice.Id,
-                    DateTime.Now,
-                    "Manual Entry",
-                    $"PAYMENT-{DateTime.Now:yyyyMMdd}-{invoice.Id}"
+                    args.Invoice.Id,
+                    args.PaymentDate,
+                    args.PaymentMethod,
+                    args.PaymentReference
                 );
 
                 if (success)
                 {
-                    await LoadData();
+                    // Reload the invoice to get updated status
+                    var updatedInvoice = await InvoiceService.GetInvoiceByIdAsync(args.Invoice.Id);
+                    if (updatedInvoice != null)
+                    {
+                        var index = customerInvoices.FindIndex(i => i.Id == args.Invoice.Id);
+                        if (index >= 0)
+                        {
+                            customerInvoices[index] = updatedInvoice;
+                        }
+                    }
+
+                    // Recalculate totals
+                    totalValue = customerInvoices.Sum(i => i.Total);
+                    totalOutstanding = customerInvoices
+                        .Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Overdue)
+                        .Sum(i => i.Total);
+
+                    StateHasChanged();
                 }
                 else
                 {
@@ -227,7 +244,7 @@ namespace Invoqs.Components.Pages
             }
             catch (Exception ex)
             {
-                errorMessage = $"Error updating invoice: {ex.Message}";
+                errorMessage = $"Error marking invoice as paid: {ex.Message}";
                 StateHasChanged();
             }
         }
