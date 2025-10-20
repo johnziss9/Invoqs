@@ -120,10 +120,13 @@
                                 {
                                     <div>
                                         <strong>@customer.Name</strong><br>
+                                        @if (invoice?.LineItems?.Any() == true && !string.IsNullOrWhiteSpace(invoice.LineItems.First().JobAddress))
+                                        {
+                                            @invoice.LineItems.First().JobAddress<br>
+                                        }
                                         @if (!string.IsNullOrWhiteSpace(customer.Email))
                                         {
                                             <a href="mailto:@customer.Email">@customer.Email</a>
-                                
                                             <br>
                                         }
                                         @if (!string.IsNullOrWhiteSpace(customer.Phone))
@@ -138,11 +141,11 @@
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label fw-medium">Invoice Date</label>
-                                <div class="form-control-plaintext">@invoice.CreatedDate.ToString("dd MMM yyyy")</div>
+                                <div class="form-control-plaintext">@invoice?.CreatedDate.ToString("dd MMM yyyy")</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-medium">Due Date</label>
-                                <div class="form-control-plaintext @(invoice.IsOverdue ? "text-danger" : "")">
+                                <div class="form-control-plaintext @(invoice!.IsOverdue ? "text-danger" : "")">
                                     @invoice.DueDate.ToString("dd MMM yyyy")
                                     @if (invoice.IsOverdue)
                                     {
@@ -181,12 +184,6 @@
                                         <tr>
                                             <td>
                                                 <div class="fw-medium">@item.Description</div>
-                                                @if (item.Job != null)
-                                                {
-                                                    <small class="text-muted">
-                                                        <i class="bi bi-geo-alt me-1"></i>@item.Job.Address
-                                                    </small>
-                                                }
                                             </td>
                                             <td>
                                                 @if (item.Job != null)

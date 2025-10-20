@@ -30,6 +30,10 @@ namespace Invoqs.Models
 
         public decimal LineTotal => Quantity * UnitPrice;
 
+        public string? JobTitle { get; set; }
+        public JobType? JobType { get; set; }
+        public string? JobAddress { get; set; }
+
         // Computed properties for UI display
         public string FormattedUnitPrice => $"£{UnitPrice:N2}";
         public string FormattedLineTotal => $"£{LineTotal:N2}";
