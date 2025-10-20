@@ -219,9 +219,6 @@ namespace Invoqs.Components.Pages
                     Quantity = 1
                 });
             }
-
-            // Calculate VAT rate based on selected jobs
-            invoice.CalculateVatRate();
         }
 
         private async Task HandleUpdateInvoice()

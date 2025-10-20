@@ -151,16 +151,8 @@ namespace Invoqs.Models
 
         public string ShortAddress => Address.Length > 50 ? Address.Substring(0, 47) + "..." : Address;
 
-        // NEW: Invoice integration helper properties and methods
+        // Invoice integration helper properties and methods
         public bool CanBeInvoiced => Status == JobStatus.Completed && !IsInvoiced;
-
-        public decimal GetVatRate() => Type switch
-        {
-            JobType.SkipRental => 5m,
-            JobType.SandDelivery => 19m,
-            JobType.ForkLiftService => 19m,
-            _ => 5m // Default to lower rate
-        };
 
         public string FormattedPrice => $"£{Price:N2}";
 

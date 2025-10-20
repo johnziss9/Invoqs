@@ -150,7 +150,7 @@ namespace Invoqs.Components.Pages
                 DueDate = DateTime.Now.AddDays(30), // 30 days from now
                 Status = InvoiceStatus.Draft,
                 PaymentTermsDays = 30,
-                VatRate = 5m, // Default to skip rental rate
+                VatRate = 0m,
                 InvoiceNumber = string.Empty
             };
         }
@@ -241,9 +241,6 @@ namespace Invoqs.Components.Pages
                     Quantity = 1
                 });
             }
-
-            // Calculate VAT rate based on selected jobs
-            newInvoice.CalculateVatRate();
         }
 
         private async Task HandleCreateInvoice()
@@ -273,18 +270,14 @@ namespace Invoqs.Components.Pages
                 var (createdInvoice, errors) = await InvoiceService.CreateInvoiceFromJobsAsync(
                     customerId,
                     selectedJobIds.ToList(),
-                    newInvoice.DueDate
+                    newInvoice.DueDate,
+                    newInvoice.VatRate,
+                    newInvoice.PaymentTermsDays,
+                    newInvoice.Notes
                 );
 
                 if (createdInvoice != null)
                 {
-                    // Update the created invoice with any custom notes
-                    if (!string.IsNullOrWhiteSpace(newInvoice.Notes))
-                    {
-                        createdInvoice.Notes = newInvoice.Notes;
-                        await InvoiceService.UpdateInvoiceAsync(createdInvoice);
-                    }
-
                     Navigation.NavigateTo($"/invoice/{createdInvoice.Id}", true);
                 }
                 else if (errors != null)

@@ -163,7 +163,10 @@ namespace Invoqs.Services
         public async Task<(InvoiceModel? Invoice, ApiValidationError? ValidationErrors)> CreateInvoiceFromJobsAsync(
             int customerId,
             List<int> jobIds,
-            DateTime? dueDate = null)
+            DateTime? dueDate = null,
+            decimal vatRate = 0m,
+            int paymentTermsDays = 30,
+            string? notes = null)
         {
             try
             {
@@ -174,9 +177,9 @@ namespace Invoqs.Services
                 {
                     CustomerId = customerId,
                     JobIds = jobIds,
-                    VatRate = 0.19m,
-                    PaymentTermsDays = 30,
-                    Notes = (string?)null
+                    VatRate = vatRate,
+                    PaymentTermsDays = paymentTermsDays,
+                    Notes = notes
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("invoices", request, _jsonOptions);

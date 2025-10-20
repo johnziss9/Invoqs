@@ -39,7 +39,7 @@ namespace Invoqs.Models
         public decimal Subtotal { get; set; }
 
         [Range(0, 100, ErrorMessage = "VAT rate must be between 0 and 100")]
-        public decimal VatRate { get; set; } = 5; // Default to skip rental rate
+        public decimal VatRate { get; set; } = 0;
 
         public decimal VatAmount => Math.Round(Subtotal * (VatRate / 100), 2);
 
@@ -106,27 +106,6 @@ namespace Invoqs.Models
                     _ when DaysUntilDue > 0 => $"Due in {DaysUntilDue} days",
                     _ => $"Overdue by {Math.Abs(DaysUntilDue)} days"
                 };
-            }
-        }
-
-        // Helper method to set VAT rate based on job types
-        public void CalculateVatRate()
-        {
-            if (!LineItems.Any()) return;
-
-            // If all jobs are skip rentals, use 5%
-            // If all jobs are sand delivery or fork lift, use 19%  
-            // If mixed, use the higher rate (19%) for safety
-            var hasSkipRentals = LineItems.Any(li => li.Job?.Type == JobType.SkipRental);
-            var hasOtherServices = LineItems.Any(li => li.Job?.Type == JobType.SandDelivery || li.Job?.Type == JobType.ForkLiftService);
-
-            if (hasOtherServices)
-            {
-                VatRate = 19; // Higher rate for sand delivery and fork lift
-            }
-            else if (hasSkipRentals)
-            {
-                VatRate = 5; // Lower rate for skip rentals only
             }
         }
 
