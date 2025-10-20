@@ -228,13 +228,42 @@ public partial class InvoiceDetails
 
     private async Task PrintInvoice()
     {
+        if (invoice == null) return;
+
         try
         {
-            await JSRuntime.InvokeVoidAsync("window.print");
+            isProcessing = true;
+            StateHasChanged();
+
+            // Generate the PDF
+            var pdfBytes = await InvoiceService.DownloadInvoicePdfAsync(invoice.Id);
+
+            if (pdfBytes == null || pdfBytes.Length == 0)
+            {
+                errorMessage = "Failed to generate PDF for printing. Please try again.";
+                return;
+            }
+
+            // Open PDF in new window for printing instead of downloading
+            await JSRuntime.InvokeVoidAsync("printPdf", pdfBytes);
+
+            successMessage = "PDF opened for printing.";
+
+            // Clear the message after 3 seconds
+            _ = Task.Delay(3000).ContinueWith(_ =>
+            {
+                successMessage = string.Empty;
+                InvokeAsync(StateHasChanged);
+            });
         }
         catch (Exception ex)
         {
-            errorMessage = $"Error printing invoice: {ex.Message}";
+            errorMessage = $"Error generating PDF: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
         }
     }
 
