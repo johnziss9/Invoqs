@@ -1,0 +1,302 @@
+@rendermode InteractiveServer
+@page "/receipts/new"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+
+<PageTitle>Create Receipt - Invoqs</PageTitle>
+
+<Navbar CurrentUser="@currentUser" OnLogout="HandleLogout" />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/receipts" class="text-decoration-none">Receipts</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create Receipt</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">Create Receipt</h2>
+                    <p class="text-muted mb-0">Select paid invoices and generate a payment receipt</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Step 1: Customer Selection -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-fill me-2"></i>
+                        Step 1: Select Customer
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold required">Customer</label>
+                        <select class="form-select" @bind="selectedCustomerId" @bind:after="OnCustomerSelected">
+                            <option value="0">-- Select Customer --</option>
+                            @foreach (var customer in customers)
+                            {
+                                <option value="@customer.Id">@customer.Name</option>
+                            }
+                        </select>
+                        <div class="form-text">Select the customer for this receipt</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Address Selection -->
+            @if (selectedCustomerId > 0 && customerAddresses.Any())
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-geo-alt-fill me-2"></i>
+                            Step 2: Filter by Address (Optional)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Filter by Address</label>
+                            <select class="form-select" @bind="selectedAddress" @bind:after="FilterInvoices">
+                                <option value="">All Addresses</option>
+                                @foreach (var address in customerAddresses)
+                                {
+                                    <option value="@address">@address</option>
+                                }
+                            </select>
+                            <div class="form-text">
+                                You can select invoices from one or multiple addresses for this customer
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Step 3: Invoice Selection -->
+            @if (selectedCustomerId > 0)
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-file-earmark-text-fill me-2"></i>
+                            Step 3: Select Invoices
+                        </h5>
+                        @if (filteredInvoices.Any())
+                        {
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-2" @onclick="SelectAllInvoices">
+                                    <i class="bi bi-check-square"></i> Select All
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="DeselectAllInvoices">
+                                    <i class="bi bi-square"></i> Deselect All
+                                </button>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-body">
+                        @if (isLoadingInvoices)
+                        {
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading invoices...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading paid invoices...</p>
+                            </div>
+                        }
+                        else if (!filteredInvoices.Any())
+                        {
+                            <div class="alert alert-info mb-0">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                No paid invoices found for this customer
+                                @if (!string.IsNullOrEmpty(selectedAddress))
+                                {
+                                    <text> at address: @selectedAddress</text>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                <table class="table table-hover">
+                                    <thead class="table-light" style="position: sticky; top: 0; z-index: 10;">
+                                        <tr>
+                                            <th style="width: 50px;"></th>
+                                            <th>Invoice #</th>
+                                            <th>Address</th>
+                                            <th>Date</th>
+                                            <th>Due Date</th>
+                                            <th class="text-end">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var invoice in filteredInvoices)
+                                        {
+                                            var isSelected = selectedInvoiceIds.Contains(invoice.Id);
+                                            <tr class="@(isSelected ? "table-active" : "")" 
+                                                style="cursor: pointer;" 
+                                                @onclick="() => ToggleInvoiceSelection(invoice.Id)">
+                                                <td>
+                                                    <input type="checkbox" 
+                                                           class="form-check-input" 
+                                                           checked="@isSelected"
+                                                           @onclick:stopPropagation="true"
+                                                           @onchange="() => ToggleInvoiceSelection(invoice.Id)" />
+                                                </td>
+                                                <td>
+                                                    <strong>@invoice.InvoiceNumber</strong>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">@invoice.Address</small>
+                                                </td>
+                                                <td>@invoice.CreatedDate.ToString("dd MMM yyyy")</td>
+                                                <td>@invoice.DueDate.ToString("dd MMM yyyy")</td>
+                                                <td class="text-end">
+                                                    <strong>£@invoice.Total.ToString("N2")</strong>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-3 p-3 bg-light rounded">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>@selectedInvoiceIds.Count</strong> invoice(s) selected
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <strong class="text-primary">
+                                            Total: £@CalculateTotalAmount().ToString("N2")
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Right Sidebar: Payment Details & Summary -->
+        <div class="col-lg-4">
+            @if (selectedInvoiceIds.Any())
+            {
+                <div class="card border-0 shadow-sm sticky-top preview-card" style="top: 20px;">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h6 class="mb-0 text-white">
+                            <i class="bi bi-credit-card-fill me-2"></i>
+                            Payment Details
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <!-- Payment Date -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold required">Payment Date</label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   @bind="paymentDate" 
+                                   @bind:after="UpdatePreview"
+                                   max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            <div class="form-text">When was the payment received?</div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold required">Payment Method</label>
+                            <select class="form-select" @bind="paymentMethod" @bind:after="UpdatePreview">
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Cheque">Cheque</option>
+                                <option value="Card">Card</option>
+                                <option value="Direct Debit">Direct Debit</option>
+                            </select>
+                            <div class="form-text">How was the payment made?</div>
+                        </div>
+
+                        <!-- Payment Reference -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Payment Reference</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   @bind="paymentReference" 
+                                   @bind:after="UpdatePreview"
+                                   placeholder="e.g., TXN-123456" 
+                                   maxlength="200" />
+                            <div class="form-text">Optional reference number</div>
+                        </div>
+
+                        <hr />
+
+                        <!-- Summary -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Selected Invoices:</span>
+                                <strong>@selectedInvoiceIds.Count</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Customer:</span>
+                                <strong>@GetSelectedCustomerName()</strong>
+                            </div>
+                            <div class="d-flex justify-content-between text-primary fs-5">
+                                <span>Total Amount:</span>
+                                <strong>£@CalculateTotalAmount().ToString("N2")</strong>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- Generate Button -->
+                        <button class="btn btn-success w-100 btn-lg" 
+                                @onclick="HandleCreateReceipt"
+                                disabled="@isCreating">
+                            @if (isCreating)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                <text>Generating Receipt...</text>
+                            }
+                            else
+                            {
+                                <i class="bi bi-receipt me-2"></i>
+                                <text>Generate Receipt</text>
+                            }
+                        </button>
+
+                        <a href="/receipts" class="btn btn-outline-secondary w-100 mt-2">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-info-circle text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3 mb-0">
+                            Select at least one invoice to continue
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

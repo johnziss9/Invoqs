@@ -16,6 +16,9 @@ namespace Invoqs.Models
         public string? CustomerEmail { get; set; }
         public string? CustomerPhone { get; set; }
 
+        public string Address { get; set; } = string.Empty; // Primary address
+        public List<string> Addresses { get; set; } = new(); // All addresses if multiple
+
         public CustomerModel? Customer => string.IsNullOrEmpty(CustomerName) ? null : new CustomerModel
         {
             Id = CustomerId,
