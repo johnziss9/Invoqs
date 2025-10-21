@@ -74,7 +74,10 @@ namespace Invoqs.Components.Pages
                 var newCustomersThisWeek = customers.Count(c => c.CreatedDate >= oneWeekAgo);
 
                 // Calculate pending invoices and amount
-                var pendingInvoices = invoices.Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Overdue).ToList();
+                var pendingInvoices = invoices.Where(i => 
+                    i.Status == InvoiceStatus.Sent || 
+                    i.Status == InvoiceStatus.Delivered || 
+                    i.Status == InvoiceStatus.Overdue).ToList();
 
                 // Calculate this week's revenue
                 var twoWeeksAgo = DateTime.Now.AddDays(-14);

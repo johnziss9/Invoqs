@@ -288,8 +288,13 @@
             @foreach (var invoice in filteredInvoices)
             {
                 <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-                    <InvoiceCard Invoice="invoice" OnView="HandleViewInvoice" OnEdit="HandleEditInvoice"
-                        OnMarkAsSent="HandleMarkAsSent" OnMarkAsPaid="HandleMarkAsPaid" OnCancel="HandleCancelInvoice" />
+                    <InvoiceCard Invoice="invoice" 
+                                OnView="HandleViewInvoice" 
+                                OnEdit="HandleEditInvoice"
+                                OnMarkAsSent="HandleMarkAsSent" 
+                                OnMarkAsDelivered="HandleMarkAsDelivered"
+                                OnMarkAsPaid="HandleMarkAsPaid" 
+                                OnCancel="HandleCancelInvoice" />
                 </div>
             }
         </div>

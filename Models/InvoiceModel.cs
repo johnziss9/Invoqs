@@ -65,11 +65,18 @@ namespace Invoqs.Models
         // Navigation property for line items
         public List<InvoiceLineItemModel> LineItems { get; set; } = new();
 
+        public DateTime? SentDate { get; set; }
+        public bool IsSent { get; set; } = false;
+        public DateTime? DeliveredDate { get; set; }
+        public bool IsDelivered { get; set; } = false;  
+
+
         // Computed properties for UI
         public string StatusBadgeClass => Status switch
         {
             InvoiceStatus.Draft => "bg-secondary",
             InvoiceStatus.Sent => "bg-primary",
+            InvoiceStatus.Delivered => "bg-info",
             InvoiceStatus.Paid => "bg-success",
             InvoiceStatus.Overdue => "bg-danger",
             InvoiceStatus.Cancelled => "bg-dark",
@@ -80,6 +87,7 @@ namespace Invoqs.Models
         {
             InvoiceStatus.Draft => "bi-file-earmark",
             InvoiceStatus.Sent => "bi-send",
+            InvoiceStatus.Delivered => "bi-hand-thumbs-up",
             InvoiceStatus.Paid => "bi-check-circle",
             InvoiceStatus.Overdue => "bi-exclamation-triangle",
             InvoiceStatus.Cancelled => "bi-x-circle",
@@ -123,6 +131,7 @@ namespace Invoqs.Models
     {
         Draft,
         Sent,
+        Delivered,
         Paid,
         Overdue,
         Cancelled

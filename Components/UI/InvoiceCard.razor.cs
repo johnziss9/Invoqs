@@ -19,12 +19,15 @@ namespace Invoqs.Components.UI
         [Parameter] public EventCallback<InvoiceModel> OnView { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnEdit { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnMarkAsSent { get; set; }
+        [Parameter] public EventCallback<InvoiceModel> OnMarkAsDelivered { get; set; }
         [Parameter] public EventCallback<MarkAsPaidEventArgs> OnMarkAsPaid { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnCancel { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnDelete { get; set; }
 
         private bool showSendConfirmation = false;
         private bool isSending = false;
+        private bool showDeliveredConfirmation = false;
+        private bool isMarkingDelivered = false;
         private bool showDeleteConfirmation = false;
         private bool isDeleting = false;
         private bool showCancelConfirmation = false;
@@ -178,6 +181,35 @@ namespace Invoqs.Components.UI
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
 
             return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
+        }
+
+        private void ShowDeliveredConfirmation()
+        {
+            showDeliveredConfirmation = true;
+            StateHasChanged();
+        }
+
+        private void HideDeliveredConfirmation()
+        {
+            showDeliveredConfirmation = false;
+            StateHasChanged();
+        }
+
+        private async Task ConfirmDeliver()
+        {
+            isMarkingDelivered = true;
+            StateHasChanged();
+
+            try
+            {
+                await OnMarkAsDelivered.InvokeAsync(Invoice);
+                showDeliveredConfirmation = false;
+            }
+            finally
+            {
+                isMarkingDelivered = false;
+                StateHasChanged();
+            }
         }
     }
 }
