@@ -361,5 +361,37 @@ namespace Invoqs.Services
                 return null;
             }
         }
+
+        public async Task<byte[]?> DownloadReceiptPdfAsync(int invoiceId)
+        {
+            try
+            {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
+                var response = await _httpClient.GetAsync($"invoices/{invoiceId}/receipt-pdf");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return null;
+                }
+
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    Console.WriteLine($"Receipt not available for invoice {invoiceId}");
+                    return null;
+                }
+
+                response.EnsureSuccessStatusCode();
+
+                return await response.Content.ReadAsByteArrayAsync();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error downloading receipt PDF: {ex.Message}");
+                return null;
+            }
+        }
     }
 }

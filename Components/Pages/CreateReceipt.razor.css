@@ -1,0 +1,290 @@
+/* Form and button consistency */
+.btn {
+    border-radius: 8px;
+}
+
+.form-control,
+.form-select,
+.form-control:focus {
+    border-radius: 8px;
+}
+
+/* Required field indicator */
+.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.form-label.required {
+    font-weight: 500;
+}
+
+/* Card styling with 8px radius */
+.card {
+    border-radius: 8px;
+    border: none;
+}
+
+.card-header {
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+/* Card hover effects matching other pages */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: "›";
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.breadcrumb-item a {
+    color: #6c757d;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #0d6efd;
+}
+
+/* Preview Card Sidebar */
+.preview-card {
+    position: sticky;
+    top: 2rem;
+}
+
+/* Table styling */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table-active {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.table thead {
+    background-color: #f8f9fa;
+}
+
+/* Checkbox styling */
+.form-check-input {
+    cursor: pointer;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 4px;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Summary section */
+.bg-light.rounded {
+    background-color: #f8f9fa !important;
+    border-radius: 8px !important;
+}
+
+/* Form styling */
+.form-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Alert styling with 8px radius */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #58151c;
+}
+
+.alert-info {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+/* Badge styling */
+.badge {
+    border-radius: 6px;
+}
+
+/* Button group styling */
+.btn-outline-primary,
+.btn-outline-secondary {
+    border-width: 1px;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+/* Success button styling */
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.btn-success:hover {
+    background-color: #157347;
+    border-color: #146c43;
+}
+
+/* Empty state styling */
+.text-center.py-5 i {
+    color: #dee2e6;
+}
+
+/* Loading state */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between.align-items-center.flex-wrap {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .mt-2.mt-md-0 {
+        margin-top: 1rem !important;
+    }
+
+    .preview-card {
+        position: static;
+        top: auto;
+        margin-top: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .row.g-3 {
+        --bs-gutter-x: 1rem;
+        --bs-gutter-y: 1rem;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Focus states for better accessibility */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Smooth transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Sticky table header */
+.table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Selected row highlight */
+tr.table-active td {
+    font-weight: 500;
+}
+
+/* Summary card enhancements */
+.card-header.bg-primary {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), 0.8) 100%) !important;
+}
+
+/* Payment details section */
+hr {
+    opacity: 0.1;
+    margin: 1rem 0;
+}

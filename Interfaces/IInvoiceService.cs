@@ -24,5 +24,6 @@ namespace Invoqs.Interfaces
 
         // PDF Generation
         Task<byte[]?> DownloadInvoicePdfAsync(int invoiceId);
+        Task<byte[]?> DownloadReceiptPdfAsync(int invoiceId);
     }
 }

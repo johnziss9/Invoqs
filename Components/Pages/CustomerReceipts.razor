@@ -1,0 +1,278 @@
+@rendermode InteractiveServer
+@page "/customer/{customerId:int}/receipts"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+
+<PageTitle>@(customer?.Name ?? "Loading...") - Receipts - Invoqs</PageTitle>
+
+<Navbar CurrentUser="@currentUser" OnLogout="HandleLogout" />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Customers</a></li>
+            <li class="breadcrumb-item"><a href="/customer/@CustomerId" class="text-decoration-none">@(customer?.Name ?? "Customer")</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Receipts</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">@(customer?.Name ?? "Customer") - Receipts</h2>
+                    @if (customer != null)
+                    {
+                        <p class="text-muted mb-0">Payment receipts for this customer</p>
+                    }
+                </div>
+                <div class="mt-2 mt-md-0">
+                    <a href="/receipts/new" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-2"></i>
+                        Create Receipt
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (!receipts.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-receipt" style="font-size: 4rem; color: #ccc;"></i>
+                <h4 class="mt-3">No receipts yet</h4>
+                <p class="text-muted">This customer doesn't have any payment receipts</p>
+                <a href="/receipts/new" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-lg me-2"></i>
+                    Create Receipt
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <!-- Search Receipts -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="form-label small text-muted">Search Receipts</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           @bind="searchTerm" 
+                                           @bind:event="oninput"
+                                           placeholder="Search by receipt #...">
+                                </div>
+                            </div>
+
+                            <!-- Sort By -->
+                            <div class="col-md-3 col-lg-2">
+                                <label class="form-label small text-muted">Sort By</label>
+                                <select class="form-select" @bind="sortBy">
+                                    <option value="date">Payment Date</option>
+                                    <option value="amount">Amount</option>
+                                    <option value="created">Date Created</option>
+                                </select>
+                            </div>
+
+                            <!-- Filter -->
+                            <div class="col-md-3 col-lg-2">
+                                <label class="form-label small text-muted">Filter</label>
+                                <select class="form-select" @bind="filterBy">
+                                    <option value="all">All Receipts</option>
+                                    <option value="sent">Sent</option>
+                                    <option value="notSent">Not Sent</option>
+                                </select>
+                            </div>
+
+                            <!-- Filter Summary -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <small class="text-muted">
+                                        Showing @filteredReceipts.Count() of @receipts.Count receipts
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card bg-primary text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@receipts.Count</h3>
+                                <p class="mb-0 small">Total Receipts</p>
+                            </div>
+                            <i class="bi bi-receipt-cutoff fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card bg-success text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@receipts.Sum(r => r.Invoices.Count)</h3>
+                                <p class="mb-0 small">Total Invoices</p>
+                            </div>
+                            <i class="bi bi-file-earmark-text fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card bg-info text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">£@receipts.Sum(r => r.TotalAmount).ToString("N0")</h3>
+                                <p class="mb-0 small">Total Amount</p>
+                            </div>
+                            <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card bg-warning text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@receipts.Count(r => r.PaymentDate >= DateTime.Today.AddDays(-30))</h3>
+                                <p class="mb-0 small">This Month</p>
+                            </div>
+                            <i class="bi bi-calendar-check fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipts Table -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Receipt #</th>
+                                <th>Payment Date</th>
+                                <th>Method</th>
+                                <th>Invoices</th>
+                                <th class="text-end">Amount</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var receipt in filteredReceipts)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-medium text-primary">@receipt.ReceiptNumber</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">@receipt.PaymentDate.ToString("dd MMM yyyy")</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">@receipt.PaymentMethod</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">@receipt.Invoices.Count invoice(s)</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="fw-medium">£@receipt.TotalAmount.ToString("N2")</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-primary" @onclick="() => ViewReceipt(receipt.Id)"
+                                                title="View Receipt">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                @onclick="() => DownloadReceipt(receipt.Id, receipt.ReceiptNumber)"
+                                                title="Download PDF">
+                                                <i class="bi bi-download"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                @onclick="() => ShowDeleteConfirmation(receipt)" title="Delete Receipt">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@* Delete Confirmation Modal *@
+@if (showDeleteConfirmation && receiptToDelete != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Receipt</h5>
+                    <button type="button" class="btn-close" @onclick="HideDeleteConfirmation"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Are you sure?</h5>
+                        <p class="text-muted">
+                            This will delete receipt <strong>@receiptToDelete.ReceiptNumber</strong> 
+                            for <strong>@receiptToDelete.CustomerName</strong>.
+                        </p>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle me-2"></i>
+                            This receipt covers @receiptToDelete.Invoices.Count invoice(s) totaling 
+                            <strong>£@receiptToDelete.TotalAmount.ToString("N2")</strong>.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
+                        @if (isDeleting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-trash me-1"></i>
+                        }
+                        @(isDeleting ? "Deleting..." : "Delete Receipt")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
