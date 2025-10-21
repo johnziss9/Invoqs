@@ -185,6 +185,28 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        protected async Task HandleMarkAsDelivered(InvoiceModel invoice)
+        {
+            try
+            {
+                var success = await InvoiceService.MarkInvoiceAsDeliveredAsync(invoice.Id);
+                if (success)
+                {
+                    await LoadData(); // Refresh data
+                }
+                else
+                {
+                    errorMessage = "Failed to mark invoice as delivered";
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error updating invoice: {ex.Message}";
+                StateHasChanged();
+            }
+        }
+
         protected async Task HandleMarkAsPaid(MarkAsPaidEventArgs args)
         {
             try

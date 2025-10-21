@@ -28,7 +28,8 @@ public partial class InvoiceDetails
     private string paymentReference = string.Empty;
     private bool showDeleteModal = false;
     private bool isDeleting = false;
-
+    private bool showDeliveredConfirmation = false;
+    
     private string currentUser = "Demo User"; // This should come from authentication service when implemented
 
     protected override async Task OnInitializedAsync()
@@ -312,6 +313,51 @@ public partial class InvoiceDetails
     {
         showSendConfirmation = false;
         await MarkAsSent();
+    }
+
+    private async Task MarkAsDelivered()
+    {
+        if (invoice == null) return;
+
+        try
+        {
+            isProcessing = true;
+            var success = await InvoiceService.MarkInvoiceAsDeliveredAsync(invoice.Id);
+
+            if (success)
+            {
+                invoice.Status = InvoiceStatus.Delivered;
+                invoice.IsDelivered = true;
+                invoice.DeliveredDate = DateTime.UtcNow;
+                successMessage = "Invoice marked as delivered successfully.";
+
+                // Clear the message after 3 seconds
+                _ = Task.Delay(3000).ContinueWith(_ =>
+                {
+                    successMessage = string.Empty;
+                    InvokeAsync(StateHasChanged);
+                });
+            }
+            else
+            {
+                errorMessage = "Failed to mark invoice as delivered.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error marking invoice as delivered: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmDeliver()
+    {
+        showDeliveredConfirmation = false;
+        await MarkAsDelivered();
     }
 
     protected async Task HandleLogout()

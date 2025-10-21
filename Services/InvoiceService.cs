@@ -249,6 +249,33 @@ namespace Invoqs.Services
             }
         }
 
+        public async Task<bool> MarkInvoiceAsDeliveredAsync(int invoiceId)
+        {
+            try
+            {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
+                var deliveredDate = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
+
+                var content = JsonContent.Create(new { DeliveredDate = deliveredDate });
+                var response = await _httpClient.PostAsync($"invoices/{invoiceId}/deliver", content);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error marking invoice as delivered: {ex.Message}");
+                return false;
+            }
+        }
+
         public async Task<bool> MarkInvoiceAsPaidAsync(int invoiceId, DateTime paidDate, string? paymentMethod = null, string? paymentReference = null)
         {
             try

@@ -54,8 +54,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">@invoices.Count(i => i.Status == InvoiceStatus.Sent)</h3>
-                            <p class="mb-0 small">Sent</p>
+                            <h3 class="mb-0">@invoices.Count(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Delivered)</h3>
+                            <p class="mb-0 small">Delivered/Sent</p>
                         </div>
                         <i class="bi bi-send fs-1 opacity-75"></i>
                     </div>
@@ -242,6 +242,7 @@
                                 OnView="HandleViewInvoice"
                                 OnEdit="HandleEditInvoice"
                                 OnMarkAsSent="HandleMarkAsSent"
+                                OnMarkAsDelivered="HandleMarkAsDelivered"
                                 OnMarkAsPaid="HandleMarkAsPaid"
                                 OnCancel="HandleCancelInvoice"
                                 OnDelete="HandleDeleteInvoice" />
