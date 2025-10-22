@@ -25,6 +25,7 @@ namespace Invoqs.Components.Pages
         protected bool showDeleteConfirmation = false;
         protected bool isInvoiced = false;
         protected bool canDeleteJob = true;
+        protected bool isCustomerDeleted = false;
         protected string errorMessage = "";
         protected string successMessage = "";
 
@@ -59,8 +60,9 @@ namespace Invoqs.Components.Pages
                 }
 
                 isInvoiced = job.IsInvoiced;
+                isCustomerDeleted = job.CustomerIsDeleted;
                 
-                // NEW: Determine if job can be deleted based on status
+                // Determine if job can be deleted based on status
                 // Can only delete: New jobs
                 // Warn but allow: Cancelled jobs
                 // Cannot delete: Active, Completed, or Invoiced jobs

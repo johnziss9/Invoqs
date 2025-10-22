@@ -17,6 +17,16 @@
         </ol>
     </nav>
 
+    <!-- Error Message Alert -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = string.Empty"></button>
+        </div>
+    }
+
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -208,10 +218,20 @@
                                 Edit Customer
                             </a>
                             <hr class="my-2">
-                            <button class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteConfirmation">
-                                <i class="bi bi-trash me-1"></i>
-                                Delete Customer
-                            </button>
+                            @if (customerStats.ActiveJobs > 0)
+                            {
+                                <button class="btn btn-outline-danger btn-sm" disabled title="@GetDeleteDisabledReason()">
+                                    <i class="bi bi-lock me-1"></i>
+                                    @GetDeleteButtonText()
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteConfirmation">
+                                    <i class="bi bi-trash me-1"></i>
+                                    Delete Customer
+                                </button>
+                            }
                         </div>
                     </div>
                 </div>

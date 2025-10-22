@@ -16,6 +16,16 @@
         </ol>
     </nav>
 
+    <!-- Error Message Alert -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = string.Empty"></button>
+        </div>
+    }
+
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">

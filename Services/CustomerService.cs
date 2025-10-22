@@ -150,11 +150,17 @@ namespace Invoqs.Services
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.DeleteAsync($"customers/{id}");
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
                     return false;
+                }
+
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException(errorContent);
                 }
 
                 return response.IsSuccessStatusCode;
@@ -162,7 +168,7 @@ namespace Invoqs.Services
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"Error deleting customer {id}: {ex.Message}");
-                return false;
+                throw;
             }
         }
     }

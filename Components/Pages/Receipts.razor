@@ -202,7 +202,17 @@
                                     <td>
                                         <span class="fw-medium text-primary">@receipt.ReceiptNumber</span>
                                     </td>
-                                    <td>@receipt.CustomerName</td>
+                                    <td>
+                                        @if (receipt.CustomerIsDeleted)
+                                        {
+                                            <span class="text-decoration-line-through text-muted">@receipt.CustomerName</span>
+                                            <span class="text-danger ms-1 small">(Deleted)</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@receipt.CustomerName</span>
+                                        }
+                                    </td>
                                     <td>
                                         <span class="text-muted">@receipt.PaymentDate.ToString("dd MMM yyyy")</span>
                                     </td>
