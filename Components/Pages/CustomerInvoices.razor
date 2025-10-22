@@ -182,7 +182,9 @@
                             <label class="form-label small text-muted">Search Invoices</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control" @bind="searchTerm" @bind:after="FilterInvoices"
+                                <input type="text" class="form-control" 
+                                    @bind="searchTerm" 
+                                    @bind:event="oninput"
                                     placeholder="Search by invoice number...">
                             </div>
                         </div>
