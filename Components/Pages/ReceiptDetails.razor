@@ -135,9 +135,19 @@
                             <div class="col-12">
                                 <label class="form-label fw-medium">Customer Name</label>
                                 <div class="form-control-plaintext">
-                                    <a href="/customer/@receipt.CustomerId" class="text-decoration-none">
-                                        <i class="bi bi-person me-2"></i>@receipt.CustomerName
-                                    </a>
+                                    @if (receipt.CustomerIsDeleted)
+                                    {
+                                        <span class="text-decoration-line-through text-muted">
+                                            <i class="bi bi-person me-2"></i>@receipt.CustomerName
+                                        </span>
+                                        <span class="badge bg-secondary ms-2">Deleted</span>
+                                    }
+                                    else
+                                    {
+                                        <a href="/customer/@receipt.CustomerId" class="text-decoration-none">
+                                            <i class="bi bi-person me-2"></i>@receipt.CustomerName
+                                        </a>
+                                    }
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -237,34 +247,37 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            @if (!receipt.IsSent)
+                            @if (!receipt.CustomerIsDeleted)
                             {
-                                <button class="btn btn-success btn-sm" @onclick="() => showSendConfirmation = true"
-                                    disabled="@isSending">
-                                    @if (isSending)
-                                    {
-                                        <span class="spinner-border spinner-border-sm me-2"></span>
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-send me-1"></i>
-                                    }
-                                    Send Receipt
-                                </button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-outline-secondary btn-sm" @onclick="ResendReceipt" disabled="@isSending">
-                                    @if (isSending)
-                                    {
-                                        <span class="spinner-border spinner-border-sm me-2"></span>
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-envelope me-1"></i>
-                                    }
-                                    Resend Receipt
-                                </button>
+                                @if (!receipt.IsSent)
+                                {
+                                    <button class="btn btn-success btn-sm" @onclick="() => showSendConfirmation = true"
+                                        disabled="@isSending">
+                                        @if (isSending)
+                                        {
+                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-send me-1"></i>
+                                        }
+                                        Send Receipt
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary btn-sm" @onclick="ResendReceipt" disabled="@isSending">
+                                        @if (isSending)
+                                        {
+                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-envelope me-1"></i>
+                                        }
+                                        Resend Receipt
+                                    </button>
+                                }
                             }
                             <button class="btn btn-primary btn-sm"
                                 @onclick="() => DownloadReceipt(receipt.Id, receipt.ReceiptNumber)"
@@ -360,10 +373,10 @@
                     </div>
                 </div>
 
-                <!-- Quick Navigation -->
+                <!-- Quick Actions -->
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white py-3">
-                        <h6 class="mb-0">Quick Navigation</h6>
+                        <h6 class="mb-0">Quick Actions</h6>
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
@@ -371,18 +384,21 @@
                                 <i class="bi bi-plus-lg me-1"></i>
                                 Create New Receipt
                             </a>
-                            <a href="/customer/@receipt.CustomerId" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-person me-1"></i>
-                                View Customer
-                            </a>
-                            <a href="/customer/@receipt.CustomerId/jobs" class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-receipt me-1"></i>
-                                Customer Jobs
-                            </a>
-                            <a href="/customer/@receipt.CustomerId/invoices" class="btn btn-outline-info btn-sm">
-                                <i class="bi bi-receipt me-1"></i>
-                                Customer Invoices
-                            </a>
+                            @if (!receipt.CustomerIsDeleted)
+                            {
+                                <a href="/customer/@receipt.CustomerId" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-person me-1"></i>
+                                    View Customer
+                                </a>
+                                <a href="/customer/@receipt.CustomerId/jobs" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-receipt me-1"></i>
+                                    Customer Jobs
+                                </a>
+                                <a href="/customer/@receipt.CustomerId/invoices" class="btn btn-outline-info btn-sm">
+                                    <i class="bi bi-receipt me-1"></i>
+                                    Customer Invoices
+                                </a>
+                            }
                         </div>
                     </div>
                 </div>
