@@ -13,6 +13,7 @@ namespace Invoqs.Components.UI
 
         private bool showDeleteConfirmation = false;
         private bool isDeleting = false;
+        private string? errorMessage;
 
         protected string GetInitials(string name)
         {
@@ -34,6 +35,13 @@ namespace Invoqs.Components.UI
 
         private void ShowDeleteConfirmation()
         {
+            if (Customer.ActiveJobs > 0)
+            {
+                errorMessage = "Cannot delete a customer with active jobs. Please complete or cancel all active jobs first.";
+                StateHasChanged();
+                return;
+            }
+
             showDeleteConfirmation = true;
             StateHasChanged();
         }
@@ -59,6 +67,22 @@ namespace Invoqs.Components.UI
                 isDeleting = false;
                 StateHasChanged();
             }
+        }
+
+        private string GetDeleteButtonText()
+        {
+            if (Customer.ActiveJobs > 0)
+                return "Cannot Delete (Active Jobs)";
+            
+            return "Delete Customer";
+        }
+
+        private string GetDeleteDisabledReason()
+        {
+            if (Customer.ActiveJobs > 0)
+                return "Cannot delete customers with active jobs. Complete or cancel all active jobs first.";
+
+            return "";
         }
     }
 }

@@ -58,25 +58,25 @@ namespace Invoqs.Components.Pages
                 {
                     canDeleteJob = job.Status == JobStatus.New || job.Status == JobStatus.Cancelled;
 
-                    customer = await CustomerService.GetCustomerByIdAsync(job.CustomerId);
+                    // Create customer object from job's flat properties
+                    // This works even when the customer is soft-deleted
+                    customer = new CustomerModel
+                    {
+                        Id = job.CustomerId,
+                        Name = job.CustomerName ?? "[Unknown Customer]",
+                        Email = job.CustomerEmail ?? "",
+                        Phone = job.CustomerPhone ?? "",
+                        IsDeleted = job.CustomerIsDeleted,
+                        CreatedDate = job.CustomerCreatedDate,
+                        UpdatedDate = job.CustomerUpdatedDate
+                    };
 
-                    // Check if customer is soft deleted (when API supports it)
-                    if (customer != null && customer.IsDeleted)
-                    {
-                        isCustomerDeleted = true;
-                    }
-                    else if (customer == null)
-                    {
-                        // Fallback for hard delete (current mock behavior)
-                        isCustomerDeleted = true;
-                        customer = new CustomerModel
-                        {
-                            Id = job.CustomerId,
-                            Name = "[Deleted Customer]",
-                            Email = "",
-                            Phone = ""
-                        };
-                    }
+                    // Set the deleted flag
+                    isCustomerDeleted = job.CustomerIsDeleted;
+                }
+                else
+                {
+                    errorMessage = "Job not found.";
                 }
             }
             catch (Exception ex)
@@ -227,7 +227,7 @@ namespace Invoqs.Components.Pages
             }
             else
             {
-                Navigation.NavigateTo("/jobs");
+                Navigation.NavigateTo("/jobs", true);
             }
         }
 

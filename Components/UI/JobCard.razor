@@ -150,33 +150,20 @@
                 <i class="@Job.TypeIcon me-1"></i>
                 @Job.TypeDisplayName
             </span>
-            @if (Customer != null)
-            {
-                <div class="mt-2">
-                    <small class="text-muted">
-                        <i class="bi bi-building me-1"></i>
-                        @if (Customer.IsDeleted)
-                        {
-                            <span class="text-decoration-line-through">@Customer.Name</span>
-                            <span class="text-danger ms-1">(Deleted)</span>
-                        }
-                        else
-                        {
-                            @Customer.Name
-                        }
-                    </small>
-                </div>
-            }
-            else
-            {
-                @* Handle hard delete case (current behavior) *@
-                <div class="mt-2">
-                    <small class="text-muted">
-                        <i class="bi bi-building me-1"></i>
-                        <span class="text-muted">[Deleted Customer]</span>
-                    </small>
-                </div>
-            }
+            <div class="mt-2">
+                <small class="text-muted">
+                    <i class="bi bi-building me-1"></i>
+                    @if (Job.CustomerIsDeleted)
+                    {
+                        <span class="text-decoration-line-through">@Job.CustomerName</span>
+                        <span class="text-danger ms-1">(Deleted)</span>
+                    }
+                    else
+                    {
+                        @Job.CustomerName
+                    }
+                </small>
+            </div>
 
             <!-- ===== TYPE-SPECIFIC INFO BADGES ===== -->
             @if (Job.Type == JobType.SkipRental && !string.IsNullOrEmpty(Job.SkipNumber))

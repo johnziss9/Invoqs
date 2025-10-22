@@ -30,6 +30,7 @@ namespace Invoqs.Components.UI
         private bool isMarkingDelivered = false;
         private bool showDeleteConfirmation = false;
         private bool isDeleting = false;
+        private string? errorMessage;
         private bool showCancelConfirmation = false;
         private bool isCancelling = false;
         private string cancellationReason = "";
@@ -71,6 +72,13 @@ namespace Invoqs.Components.UI
 
         private void ShowDeleteConfirmation()
         {
+            if (Invoice.Status != InvoiceStatus.Draft)
+            {
+                errorMessage = GetDeleteDisabledReason();
+                StateHasChanged();
+                return;
+            }
+
             showDeleteConfirmation = true;
             StateHasChanged();
         }
@@ -173,10 +181,17 @@ namespace Invoqs.Components.UI
 
         protected string GetCustomerInitials()
         {
-            if (Invoice.Customer == null || string.IsNullOrWhiteSpace(Invoice.Customer.Name))
+            // Use flat CustomerName property instead of nested Customer object
+            var name = Invoice.CustomerName;
+
+            if (string.IsNullOrWhiteSpace(name))
                 return "?";
 
-            var parts = Invoice.Customer.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length == 0)
+                return "?";
+
             if (parts.Length == 1)
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
 
@@ -210,6 +225,27 @@ namespace Invoqs.Components.UI
                 isMarkingDelivered = false;
                 StateHasChanged();
             }
+        }
+
+        private string GetDeleteButtonText()
+        {
+            if (Invoice.Status != InvoiceStatus.Draft)
+                return "Cannot Delete";
+            
+            return "Delete Invoice";
+        }
+
+        private string GetDeleteDisabledReason()
+        {
+            return Invoice.Status switch
+            {
+                InvoiceStatus.Sent => "Cannot delete sent invoices. Cancel the invoice first if needed.",
+                InvoiceStatus.Delivered => "Cannot delete delivered invoices. Cancel the invoice first if needed.",
+                InvoiceStatus.Paid => "Cannot delete paid invoices. Paid invoices must be preserved for financial records.",
+                InvoiceStatus.Overdue => "Cannot delete overdue invoices. Cancel the invoice first if needed.",
+                InvoiceStatus.Cancelled => "Cannot delete cancelled invoices. Cancelled invoices must be preserved for audit trail.",
+                _ => ""
+            };
         }
     }
 }

@@ -121,9 +121,18 @@ namespace Invoqs.Components.Pages
             // Always redirect to login, even if localStorage clearing fails
             Navigation.NavigateTo("/login", true);
         }
-        
+
         private void ShowDeleteConfirmation()
         {
+            if (customer == null) return;
+
+            if (customerStats.ActiveJobs > 0)
+            {
+                errorMessage = "Cannot delete a customer with active jobs. Please complete or cancel all active jobs first.";
+                StateHasChanged();
+                return;
+            }
+
             showDeleteConfirmation = true;
             StateHasChanged();
         }
@@ -141,10 +150,11 @@ namespace Invoqs.Components.Pages
             try
             {
                 isDeleting = true;
+                errorMessage = string.Empty;
                 StateHasChanged();
 
                 var success = await CustomerService.DeleteCustomerAsync(customer.Id);
-                
+
                 if (success)
                 {
                     Navigation.NavigateTo("/customers", true);
@@ -167,6 +177,21 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        private string GetDeleteButtonText()
+        {
+            if (customerStats.ActiveJobs > 0)
+                return "Cannot Delete (Active Jobs)";
+
+            return "Delete Customer";
+        }
+
+        private string GetDeleteDisabledReason()
+        {
+            if (customerStats.ActiveJobs > 0)
+                return "Cannot delete customers with active jobs. Complete or cancel all active jobs first.";
+
+            return "";
+        }
     }
 
     public class CustomerStats

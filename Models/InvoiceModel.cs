@@ -15,6 +15,9 @@ namespace Invoqs.Models
         public string? CustomerName { get; set; }
         public string? CustomerEmail { get; set; }
         public string? CustomerPhone { get; set; }
+        public bool CustomerIsDeleted { get; set; }
+        public DateTime CustomerCreatedDate { get; set; }
+        public DateTime? CustomerUpdatedDate { get; set; }
 
         public string Address { get; set; } = string.Empty; // Primary address
         public List<string> Addresses { get; set; } = new(); // All addresses if multiple

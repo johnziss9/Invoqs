@@ -310,10 +310,20 @@
                                     </button>
                                     
                                     <hr class="my-3">
-                                    <button class="btn btn-outline-danger btn-sm" @onclick="() => showDeleteModal = true">
-                                        <i class="bi bi-trash me-1"></i>
-                                        Delete Invoice
-                                    </button>
+                                    @if (invoice.Status != InvoiceStatus.Draft)
+                                    {
+                                        <button class="btn btn-outline-danger btn-sm" disabled title="@GetDeleteDisabledReason()">
+                                            <i class="bi bi-lock me-1"></i>
+                                            @GetDeleteButtonText()
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteConfirmation">
+                                            <i class="bi bi-trash me-1"></i>
+                                            Delete Invoice
+                                        </button>
+                                    }
                                 </div>
                             }
                             else if (invoice.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue)
@@ -426,26 +436,56 @@
                 {
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h6 class="mb-0">Customer Details</h6>
+                            <h6 class="mb-0">
+                                Customer Details
+                                @if (isCustomerDeleted)
+                                {
+                                    <i class="bi bi-exclamation-triangle text-warning ms-2" title="Customer has been deleted"></i>
+                                }
+                            </h6>
                         </div>
                         <div class="card-body">
+                            @if (isCustomerDeleted)
+                            {
+                                <div class="alert alert-warning mb-3">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    <strong>Customer Deleted:</strong> The customer associated with this invoice has been removed from the system.
+                                </div>
+                            }
+                            
                             <div class="small">
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">Name:</span>
-                                    <span class="fw-medium">@customer.Name</span>
+                                    <span class="fw-medium @(isCustomerDeleted ? "text-muted text-decoration-line-through" : "")">
+                                        @customer.Name
+                                    </span>
                                 </div>
                                 @if (!string.IsNullOrEmpty(customer.Email))
                                 {
                                     <div class="d-flex justify-content-between mb-2">
                                         <span class="text-muted">Email:</span>
-                                        <a href="mailto:@customer.Email" class="fw-medium text-decoration-none">@customer.Email</a>
+                                        @if (isCustomerDeleted)
+                                        {
+                                            <span class="fw-medium text-muted">@customer.Email</span>
+                                        }
+                                        else
+                                        {
+                                            <a href="mailto:@customer.Email" class="fw-medium text-decoration-none">@customer.Email</a>
+                                        }
                                     </div>
                                 }
                                 @if (!string.IsNullOrEmpty(customer.Phone))
                                 {
                                     <div class="d-flex justify-content-between mb-2">
                                         <span class="text-muted">Phone:</span>
-                                        <a href="tel:@customer.Phone" class="fw-medium text-decoration-none">@customer.Phone</a>
+                                        @if (isCustomerDeleted)
+                                        {
+                                            <span class="fw-medium text-muted">@customer.Phone</span>
+                                        }
+                                        else
+                                        {
+                                            <a href="tel:@customer.Phone" class="fw-medium text-decoration-none">@customer.Phone</a>
+                                        }
                                     </div>
                                 }
                                 <div class="d-flex justify-content-between mb-2">
@@ -457,55 +497,65 @@
                                     <span class="fw-medium">@((customer.UpdatedDate ?? customer.CreatedDate).ToString("dd/MM/yyyy"))</span>
                                 </div>
 
-                                <!-- Work Status -->
-                                <div class="pb-2 border-bottom mb-2">
-                                    @if (customer.HasActiveWork)
-                                    {
-                                        <div class="mb-1">
-                                            <span class="text-success">
-                                                <i class="bi bi-briefcase me-1"></i>
-                                                @((customer.ActiveJobs + customer.NewJobs)) ongoing jobs
-                                            </span>
-                                        </div>
-                                    }
-                                    else if (customer.CompletedJobs > 0)
-                                    {
-                                        <div class="mb-1">
-                                            <span class="text-muted">
-                                                <i class="bi bi-check-circle me-1"></i>
-                                                Last job completed
-                                            </span>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="mb-1">
-                                            <span class="text-muted">
-                                                <i class="bi bi-clock-history me-1"></i>
-                                                No jobs yet
-                                            </span>
-                                        </div>
-                                    }
-                                </div>
-
-                                <!-- Financial Status -->
-                                @if (customer.UninvoicedJobs > 0)
+                                @if (!isCustomerDeleted)
                                 {
-                                    <div class="mb-1">
-                                        <span class="text-warning">
-                                            <i class="bi bi-exclamation-circle me-1"></i>
-                                            @customer.UninvoicedJobs uninvoiced jobs
-                                        </span>
+                                    <!-- Work Status -->
+                                    <div class="pb-2 border-bottom mb-2">
+                                        @if (customer.HasActiveWork)
+                                        {
+                                            <div class="mb-1">
+                                                <span class="text-success fw-normal">
+                                                    <i class="bi bi-briefcase me-1"></i>
+                                                    @((customer.ActiveJobs + customer.NewJobs)) ongoing jobs
+                                                </span>
+                                            </div>
+                                        }
+                                        else if (customer.CompletedJobs > 0)
+                                        {
+                                            <div class="mb-1">
+                                                <span class="text-muted">
+                                                    <i class="bi bi-check-circle me-1"></i>
+                                                    Last job completed
+                                                </span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="mb-1">
+                                                <span class="text-muted">
+                                                    <i class="bi bi-clock-history me-1"></i>
+                                                    No jobs yet
+                                                </span>
+                                            </div>
+                                        }
                                     </div>
-                                }
 
-                                @if (customer.UnpaidInvoices > 0)
+                                    <!-- Financial Status -->
+                                    @if (customer.UninvoicedJobs > 0)
+                                    {
+                                        <div class="mb-1">
+                                            <span class="text-warning">
+                                                <i class="bi bi-exclamation-circle me-1"></i>
+                                                @customer.UninvoicedJobs uninvoiced jobs
+                                            </span>
+                                        </div>
+                                    }
+
+                                    @if (customer.UnpaidInvoices > 0)
+                                    {
+                                        <div>
+                                            <span class="text-danger">
+                                                <i class="bi bi-currency-pound me-1"></i>
+                                                @customer.UnpaidInvoices unpaid (@customer.OutstandingAmount.ToString("C"))
+                                            </span>
+                                        </div>
+                                    }
+                                }
+                                else
                                 {
-                                    <div>
-                                        <span class="text-danger">
-                                            <i class="bi bi-currency-pound me-1"></i>
-                                            @customer.UnpaidInvoices unpaid (@customer.OutstandingAmount.ToString("C"))
-                                        </span>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Status:</span>
+                                        <span class="badge bg-secondary ms-2">Deleted</span>
                                     </div>
                                 }
                             </div>
@@ -522,31 +572,55 @@
                         </div>
                         <div class="card-body">
                             <div class="d-grid gap-2">
-                                <!-- Primary Customer Actions -->
-                                <a href="/customer/@customer.Id" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-person me-1"></i>
-                                    View Customer
-                                </a>
-                                <a href="/customer/@customer.Id/jobs" class="btn btn-outline-secondary btn-sm">
-                                    <i class="bi bi-briefcase me-1"></i>
-                                    Customer Jobs
-                                </a>
-                                <a href="/customer/@customer.Id/job/new?returnUrl=@Uri.EscapeDataString($"/invoice/{Id}")" class="btn btn-outline-success btn-sm">
-                                    <i class="bi bi-plus-lg me-1"></i>
-                                    Create New Job
-                                </a>
-                                <a href="/customer/@customer.Id/invoice/new" class="btn btn-outline-info btn-sm">
-                                    <i class="bi bi-receipt me-1"></i>
-                                    Create Invoice
-                                </a>
-                                <a href="/customer/@customer.Id/invoices" class="btn btn-outline-dark btn-sm">
-                                    <i class="bi bi-file-earmark-text me-1"></i>
-                                    Customer Invoices
-                                </a>
-                                <a href="/receipts/new" class="btn btn-outline-success btn-sm">
-                                    <i class="bi bi-receipt-cutoff me-1"></i>
-                                    Create Receipt
-                                </a>
+                                @if (!isCustomerDeleted)
+                                {
+                                    <!-- Primary Customer Actions (only show for active customers) -->
+                                    <a href="/customer/@customer.Id" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-person me-1"></i>
+                                        View Customer
+                                    </a>
+                                    <a href="/customer/@customer.Id/jobs" class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-briefcase me-1"></i>
+                                        Customer Jobs
+                                    </a>
+                                    <a href="/customer/@customer.Id/invoices" class="btn btn-outline-dark btn-sm">
+                                        <i class="bi bi-file-earmark-text me-1"></i>
+                                        Customer Invoices
+                                    </a>
+                                    
+                                    <hr class="my-2">
+                                    
+                                    <!-- Creation Actions with customer pre-selected -->
+                                    <a href="/customer/@customer.Id/job/new?returnUrl=@Uri.EscapeDataString($"/invoice/{Id}")" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-plus-lg me-1"></i>
+                                        Create New Job
+                                    </a>
+                                    <a href="/customer/@customer.Id/invoice/new" class="btn btn-outline-info btn-sm">
+                                        <i class="bi bi-receipt me-1"></i>
+                                        Create Invoice
+                                    </a>
+                                    <a href="/customer/@customer.Id/receipt/new" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-receipt-cutoff me-1"></i>
+                                        Create Receipt
+                                    </a>
+                                }
+                                else
+                                {
+                                    <!-- Global creation links (no customer pre-selected) -->
+                                    <a href="/invoice/new" class="btn btn-outline-info btn-sm">
+                                        <i class="bi bi-receipt me-1"></i>
+                                        Create Invoice
+                                    </a>
+                                    <a href="/receipts/new" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-receipt-cutoff me-1"></i>
+                                        Create Receipt
+                                    </a>
+                                    
+                                    <div class="text-muted text-center mt-2 small">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Customer-specific actions unavailable
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

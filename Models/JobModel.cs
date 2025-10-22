@@ -75,6 +75,12 @@ namespace Invoqs.Models
 
         // Navigation properties
         public CustomerModel? Customer { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public bool CustomerIsDeleted { get; set; }
+        public string? CustomerEmail { get; set; }
+        public string? CustomerPhone { get; set; }
+        public DateTime CustomerCreatedDate { get; set; }
+        public DateTime? CustomerUpdatedDate { get; set; }
         public InvoiceModel? Invoice { get; set; }
 
         // Existing computed properties

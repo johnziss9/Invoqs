@@ -13,6 +13,7 @@ namespace Invoqs.Models
         public int CustomerId { get; set; }
 
         public string CustomerName { get; set; } = string.Empty;
+        public bool CustomerIsDeleted { get; set; }
         public string? CustomerEmail { get; set; }
         public string? CustomerPhone { get; set; }
 

@@ -29,6 +29,7 @@ public partial class InvoiceDetails
     private bool showDeleteModal = false;
     private bool isDeleting = false;
     private bool showDeliveredConfirmation = false;
+    protected bool isCustomerDeleted = false;
     
     private string currentUser = "Demo User"; // This should come from authentication service when implemented
 
@@ -42,16 +43,39 @@ public partial class InvoiceDetails
         try
         {
             isLoading = true;
+            errorMessage = string.Empty;
+            isCustomerDeleted = false;
+
             invoice = await InvoiceService.GetInvoiceByIdAsync(Id);
 
-            if (invoice?.CustomerId != null)
+            if (invoice != null)
             {
-                customer = await CustomerService.GetCustomerByIdAsync(invoice.CustomerId);
+                // Create customer object from invoice's flat properties
+                // This works even when the customer is soft-deleted
+                customer = new CustomerModel
+                {
+                    Id = invoice.CustomerId,
+                    Name = invoice.CustomerName ?? "[Unknown Customer]",
+                    Email = invoice.CustomerEmail ?? "",
+                    Phone = invoice.CustomerPhone ?? "",
+                    IsDeleted = invoice.CustomerIsDeleted,
+                    CreatedDate = invoice.CustomerCreatedDate,
+                    UpdatedDate = invoice.CustomerUpdatedDate
+                };
+
+                // Set the deleted flag
+                isCustomerDeleted = invoice.CustomerIsDeleted;
+            }
+            else
+            {
+                errorMessage = "Invoice not found.";
             }
         }
         catch (Exception ex)
         {
             errorMessage = $"Error loading invoice: {ex.Message}";
+            invoice = null;
+            customer = null;
         }
         finally
         {
@@ -361,28 +385,28 @@ public partial class InvoiceDetails
     }
 
     protected async Task HandleLogout()
+    {
+        try
         {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
-            }
-            catch (JSDisconnectedException)
-            {
-                // Circuit disconnected, ignore
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
-            {
-                // Prerendering, ignore localStorage calls
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
-            }
-
-            // Always redirect to login, even if localStorage clearing fails
-            Navigation.NavigateTo("/login", true);
+            await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+            await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
         }
+        catch (JSDisconnectedException)
+        {
+            // Circuit disconnected, ignore
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
+        {
+            // Prerendering, ignore localStorage calls
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
+        }
+
+        // Always redirect to login, even if localStorage clearing fails
+        Navigation.NavigateTo("/login", true);
+    }
 
     private async Task DeleteInvoice()
     {
@@ -391,9 +415,9 @@ public partial class InvoiceDetails
         try
         {
             isDeleting = true;
-            
+
             var success = await InvoiceService.DeleteInvoiceAsync(invoice.Id);
-            
+
             if (success)
             {
                 Navigation.NavigateTo("/invoices", true);
@@ -413,5 +437,45 @@ public partial class InvoiceDetails
             showDeleteModal = false;
             StateHasChanged();
         }
+    }
+
+    private void ShowDeleteConfirmation()
+    {
+        if (invoice == null) return;
+
+        if (invoice.Status != InvoiceStatus.Draft)
+        {
+            errorMessage = GetDeleteDisabledReason();
+            StateHasChanged();
+            return;
+        }
+
+        showDeleteModal = true;
+        StateHasChanged();
+    }
+    
+    private string GetDeleteButtonText()
+    {
+        if (invoice == null) return "Delete Invoice";
+        
+        if (invoice.Status != InvoiceStatus.Draft)
+            return "Cannot Delete";
+        
+        return "Delete Invoice";
+    }
+
+    private string GetDeleteDisabledReason()
+    {
+        if (invoice == null) return "";
+
+        return invoice.Status switch
+        {
+            InvoiceStatus.Sent => "Cannot delete sent invoices. Cancel the invoice first if needed.",
+            InvoiceStatus.Delivered => "Cannot delete delivered invoices. Cancel the invoice first if needed.",
+            InvoiceStatus.Paid => "Cannot delete paid invoices. Paid invoices must be preserved for financial records.",
+            InvoiceStatus.Overdue => "Cannot delete overdue invoices. Cancel the invoice first if needed.",
+            InvoiceStatus.Cancelled => "Cannot delete cancelled invoices. Cancelled invoices must be preserved for audit trail.",
+            _ => ""
+        };
     }
 }
