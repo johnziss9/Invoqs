@@ -14,7 +14,6 @@ namespace Invoqs.Components.Pages
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
         // Component state
-        protected string currentUser = "John Doe";
         protected bool isLoading = true;
         protected string errorMessage = "";
 
@@ -127,30 +126,6 @@ namespace Invoqs.Components.Pages
         }
 
         // Event handlers
-        protected async Task HandleLogout()
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
-            }
-            catch (JSDisconnectedException)
-            {
-                // Circuit disconnected, ignore
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
-            {
-                // Prerendering, ignore localStorage calls
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
-            }
-
-            // Always redirect to login, even if localStorage clearing fails
-            Navigation.NavigateTo("/login", true);
-        }
-
         protected Task HandleViewInvoice(InvoiceModel invoice)
         {
             Navigation.NavigateTo($"/invoice/{invoice.Id}", true);
@@ -291,7 +266,7 @@ namespace Invoqs.Components.Pages
                 if (success)
                 {
                     invoices.Remove(invoice);
-                    
+
                     // Recalculate outstanding total
                     totalOutstanding = invoices
                         .Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Overdue)

@@ -1,3 +1,4 @@
+using Invoqs.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -7,9 +8,43 @@ namespace Invoqs.Components.UI
     {
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+
+        [Parameter] public EventCallback<string> OnUserLoaded { get; set; }
         
-        [Parameter] public string CurrentUser { get; set; } = "John Doe";
-        [Parameter] public EventCallback OnLogout { get; set; }
+        private string currentUser = "User";
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await LoadCurrentUserAsync();
+                StateHasChanged();
+            }
+        }
+
+        private async Task LoadCurrentUserAsync()
+        {
+            try
+            {
+                var storedUserJson = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "currentUser");
+                
+                if (!string.IsNullOrEmpty(storedUserJson))
+                {
+                    var userInfo = System.Text.Json.JsonSerializer.Deserialize<UserInfo>(storedUserJson);
+                    
+                    if (userInfo != null && !string.IsNullOrEmpty(userInfo.FirstName))
+                    {
+                        currentUser = userInfo.FirstName;
+                        await OnUserLoaded.InvokeAsync(currentUser);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading current user: {ex.Message}");
+                currentUser = "User";
+            }
+        }
 
         protected async Task HandleLogout()
         {
