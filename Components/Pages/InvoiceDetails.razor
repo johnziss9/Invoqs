@@ -729,29 +729,51 @@
     </div>
 }
 
-@* Send Confirmation Modal *@
+@* Send/Resend Confirmation Modal *@
 @if (showSendConfirmation)
 {
     <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Send Invoice</h5>
+                    <h5 class="modal-title">@(invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "Resend" : "Send") Invoice</h5>
                     <button type="button" class="btn-close" @onclick="() => showSendConfirmation = false"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-envelope text-primary" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Send Invoice?</h5>
+                        <h5 class="mt-3">@(invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "Resend" : "Send") Invoice to Customer?</h5>
                         <p class="text-muted">
-                            This will send invoice <strong>@invoice?.InvoiceNumber</strong> to the customer.
-                            The invoice status will be changed to "Sent".
+                            This will @(invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "resend" : "send") invoice
+                            <strong>@invoice?.InvoiceNumber</strong> to
+                            <strong>@invoice?.CustomerName</strong>.
                         </p>
+                        @if (!string.IsNullOrEmpty(invoice?.CustomerEmail))
+                        {
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Invoice will be sent to: <strong>@invoice.CustomerEmail</strong>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong>Warning:</strong> Customer email address is not available.
+                            </div>
+                        }
                         @if (invoice?.Status == InvoiceStatus.Draft)
                         {
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle me-2"></i>
                                 This invoice is currently in draft status. Sending will finalize the invoice.
+                            </div>
+                        }
+                        @if ((invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue) && invoice.SentDate.HasValue)
+                        {
+                            <div class="alert alert-secondary">
+                                <i class="bi bi-clock-history me-2"></i>
+                                Previously sent on: <strong>@invoice.SentDate.Value.ToString("dd MMM yyyy 'at' HH:mm")</strong>
                             </div>
                         }
                         @if (invoice?.Total > 1000)
@@ -765,7 +787,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="() => showSendConfirmation = false">Cancel</button>
-                    <button type="button" class="btn btn-success" @onclick="ConfirmSend" disabled="@isProcessing">
+                    <button type="button" class="btn btn-success" @onclick="ConfirmSend" 
+                        disabled="@(isProcessing || string.IsNullOrEmpty(invoice?.CustomerEmail))">
                         @if (isProcessing)
                         {
                             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -774,7 +797,7 @@
                         {
                             <i class="bi bi-send me-1"></i>
                         }
-                        @(isProcessing ? "Sending..." : "Send Invoice")
+                        @(isProcessing ? "Sending..." : (invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "Resend Invoice" : "Send Invoice"))
                     </button>
                 </div>
             </div>
