@@ -289,12 +289,43 @@
                                     </div>
                                 }
 
-                                <!-- Address -->
+                                <!-- Address with Autocomplete -->
                                 <div class="col-12">
                                     <label class="form-label required">Service Address</label>
-                                    <InputText @bind-Value="job.Address" class="@GetFieldErrorClass("Address")" 
-                                            placeholder="Enter the full address where the service will be provided" disabled="@isInvoiced" />
-                                    <div class="form-text">This will be used for scheduling and invoicing</div>
+                                    <div class="position-relative">
+                                        <input type="text" 
+                                               class="@GetFieldErrorClass("Address")" 
+                                               value="@job.Address"
+                                               @oninput="OnAddressInput"
+                                               @onfocus="@(() => { if (addressSuggestions.Any()) showAddressSuggestions = true; })"
+                                               @onblur="HideAddressSuggestions"
+                                               placeholder="Start typing an address..."
+                                               autocomplete="off"
+                                               disabled="@isInvoiced" />
+                                        
+                                        @if (isSearchingAddresses)
+                                        {
+                                            <div class="position-absolute end-0 top-50 translate-middle-y me-2">
+                                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                    <span class="visually-hidden">Searching...</span>
+                                                </div>
+                                            </div>
+                                        }
+                                        
+                                        @if (showAddressSuggestions && addressSuggestions.Any() && !isInvoiced)
+                                        {
+                                            <div class="address-suggestions">
+                                                @foreach (var suggestion in addressSuggestions)
+                                                {
+                                                    <div class="address-suggestion-item" @onmousedown="@(() => SelectAddress(suggestion))">
+                                                        <i class="bi bi-geo-alt me-2 text-muted"></i>
+                                                        @suggestion
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="form-text">Start typing to see previous addresses, or enter a new one</div>
                                     <ValidationMessage For="@(() => job.Address)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Address").Any() == true)
                                     {

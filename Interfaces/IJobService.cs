@@ -24,5 +24,6 @@ namespace Invoqs.Interfaces
         Task<bool> RemoveJobsFromInvoiceAsync(List<int> jobIds);
         Task<bool> CanJobBeInvoicedAsync(int jobId);
         Task<bool> CanJobsBeInvoicedAsync(List<int> jobIds);
+        Task<List<string>> SearchAddressesAsync(string query);
     }
 }

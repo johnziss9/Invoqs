@@ -12,7 +12,6 @@ namespace Invoqs.Components.Pages
         [Inject] private IJobService JobService { get; set; } = default!;
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
-        [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
         [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
 
@@ -29,6 +28,12 @@ namespace Invoqs.Components.Pages
         protected string successMessage = "";
 
         private ApiValidationError? validationErrors;
+
+        // Address autocomplete properties
+        protected List<string> addressSuggestions = new();
+        protected bool showAddressSuggestions = false;
+        protected bool isSearchingAddresses = false;
+        private System.Threading.Timer? addressSearchTimer;
 
         protected override async Task OnInitializedAsync()
         {
@@ -370,6 +375,85 @@ namespace Invoqs.Components.Pages
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
 
             return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
+        }
+
+        protected void OnAddressInput(ChangeEventArgs e)
+        {
+            if (job == null) return;
+
+            var value = e.Value?.ToString() ?? "";
+            job.Address = value;
+
+            // Cancel previous timer
+            addressSearchTimer?.Dispose();
+
+            if (string.IsNullOrWhiteSpace(value) || value.Length < 2)
+            {
+                showAddressSuggestions = false;
+                addressSuggestions.Clear();
+                StateHasChanged();
+                return;
+            }
+
+            // Debounce: wait 300ms before searching
+            addressSearchTimer = new System.Threading.Timer(async _ =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    await SearchAddresses(value);
+                });
+            }, null, 300, Timeout.Infinite);
+        }
+
+        private async Task SearchAddresses(string query)
+        {
+            try
+            {
+                isSearchingAddresses = true;
+                StateHasChanged();
+
+                addressSuggestions = await JobService.SearchAddressesAsync(query);
+                showAddressSuggestions = addressSuggestions.Any();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error searching addresses: {ex.Message}");
+                addressSuggestions.Clear();
+                showAddressSuggestions = false;
+            }
+            finally
+            {
+                isSearchingAddresses = false;
+                StateHasChanged();
+            }
+        }
+
+        protected void SelectAddress(string address)
+        {
+            if (job == null) return;
+
+            job.Address = address;
+            showAddressSuggestions = false;
+            addressSuggestions.Clear();
+            StateHasChanged();
+        }
+
+        protected void HideAddressSuggestions()
+        {
+            // Delay hiding to allow click events to register
+            Task.Delay(200).ContinueWith(_ =>
+            {
+                InvokeAsync(() =>
+                {
+                    showAddressSuggestions = false;
+                    StateHasChanged();
+                });
+            });
+        }
+
+        public void Dispose()
+        {
+            addressSearchTimer?.Dispose();
         }
     }
 }
