@@ -272,7 +272,7 @@ namespace Invoqs.Components.Pages
             };
         }
 
-        protected async Task OnAddressInput(ChangeEventArgs e)
+        protected void OnAddressInput(ChangeEventArgs e)
         {
             var value = e.Value?.ToString() ?? "";
             newJob.Address = value;
@@ -289,7 +289,7 @@ namespace Invoqs.Components.Pages
             }
 
             // Debounce: wait 300ms before searching
-            addressSearchTimer = new System.Threading.Timer(async _ =>
+            addressSearchTimer = new Timer(async _ =>
             {
                 await InvokeAsync(async () =>
                 {

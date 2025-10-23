@@ -377,7 +377,7 @@ namespace Invoqs.Components.Pages
             return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
         }
 
-        protected async Task OnAddressInput(ChangeEventArgs e)
+        protected void OnAddressInput(ChangeEventArgs e)
         {
             if (job == null) return;
 
