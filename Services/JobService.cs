@@ -270,6 +270,38 @@ namespace Invoqs.Services
             }
         }
 
+        public async Task<List<string>> SearchAddressesAsync(string query)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(query) || query.Length < 2)
+                {
+                    return new List<string>();
+                }
+
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
+                var response = await _httpClient.GetAsync($"jobs/addresses/search?query={Uri.EscapeDataString(query)}");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return new List<string>();
+                }
+
+                response.EnsureSuccessStatusCode();
+
+                var addresses = await response.Content.ReadFromJsonAsync<List<string>>(_jsonOptions);
+                return addresses ?? new List<string>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error searching addresses: {ex.Message}");
+                return new List<string>();
+            }
+        }
+
         // Invoice integration methods
         public async Task<List<JobModel>> GetCompletedUninvoicedJobsByCustomerAsync(int customerId)
         {
