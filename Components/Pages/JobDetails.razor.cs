@@ -17,7 +17,6 @@ namespace Invoqs.Components.Pages
 
         protected bool isCustomerDeleted = false;
         protected bool isLoading = true;
-        protected string currentUser = "John Doe"; // Replace with actual user service
         protected string? errorMessage;
         protected bool showDeleteJobConfirmation = false;
         protected bool isDeletingJob = false;
@@ -246,30 +245,6 @@ namespace Invoqs.Components.Pages
             {
                 Navigation.NavigateTo($"/invoice/{invoiceId.Value}", true);
             }
-        }
-
-        protected async Task HandleLogout()
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
-            }
-            catch (JSDisconnectedException)
-            {
-                // Circuit disconnected, ignore
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
-            {
-                // Prerendering, ignore localStorage calls
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
-            }
-
-            // Always redirect to login, even if localStorage clearing fails
-            Navigation.NavigateTo("/login", true);
         }
 
         protected string GetDeleteButtonText()

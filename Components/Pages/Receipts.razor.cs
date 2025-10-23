@@ -12,7 +12,6 @@ namespace Invoqs.Components.Pages
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
-        protected string currentUser = "Demo User";
         protected List<ReceiptModel> receipts = new();
         protected bool isLoading = true;
         protected string errorMessage = "";
@@ -163,34 +162,6 @@ namespace Invoqs.Components.Pages
                 isDeleting = false;
                 StateHasChanged();
             }
-        }
-
-        protected async Task HandleLogout()
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
-            }
-            catch (JSDisconnectedException)
-            {
-                // Circuit disconnected, ignore
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
-            {
-                // Prerendering, ignore localStorage calls
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
-            }
-
-            Navigation.NavigateTo("/login", true);
-        }
-
-        protected async Task RefreshData()
-        {
-            await LoadReceipts();
         }
     }
 }

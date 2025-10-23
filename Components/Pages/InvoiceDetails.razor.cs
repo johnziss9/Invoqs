@@ -29,9 +29,8 @@ public partial class InvoiceDetails
     private bool showDeleteModal = false;
     private bool isDeleting = false;
     private bool showDeliveredConfirmation = false;
-    protected bool isCustomerDeleted = false;
     
-    private string currentUser = "Demo User"; // This should come from authentication service when implemented
+    protected bool isCustomerDeleted = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -382,30 +381,6 @@ public partial class InvoiceDetails
     {
         showDeliveredConfirmation = false;
         await MarkAsDelivered();
-    }
-
-    protected async Task HandleLogout()
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
-            await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
-        }
-        catch (JSDisconnectedException)
-        {
-            // Circuit disconnected, ignore
-        }
-        catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
-        {
-            // Prerendering, ignore localStorage calls
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
-        }
-
-        // Always redirect to login, even if localStorage clearing fails
-        Navigation.NavigateTo("/login", true);
     }
 
     private async Task DeleteInvoice()

@@ -31,8 +31,6 @@ namespace Invoqs.Components.Pages
                         return;
                     }
 
-                    await LoadCurrentUserAsync();
-
                     await LoadDashboardData();
                     StateHasChanged();
                 }
@@ -46,6 +44,12 @@ namespace Invoqs.Components.Pages
                     Navigation.NavigateTo("/login", true);
                 }
             }
+        }
+
+        private void HandleUserLoaded(string userName)
+        {
+            currentUser = userName;
+            StateHasChanged();
         }
 
         private async Task LoadDashboardData()
@@ -137,29 +141,6 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        private async Task LoadCurrentUserAsync()
-        {
-            try
-            {
-                var storedUserJson = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "currentUser");
-                
-                if (!string.IsNullOrEmpty(storedUserJson))
-                {
-                    var userInfo = System.Text.Json.JsonSerializer.Deserialize<UserInfo>(storedUserJson);
-                    
-                    if (userInfo != null && !string.IsNullOrEmpty(userInfo.FirstName))
-                    {
-                        currentUser = userInfo.FirstName;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading current user: {ex.Message}");
-                currentUser = "User";
-            }
-        }
-
         private async Task<string?> GetStoredTokenAsync()
         {
             try
@@ -206,30 +187,6 @@ namespace Invoqs.Components.Pages
             {
                 Navigation.NavigateTo(url, forceLoad: true);
             }
-        }
-
-        protected async Task HandleLogout()
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
-            }
-            catch (JSDisconnectedException)
-            {
-                // Circuit disconnected, ignore
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
-            {
-                // Prerendering, ignore localStorage calls
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
-            }
-
-            // Always redirect to login, even if localStorage clearing fails
-            Navigation.NavigateTo("/login", true);
         }
 
         // Method to refresh dashboard data

@@ -18,7 +18,6 @@ namespace Invoqs.Components.Pages
         [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
 
         // Component state
-        protected string currentUser = "John Doe";
         protected CustomerModel? selectedCustomer;
         protected InvoiceModel? invoice;
         protected List<JobModel> availableJobs = new();
@@ -334,30 +333,6 @@ namespace Invoqs.Components.Pages
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
 
             return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
-        }
-
-        protected async Task HandleLogout()
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
-            }
-            catch (JSDisconnectedException)
-            {
-                // Circuit disconnected, ignore
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
-            {
-                // Prerendering, ignore localStorage calls
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
-            }
-
-            // Always redirect to login, even if localStorage clearing fails
-            Navigation.NavigateTo("/login", true);
         }
 
         protected List<string> GetUniqueAddresses()

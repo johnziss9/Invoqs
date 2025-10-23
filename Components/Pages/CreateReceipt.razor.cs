@@ -16,8 +16,6 @@ namespace Invoqs.Components.Pages
         [SupplyParameterFromQuery(Name = "customerId")]
         public int? PreselectedCustomerId { get; set; }
 
-        protected string currentUser = "Demo User";
-
         // Customer and Address data
         protected List<CustomerModel> customers = new();
         protected int selectedCustomerId = 0;
@@ -258,27 +256,5 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        protected async Task HandleLogout()
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
-                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "currentUser");
-            }
-            catch (JSDisconnectedException)
-            {
-                // Circuit disconnected, ignore
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
-            {
-                // Prerendering, ignore localStorage calls
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error clearing localStorage during logout: {ex.Message}");
-            }
-
-            Navigation.NavigateTo("/login", true);
-        }
     }
 }
