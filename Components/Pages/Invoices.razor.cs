@@ -266,12 +266,12 @@ namespace Invoqs.Components.Pages
                 if (success)
                 {
                     invoices.Remove(invoice);
-
+                    
                     // Recalculate outstanding total
                     totalOutstanding = invoices
                         .Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Overdue)
                         .Sum(i => i.Total);
-                        
+
                     StateHasChanged();
                 }
                 else

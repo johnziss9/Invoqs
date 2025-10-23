@@ -120,35 +120,10 @@ public partial class InvoiceDetails
         }
     }
 
-    private async Task ResendInvoice()
+    private void ResendInvoice()
     {
-        if (invoice == null) return;
-
-        try
-        {
-            isProcessing = true;
-
-            // Simulate email sending delay
-            await Task.Delay(1000);
-
-            successMessage = "Invoice resent successfully.";
-
-            // Clear the message after 3 seconds
-            _ = Task.Delay(3000).ContinueWith(_ =>
-            {
-                successMessage = string.Empty;
-                InvokeAsync(StateHasChanged);
-            });
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error resending invoice: {ex.Message}";
-        }
-        finally
-        {
-            isProcessing = false;
-            StateHasChanged();
-        }
+        showSendConfirmation = true;
+        StateHasChanged();
     }
 
     private async Task ConfirmMarkAsPaid()
@@ -334,8 +309,55 @@ public partial class InvoiceDetails
 
     private async Task ConfirmSend()
     {
-        showSendConfirmation = false;
-        await MarkAsSent();
+        if (invoice == null) return;
+
+        try
+        {
+            isProcessing = true;
+            showSendConfirmation = false;
+            StateHasChanged();
+
+            // Determine if this is a resend based on current status
+            bool isResend = invoice.Status == InvoiceStatus.Sent;
+
+            var success = await InvoiceService.MarkInvoiceAsSentAsync(invoice.Id);
+
+            if (success)
+            {
+                if (!isResend)
+                {
+                    invoice.Status = InvoiceStatus.Sent;
+                }
+
+                invoice.IsSent = true;
+                invoice.SentDate = DateTime.UtcNow;
+
+                successMessage = isResend ?
+                    $"Invoice resent successfully to {invoice.CustomerEmail}" :
+                    $"Invoice sent successfully to {invoice.CustomerEmail}";
+
+                // Clear the message after 3 seconds
+                _ = Task.Delay(3000).ContinueWith(_ =>
+                {
+                    successMessage = string.Empty;
+                    InvokeAsync(StateHasChanged);
+                });
+            }
+            else
+            {
+                errorMessage = "Failed to send invoice. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error sending invoice: {ex.Message}";
+            Console.WriteLine($"Error sending invoice: {ex.Message}");
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
     }
 
     private async Task MarkAsDelivered()
