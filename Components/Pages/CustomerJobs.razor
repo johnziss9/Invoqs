@@ -267,37 +267,9 @@
                                     </div>
                                     <div class="text-end ms-3">
                                         <div class="fw-bold text-success mb-2">£@job.Price.ToString("N2")</div>
-                                        <div class="btn-group btn-group-sm">
-                                            @if (job.Status == JobStatus.New)
-                                            {
-                                                <button class="btn btn-primary btn-sm"
-                                                    @onclick="() => HandleStatusChange(job, JobStatus.Active)">
-                                                    <i class="bi bi-play"></i>
-                                                </button>
-                                            }
-                                            else if (job.Status == JobStatus.Active)
-                                            {
-                                                <button class="btn btn-success btn-sm"
-                                                    @onclick="() => HandleStatusChange(job, JobStatus.Completed)">
-                                                    <i class="bi bi-check"></i>
-                                                </button>
-                                            }
-                                            else if (job.CanBeInvoiced)
-                                            {
-                                                <button class="btn btn-outline-success btn-sm" @onclick="() => HandleGenerateInvoice(job)">
-                                                    <i class="bi bi-file-earmark-text"></i>
-                                                </button>
-                                            }
-                                            else if (job.Status == JobStatus.Completed && job.IsInvoiced)
-                                            {
-                                                <button class="btn btn-outline-info btn-sm" disabled title="Already invoiced">
-                                                    <i class="bi bi-check-circle"></i>
-                                                </button>
-                                            }
-                                            <button class="btn btn-outline-secondary btn-sm" @onclick="() => HandleEditJob(job)">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                        </div>
+                                        <button class="btn btn-outline-primary btn-sm" @onclick="() => HandleViewJob(job.Id)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
                                     </div>
                                 </div>
                             }

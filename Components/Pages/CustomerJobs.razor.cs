@@ -15,10 +15,6 @@ namespace Invoqs.Components.Pages
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
         // Component state
-        protected string searchTerm = "";
-        protected string statusFilter = "all";
-        protected string typeFilter = "all";
-        protected string sortBy = "startDate";
         protected bool isLoading = true;
         protected string errorMessage = "";
 
@@ -83,6 +79,12 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        protected void HandleViewJob(int jobId)
+        {
+            var currentUrl = Navigation.Uri;
+            Navigation.NavigateTo($"/job/{jobId}?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
+        }
+
         protected string GetInitials(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -139,93 +141,6 @@ namespace Invoqs.Components.Pages
             }
 
             return relevant;
-        }
-
-        // Event handlers
-
-        protected async Task HandleStatusChange(JobModel job, JobStatus newStatus)
-        {
-            try
-            {
-                var originalStatus = job.Status;
-
-                var (success, errors) = await JobService.UpdateJobStatusAsync(job.Id, newStatus);
-
-                if (success)
-                {
-                    job.Status = newStatus;
-
-                    if (newStatus == JobStatus.Completed && !job.EndDate.HasValue)
-                    {
-                        job.EndDate = DateTime.Now;
-                    }
-                    else if (newStatus != JobStatus.Completed && originalStatus == JobStatus.Completed)
-                    {
-                        job.EndDate = null;
-                    }
-
-                    // Refresh data to update stats and groupings
-                    await LoadJobs();
-                    await LoadCustomerData();
-                    StateHasChanged();
-                }
-                else
-                {
-                    if (errors != null)
-                    {
-                        errorMessage = "Validation error: " + string.Join(", ", errors.GetAllErrors());
-                    }
-                    else
-                    {
-                        errorMessage = "Failed to update job status";
-                    }
-
-                    StateHasChanged();
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Error updating job status: {ex.Message}";
-                StateHasChanged();
-            }
-        }
-
-        protected Task HandleEditJob(JobModel job)
-        {
-            var currentUrl = Navigation.Uri;
-            Navigation.NavigateTo($"/job/{job.Id}/edit?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
-            return Task.CompletedTask;
-        }
-
-        protected async Task HandleDeleteJob(JobModel job)
-        {
-            try
-            {
-                // In a real app, you'd show a confirmation dialog here
-                var success = await JobService.DeleteJobAsync(job.Id);
-
-                if (success)
-                {
-                    await LoadJobs();
-                    await LoadCustomerData(); // Refresh customer stats
-                }
-                else
-                {
-                    errorMessage = "Failed to delete job";
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Error deleting job: {ex.Message}";
-                StateHasChanged();
-            }
-        }
-
-        protected Task HandleGenerateInvoice(JobModel job)
-        {
-            // Navigate to create invoice page with this customer, job will be pre-selected if only one
-            Navigation.NavigateTo($"/customer/{CustomerId}/invoice/new");
-            return Task.CompletedTask;
         }
 
         protected Task HandleGenerateInvoiceForAddress(string address)
