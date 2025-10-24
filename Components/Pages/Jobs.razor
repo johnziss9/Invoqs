@@ -129,7 +129,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-3">
+                        <div class="col-md-6 col-lg-4">
                             <label class="form-label small text-muted">Search Jobs</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
@@ -137,7 +137,7 @@
                                     placeholder="Search by title, customer, or address...">
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3 col-lg-2">
                             <label class="form-label small text-muted">Customer</label>
                             <select class="form-select" @bind="customerFilter">
                                 <option value="all">All Customers</option>
@@ -147,7 +147,7 @@
                                 }
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3 col-lg-2">
                             <label class="form-label small text-muted">Status</label>
                             <select class="form-select" @bind="statusFilter">
                                 <option value="all">All Status</option>
@@ -157,7 +157,7 @@
                                 <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3 col-lg-2">
                             <label class="form-label small text-muted">Type</label>
                             <select class="form-select" @bind="typeFilter">
                                 <option value="all">All Types</option>
@@ -166,7 +166,7 @@
                                 <option value="cliff">Fork Lift Service</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3 col-lg-2">
                             <label class="form-label small text-muted">Sort By</label>
                             <select class="form-select" @bind="sortBy">
                                 <option value="startDate">Start Date</option>
@@ -176,8 +176,7 @@
                                 <option value="price">Price</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="row mt-3">
+                        <div class="row mt-3">
                         <div class="col-12">
                             <small class="text-muted">
                                 Showing @filteredJobs.Count() of @jobs.Count jobs
@@ -187,6 +186,7 @@
                                 }
                             </small>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>

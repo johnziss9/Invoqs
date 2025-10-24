@@ -8,6 +8,7 @@
 .form-control,
 .form-select {
     border-radius: 8px;
+    font-size: 0.9rem;
 }
 
 /* Card styling with 8px radius */

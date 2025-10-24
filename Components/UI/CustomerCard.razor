@@ -24,7 +24,10 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="/customer/@Customer.Id/jobs"><i class="bi bi-calendar-check me-2"></i>Customer Jobs</a></li>
                     <li><a class="dropdown-item" href="/customer/@Customer.Id/invoices"><i class="bi bi-file-earmark-text me-2"></i>Customer Invoices</a></li>
-                    <li><a class="dropdown-item" href="/customer/@Customer.Id/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)"><i class="bi bi-receipt me-2"></i>Create Invoice</a></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/receipts"><i class="bi bi-receipt-cutoff me-2"></i>Customer Receipts</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)"><i class="bi bi-file-earmark-plus me-2"></i>Create Invoice</a></li>
+                    <li><a class="dropdown-item" href="/receipt/new?customerId=@Customer.Id&returnUrl=@Uri.EscapeDataString(Navigation.Uri)"><i class="bi bi-receipt me-2"></i>Create Receipt</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" @onclick="() => EditCustomer(Customer.Id)"><i class="bi bi-pencil me-2"></i>Edit</a></li>
                     <li><hr class="dropdown-divider"></li>
