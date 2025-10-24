@@ -178,7 +178,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-3">
+                        <div class="col-md-6 col-lg-4">
                             <label class="form-label small text-muted">Search Invoices</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
@@ -188,7 +188,7 @@
                                     placeholder="Search by invoice number...">
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3 col-lg-2">
                             <label class="form-label small text-muted">Status</label>
                             <select class="form-select" @bind="statusFilter" @bind:after="FilterInvoices">
                                 <option value="">All Statuses</option>
@@ -199,7 +199,7 @@
                                 <option value="Cancelled">Cancelled</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3 col-lg-2">
                             <label class="form-label small text-muted">Date Range</label>
                             <select class="form-select" @bind="dateFilter" @bind:after="FilterInvoices">
                                 <option value="all">All Time</option>
@@ -209,7 +209,7 @@
                                 <option value="thisYear">This Year</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3 col-lg-2">
                             <label class="form-label small text-muted">Sort By</label>
                             <select class="form-select" @bind="sortBy" @bind:after="FilterInvoices">
                                 <option value="created">Created Date</option>
@@ -219,7 +219,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row mt-3">
                         <div class="col-12">
                             <small class="text-muted">
                                 Showing @filteredInvoices.Count() of @customerInvoices.Count invoices

@@ -133,8 +133,15 @@
 .form-control,
 .form-select {
     border-radius: 8px;
-    border-color: #e9ecef;
     font-size: 0.9rem;
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+}
+
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
 }
 
 .form-control:focus,

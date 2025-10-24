@@ -8,31 +8,15 @@
 .form-control,
 .form-select {
     border-radius: 8px;
+    font-size: 0.9rem;
 }
 
 .input-group-text {
     border-radius: 8px 0 0 8px;
-    background-color: #f8f9fa;
-    border-right: none;
 }
 
 .input-group .form-control {
     border-radius: 0 8px 8px 0;
-    border-left: none;
-}
-
-.input-group .form-control:focus {
-    border-color: #ced4da;
-    box-shadow: none;
-}
-
-.input-group:focus-within .input-group-text {
-    border-color: #0d6efd;
-}
-
-.input-group:focus-within .form-control {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
 }
 
 /* Card styling - 8px radius */
