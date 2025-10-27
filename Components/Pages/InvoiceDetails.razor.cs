@@ -317,6 +317,13 @@ public partial class InvoiceDetails
             showSendConfirmation = false;
             StateHasChanged();
 
+            // Check if customer has email
+            if (string.IsNullOrWhiteSpace(invoice.CustomerEmail))
+            {
+                errorMessage = "Cannot send invoice: Customer has no email address. Please update customer details first.";
+                return;
+            }
+
             // Determine if this is a resend based on current status
             bool isResend = invoice.Status == InvoiceStatus.Sent;
 
@@ -336,8 +343,8 @@ public partial class InvoiceDetails
                     $"Invoice resent successfully to {invoice.CustomerEmail}" :
                     $"Invoice sent successfully to {invoice.CustomerEmail}";
 
-                // Clear the message after 3 seconds
-                _ = Task.Delay(3000).ContinueWith(_ =>
+                // Clear the message after 5 seconds
+                _ = Task.Delay(5000).ContinueWith(_ =>
                 {
                     successMessage = string.Empty;
                     InvokeAsync(StateHasChanged);
@@ -350,7 +357,22 @@ public partial class InvoiceDetails
         }
         catch (Exception ex)
         {
-            errorMessage = $"Error sending invoice: {ex.Message}";
+            // Parse error message for better user feedback
+            var errorMsg = ex.Message;
+
+            if (errorMsg.Contains("no email address"))
+            {
+                errorMessage = "Cannot send invoice: Customer has no email address.";
+            }
+            else if (errorMsg.Contains("Failed to send email"))
+            {
+                errorMessage = "Failed to send invoice email. Please check your email configuration and try again.";
+            }
+            else
+            {
+                errorMessage = $"Error sending invoice: {errorMsg}";
+            }
+
             Console.WriteLine($"Error sending invoice: {ex.Message}");
         }
         finally

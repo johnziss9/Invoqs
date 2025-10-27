@@ -164,6 +164,13 @@ namespace Invoqs.Components.Pages
                 showSendConfirmation = false;
                 StateHasChanged();
 
+                // Check if customer has email
+                if (string.IsNullOrWhiteSpace(receipt.CustomerEmail))
+                {
+                    errorMessage = "Cannot send receipt: Customer has no email address. Please update customer details first.";
+                    return;
+                }
+
                 // Call service to send receipt
                 var success = await ReceiptService.SendReceiptAsync(receipt.Id);
 
@@ -174,8 +181,8 @@ namespace Invoqs.Components.Pages
 
                     successMessage = $"Receipt sent successfully to {receipt.CustomerEmail}";
 
-                    // Clear the message after 3 seconds
-                    _ = Task.Delay(3000).ContinueWith(_ =>
+                    // Clear the message after 5 seconds
+                    _ = Task.Delay(5000).ContinueWith(_ =>
                     {
                         successMessage = string.Empty;
                         InvokeAsync(StateHasChanged);
@@ -188,7 +195,22 @@ namespace Invoqs.Components.Pages
             }
             catch (Exception ex)
             {
-                errorMessage = $"Error sending receipt: {ex.Message}";
+                // Parse error message for better user feedback
+                var errorMsg = ex.Message;
+
+                if (errorMsg.Contains("no email address"))
+                {
+                    errorMessage = "Cannot send receipt: Customer has no email address.";
+                }
+                else if (errorMsg.Contains("Failed to send email"))
+                {
+                    errorMessage = "Failed to send receipt email. Please check your email configuration and try again.";
+                }
+                else
+                {
+                    errorMessage = $"Error sending receipt: {errorMsg}";
+                }
+
                 Console.WriteLine($"Error sending receipt: {ex.Message}");
             }
             finally
