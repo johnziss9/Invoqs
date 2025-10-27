@@ -18,16 +18,6 @@ namespace Invoqs.Models
         public string? CustomerPhone { get; set; }
 
         [Required]
-        public DateTime PaymentDate { get; set; } = DateTime.Today;
-
-        [Required]
-        [StringLength(100)]
-        public string PaymentMethod { get; set; } = "Bank Transfer";
-
-        [StringLength(200)]
-        public string? PaymentReference { get; set; }
-
-        [Required]
         [Range(0.01, double.MaxValue)]
         public decimal TotalAmount { get; set; }
 
@@ -55,13 +45,5 @@ namespace Invoqs.Models
         [Required]
         [MinLength(1, ErrorMessage = "At least one invoice must be selected")]
         public List<int> InvoiceIds { get; set; } = new();
-
-        [Required]
-        public DateTime PaymentDate { get; set; } = DateTime.Today;
-
-        [Required]
-        public string PaymentMethod { get; set; } = "Bank Transfer";
-
-        public string? PaymentReference { get; set; }
     }
 }

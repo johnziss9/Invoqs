@@ -196,7 +196,7 @@
             }
         </div>
 
-        <!-- Right Sidebar: Payment Details & Summary -->
+        <!-- Right Sidebar: Receipt Details & Summary -->
         <div class="col-lg-4">
             @if (selectedInvoiceIds.Any())
             {
@@ -204,48 +204,10 @@
                     <div class="card-header bg-primary text-white py-3">
                         <h6 class="mb-0 text-white">
                             <i class="bi bi-credit-card-fill me-2"></i>
-                            Payment Details
+                            Receipt Details
                         </h6>
                     </div>
                     <div class="card-body">
-                        <!-- Payment Date -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold required">Payment Date</label>
-                            <input type="date" 
-                                   class="form-control" 
-                                   @bind="paymentDate" 
-                                   @bind:after="UpdatePreview"
-                                   max="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                            <div class="form-text">When was the payment received?</div>
-                        </div>
-
-                        <!-- Payment Method -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold required">Payment Method</label>
-                            <select class="form-select" @bind="paymentMethod" @bind:after="UpdatePreview">
-                                <option value="Bank Transfer">Bank Transfer</option>
-                                <option value="Cash">Cash</option>
-                                <option value="Cheque">Cheque</option>
-                                <option value="Card">Card</option>
-                                <option value="Direct Debit">Direct Debit</option>
-                            </select>
-                            <div class="form-text">How was the payment made?</div>
-                        </div>
-
-                        <!-- Payment Reference -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Payment Reference</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   @bind="paymentReference" 
-                                   @bind:after="UpdatePreview"
-                                   placeholder="e.g., TXN-123456" 
-                                   maxlength="200" />
-                            <div class="form-text">Optional reference number</div>
-                        </div>
-
-                        <hr />
-
                         <!-- Summary -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-2">

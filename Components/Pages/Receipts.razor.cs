@@ -39,7 +39,7 @@ namespace Invoqs.Components.Pages
                 errorMessage = "";
 
                 var allReceipts = await ReceiptService.GetAllReceiptsAsync();
-                receipts = allReceipts.OrderByDescending(r => r.PaymentDate).ToList();
+                receipts = allReceipts.OrderByDescending(r => r.CreatedDate).ToList();
             }
             catch (Exception ex)
             {
@@ -82,7 +82,7 @@ namespace Invoqs.Components.Pages
                     "customer" => filtered.OrderBy(r => r.CustomerName),
                     "amount" => filtered.OrderByDescending(r => r.TotalAmount),
                     "created" => filtered.OrderByDescending(r => r.CreatedDate),
-                    _ => filtered.OrderByDescending(r => r.PaymentDate) // default: date
+                    _ => filtered.OrderByDescending(r => r.CreatedDate)
                 };
 
                 return filtered;
