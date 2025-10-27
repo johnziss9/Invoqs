@@ -115,7 +115,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h3 class="mb-0">@receipts.Count(r => r.PaymentDate >= DateTime.Today.AddDays(-30))</h3>
+                                <h3 class="mb-0">@receipts.Count(r => r.CreatedDate >= DateTime.Today.AddDays(-30))</h3>
                                 <p class="mb-0 small">This Month</p>
                             </div>
                             <i class="bi bi-calendar-check fs-1 opacity-75"></i>
@@ -188,10 +188,9 @@
                             <tr>
                                 <th>Receipt #</th>
                                 <th>Customer</th>
-                                <th>Payment Date</th>
-                                <th>Method</th>
                                 <th>Invoices</th>
-                                <th class="text-end">Amount</th>
+                                <th>Amount</th>
+                                <th class="text-end">Created</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -214,16 +213,13 @@
                                         }
                                     </td>
                                     <td>
-                                        <span class="text-muted">@receipt.PaymentDate.ToString("dd MMM yyyy")</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary">@receipt.PaymentMethod</span>
-                                    </td>
-                                    <td>
                                         <span class="text-muted">@receipt.Invoices.Count invoice(s)</span>
                                     </td>
-                                    <td class="text-end">
+                                    <td>
                                         <span class="fw-medium">£@receipt.TotalAmount.ToString("N2")</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="fw-medium">@receipt.CreatedDate.ToString("dd/MM/yyyy")</span>
                                     </td>
                                     <td class="text-end">
                                         <div class="btn-group btn-group-sm" role="group">

@@ -87,30 +87,6 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-medium">Payment Date</label>
-                                <div class="form-control-plaintext">
-                                    <i class="bi bi-calendar-check me-2 text-primary"></i>
-                                    @receipt.PaymentDate.ToString("dd MMMM yyyy")
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-medium">Payment Method</label>
-                                <div class="form-control-plaintext">
-                                    <i class="bi bi-wallet2 me-2 text-primary"></i>
-                                    @receipt.PaymentMethod
-                                </div>
-                            </div>
-                            @if (!string.IsNullOrEmpty(receipt.PaymentReference))
-                            {
-                                <div class="col-12">
-                                    <label class="form-label fw-medium">Payment Reference</label>
-                                    <div class="form-control-plaintext">
-                                        <i class="bi bi-tag me-2 text-primary"></i>
-                                        @receipt.PaymentReference
-                                    </div>
-                                </div>
-                            }
                             <div class="col-12">
                                 <label class="form-label fw-medium">Total Amount Paid</label>
                                 <div class="form-control-plaintext">
@@ -361,14 +337,6 @@
                                 <span class="text-muted">Created:</span>
                                 <span class="fw-medium">@receipt.CreatedDate.ToString("dd/MM/yyyy")</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Payment Date:</span>
-                                <span class="fw-medium">@receipt.PaymentDate.ToString("dd/MM/yyyy")</span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted">Method:</span>
-                                <span class="badge bg-secondary">@receipt.PaymentMethod</span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -447,11 +415,6 @@
                                 Previously sent on: <strong>@receipt.SentDate.Value.ToString("dd MMM yyyy 'at' HH:mm")</strong>
                             </div>
                         }
-                        <div class="alert alert-success">
-                            <i class="bi bi-receipt me-2"></i>
-                            <strong>Payment Confirmation:</strong> £@receipt?.TotalAmount.ToString("N2") received on
-                            @receipt?.PaymentDate.ToString("dd MMM yyyy")
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

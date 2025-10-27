@@ -28,11 +28,6 @@ namespace Invoqs.Components.Pages
         protected HashSet<int> selectedInvoiceIds = new();
         protected bool isLoadingInvoices = false;
 
-        // Payment details
-        protected DateTime paymentDate = DateTime.Today;
-        protected string paymentMethod = "Bank Transfer";
-        protected string paymentReference = "";
-
         // UI state
         protected bool isCreating = false;
         protected string? errorMessage = null;
@@ -215,10 +210,7 @@ namespace Invoqs.Components.Pages
                 var createModel = new CreateReceiptModel
                 {
                     CustomerId = selectedCustomerId,
-                    InvoiceIds = selectedInvoiceIds.ToList(),
-                    PaymentDate = paymentDate,
-                    PaymentMethod = paymentMethod,
-                    PaymentReference = paymentReference
+                    InvoiceIds = selectedInvoiceIds.ToList()
                 };
 
                 var receipt = await ReceiptService.CreateReceiptAsync(createModel);

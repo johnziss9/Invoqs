@@ -56,7 +56,7 @@ namespace Invoqs.Components.Pages
                 await Task.WhenAll(customerTask, receiptsTask);
 
                 customer = customerTask.Result;
-                receipts = receiptsTask.Result.OrderByDescending(r => r.PaymentDate).ToList();
+                receipts = receiptsTask.Result.OrderByDescending(r => r.CreatedDate).ToList();
 
                 if (customer == null)
                 {
@@ -103,7 +103,7 @@ namespace Invoqs.Components.Pages
                 {
                     "amount" => filtered.OrderByDescending(r => r.TotalAmount),
                     "created" => filtered.OrderByDescending(r => r.CreatedDate),
-                    _ => filtered.OrderByDescending(r => r.PaymentDate) // default: date
+                    _ => filtered.OrderByDescending(r => r.CreatedDate)
                 };
 
                 return filtered;
@@ -112,7 +112,7 @@ namespace Invoqs.Components.Pages
 
         protected void ViewReceipt(int receiptId)
         {
-            Navigation.NavigateTo($"/receipt/{receiptId}");
+            Navigation.NavigateTo($"/receipt/{receiptId}", true);
         }
 
         private async Task DownloadReceipt(int receiptId, string receiptNumber)
