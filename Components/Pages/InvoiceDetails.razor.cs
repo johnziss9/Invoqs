@@ -497,4 +497,9 @@ public partial class InvoiceDetails
             _ => ""
         };
     }
+
+    private void GoToCreateReceipt()
+    {
+        Navigation.NavigateTo($"/receipts/new?customerId={customer!.Id}", true);
+    }
 }
