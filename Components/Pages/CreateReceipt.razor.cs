@@ -217,19 +217,7 @@ namespace Invoqs.Components.Pages
 
                 if (receipt != null)
                 {
-                    // Download PDF
-                    var pdfBytes = await ReceiptService.DownloadReceiptPdfAsync(receipt.Id);
-
-                    if (pdfBytes != null)
-                    {
-                        await JSRuntime.InvokeVoidAsync("downloadFile",
-                            $"{receipt.ReceiptNumber}.pdf",
-                            "application/pdf",
-                            pdfBytes);
-                    }
-
-                    // Navigate to receipts list
-                    Navigation.NavigateTo("/receipts");
+                    Navigation.NavigateTo($"/receipt/{receipt.Id}", true);
                 }
                 else
                 {
@@ -247,6 +235,5 @@ namespace Invoqs.Components.Pages
                 StateHasChanged();
             }
         }
-
     }
 }
