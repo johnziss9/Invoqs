@@ -71,7 +71,8 @@ namespace Invoqs.Models
         public DateTime? SentDate { get; set; }
         public bool IsSent { get; set; } = false;
         public DateTime? DeliveredDate { get; set; }
-        public bool IsDelivered { get; set; } = false;  
+        public bool IsDelivered { get; set; } = false;
+        public bool HasReceipt { get; set; }
 
 
         // Computed properties for UI
