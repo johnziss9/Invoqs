@@ -96,7 +96,7 @@ namespace Invoqs.Components.Pages
 
                 // Filter to only paid invoices
                 allInvoices = allInvoices
-                    .Where(i => i.Status == InvoiceStatus.Paid)
+                    .Where(i => i.Status == InvoiceStatus.Paid && !i.HasReceipt)
                     .OrderByDescending(i => i.CreatedDate)
                     .ToList();
 
