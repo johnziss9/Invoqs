@@ -55,6 +55,22 @@ namespace Invoqs.Components.UI
 
         private async Task ConfirmSend()
         {
+            // Check if customer has email before attempting to send
+            if (string.IsNullOrWhiteSpace(Invoice.CustomerEmail))
+            {
+                errorMessage = "Cannot send invoice: Customer has no email address.";
+                showSendConfirmation = false;
+                StateHasChanged();
+
+                // Clear error after 5 seconds
+                _ = Task.Delay(5000).ContinueWith(_ =>
+                {
+                    errorMessage = null;
+                    InvokeAsync(StateHasChanged);
+                });
+                return;
+            }
+
             isSending = true;
             StateHasChanged();
 
@@ -62,6 +78,18 @@ namespace Invoqs.Components.UI
             {
                 await OnMarkAsSent.InvokeAsync(Invoice);
                 showSendConfirmation = false;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error sending invoice: {ex.Message}";
+                showSendConfirmation = false;
+
+                // Clear error after 5 seconds
+                _ = Task.Delay(5000).ContinueWith(_ =>
+                {
+                    errorMessage = null;
+                    InvokeAsync(StateHasChanged);
+                });
             }
             finally
             {
