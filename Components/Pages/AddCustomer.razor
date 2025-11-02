@@ -102,7 +102,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">VAT Number</label>
                                 <InputText @bind-Value="newCustomer.VatNumber" @bind-Value:after="UpdatePreview" 
-                                          class="@GetFieldErrorClass("VatNumber")" placeholder="GB123456789" />
+                                          class="@GetFieldErrorClass("VatNumber")" placeholder="12345678A" />
                                 @if (validationErrors?.GetFieldErrors("VatNumber").Any() == true)
                                 {
                                     @foreach (var error in validationErrors.GetFieldErrors("VatNumber"))
