@@ -173,8 +173,10 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Invoice #</th>
-                                        <th>Date</th>
-                                        <th class="text-end">Amount</th>
+                                        <th>Invoice Date</th>
+                                        <th class="text-end">Invoice Amount</th>
+                                        <th>Payment Date</th>
+                                        <th>Payment Method</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -190,6 +192,26 @@
                                             </td>
                                             <td class="text-end">
                                                 <span class="fw-medium">£@invoice.AllocatedAmount.ToString("N2")</span>
+                                            </td>
+                                            <td>
+                                                @if (invoice.PaymentDate.HasValue)
+                                                {
+                                                    <span class="text-muted">@invoice.PaymentDate.Value.ToString("dd MMM yyyy")</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrWhiteSpace(invoice.PaymentMethod))
+                                                {
+                                                    <span class="badge bg-info">@invoice.PaymentMethod</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
                                             </td>
                                             <td class="text-end">
                                                 <a href="/invoice/@invoice.InvoiceId" class="btn btn-sm btn-outline-primary">
