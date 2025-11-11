@@ -3,7 +3,7 @@
 @using Invoqs.Components.UI
 @using Invoqs.Models
 
-<PageTitle>Create Receipt - Invoqs</PageTitle>
+<PageTitle>Δημιουργία Απόδειξης - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -11,9 +11,9 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/receipts" class="text-decoration-none">Receipts</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Create Receipt</li>
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/receipts" class="text-decoration-none">Αποδείξεις</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Δημιουργία Απόδειξης</li>
         </ol>
     </nav>
 
@@ -22,8 +22,8 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h2 class="text-primary mb-1">Create Receipt</h2>
-                    <p class="text-muted mb-0">Select paid invoices and generate a payment receipt</p>
+                    <h2 class="text-primary mb-1">Δημιουργία Απόδειξης</h2>
+                    <p class="text-muted mb-0">Επιλέξτε πληρωμένα τιμολόγια και δημιουργήστε απόδειξη πληρωμής</p>
                 </div>
             </div>
         </div>
@@ -45,20 +45,20 @@
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0">
                         <i class="bi bi-person-fill me-2"></i>
-                        Step 1: Select Customer
+                        Βήμα 1: Επιλογή Πελάτη
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold required">Customer</label>
+                        <label class="form-label fw-bold required">Πελάτης</label>
                         <select class="form-select" @bind="selectedCustomerId" @bind:after="OnCustomerSelected">
-                            <option value="0">-- Select Customer --</option>
+                            <option value="0">-- Επιλέξτε Πελάτη --</option>
                             @foreach (var customer in customers)
                             {
                                 <option value="@customer.Id">@customer.Name</option>
                             }
                         </select>
-                        <div class="form-text">Select the customer for this receipt</div>
+                        <div class="form-text">Επιλέξτε τον πελάτη για αυτήν την απόδειξη</div>
                     </div>
                 </div>
             </div>
@@ -70,21 +70,21 @@
                     <div class="card-header bg-white py-3">
                         <h5 class="mb-0">
                             <i class="bi bi-geo-alt-fill me-2"></i>
-                            Step 2: Filter by Address (Optional)
+                            Βήμα 2: Φιλτράρισμα κατά Διεύθυνση (Προαιρετικό)
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Filter by Address</label>
+                            <label class="form-label fw-bold">Φιλτράρισμα κατά Διεύθυνση</label>
                             <select class="form-select" @bind="selectedAddress" @bind:after="FilterInvoices">
-                                <option value="">All Addresses</option>
+                                <option value="">Όλες οι Διευθύνσεις</option>
                                 @foreach (var address in customerAddresses)
                                 {
                                     <option value="@address">@address</option>
                                 }
                             </select>
                             <div class="form-text">
-                                You can select invoices from one or multiple addresses for this customer
+                                Μπορείτε να επιλέξετε τιμολόγια από μία ή περισσότερες διευθύνσεις για αυτόν τον πελάτη
                             </div>
                         </div>
                     </div>
@@ -98,16 +98,16 @@
                     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             <i class="bi bi-file-earmark-text-fill me-2"></i>
-                            Step 3: Select Invoices
+                            Βήμα 3: Επιλογή Τιμολογίων
                         </h5>
                         @if (filteredInvoices.Any())
                         {
                             <div>
                                 <button class="btn btn-sm btn-outline-primary me-2" @onclick="SelectAllInvoices">
-                                    <i class="bi bi-check-square"></i> Select All
+                                    <i class="bi bi-check-square"></i> Επιλογή Όλων
                                 </button>
                                 <button class="btn btn-sm btn-outline-secondary" @onclick="DeselectAllInvoices">
-                                    <i class="bi bi-square"></i> Deselect All
+                                    <i class="bi bi-square"></i> Αποεπιλογή Όλων
                                 </button>
                             </div>
                         }
@@ -117,19 +117,19 @@
                         {
                             <div class="text-center py-4">
                                 <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading invoices...</span>
+                                    <span class="visually-hidden">Φόρτωση τιμολογίων...</span>
                                 </div>
-                                <p class="mt-2 text-muted">Loading paid invoices...</p>
+                                <p class="mt-2 text-muted">Φόρτωση πληρωμένων τιμολογίων...</p>
                             </div>
                         }
                         else if (!filteredInvoices.Any())
                         {
                             <div class="alert alert-info mb-0">
                                 <i class="bi bi-info-circle-fill me-2"></i>
-                                No paid invoices found for this customer
+                                Δεν βρέθηκαν πληρωμένα τιμολόγια για αυτόν τον πελάτη
                                 @if (!string.IsNullOrEmpty(selectedAddress))
                                 {
-                                    <text> at address: @selectedAddress</text>
+                                    <text> στη διεύθυνση: @selectedAddress</text>
                                 }
                             </div>
                         }
@@ -140,11 +140,11 @@
                                     <thead class="table-light" style="position: sticky; top: 0; z-index: 10;">
                                         <tr>
                                             <th style="width: 50px;"></th>
-                                            <th>Invoice #</th>
-                                            <th>Address</th>
-                                            <th>Date</th>
-                                            <th>Due Date</th>
-                                            <th class="text-end">Amount</th>
+                                            <th>Αρ. Τιμολογίου</th>
+                                            <th>Διεύθυνση</th>
+                                            <th>Ημερομηνία</th>
+                                            <th>Ημερ. Λήξης</th>
+                                            <th class="text-end">Ποσό</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -170,7 +170,7 @@
                                                 <td>@invoice.CreatedDate.ToString("dd MMM yyyy")</td>
                                                 <td>@invoice.DueDate.ToString("dd MMM yyyy")</td>
                                                 <td class="text-end">
-                                                    <strong>£@invoice.Total.ToString("N2")</strong>
+                                                    <strong>€@invoice.Total.ToString("N2")</strong>
                                                 </td>
                                             </tr>
                                         }
@@ -181,11 +181,11 @@
                             <div class="mt-3 p-3 bg-light rounded">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <strong>@selectedInvoiceIds.Count</strong> invoice(s) selected
+                                        <strong>@selectedInvoiceIds.Count</strong> τιμολόγιο(α) επιλεγμένα
                                     </div>
                                     <div class="col-md-6 text-end">
                                         <strong class="text-primary">
-                                            Total: £@CalculateTotalAmount().ToString("N2")
+                                            Σύνολο: €@CalculateTotalAmount().ToString("N2")
                                         </strong>
                                     </div>
                                 </div>
@@ -204,23 +204,23 @@
                     <div class="card-header bg-primary text-white py-3">
                         <h6 class="mb-0 text-white">
                             <i class="bi bi-credit-card-fill me-2"></i>
-                            Receipt Details
+                            Λεπτομέρειες Απόδειξης
                         </h6>
                     </div>
                     <div class="card-body">
                         <!-- Summary -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-2">
-                                <span>Selected Invoices:</span>
+                                <span>Επιλεγμένα Τιμολόγια:</span>
                                 <strong>@selectedInvoiceIds.Count</strong>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
-                                <span>Customer:</span>
+                                <span>Πελάτης:</span>
                                 <strong>@GetSelectedCustomerName()</strong>
                             </div>
                             <div class="d-flex justify-content-between text-primary fs-5">
-                                <span>Total Amount:</span>
-                                <strong>£@CalculateTotalAmount().ToString("N2")</strong>
+                                <span>Συνολικό Ποσό:</span>
+                                <strong>€@CalculateTotalAmount().ToString("N2")</strong>
                             </div>
                         </div>
 
@@ -233,17 +233,17 @@
                             @if (isCreating)
                             {
                                 <span class="spinner-border spinner-border-sm me-2"></span>
-                                <text>Generating Receipt...</text>
+                                <text>Δημιουργία Απόδειξης...</text>
                             }
                             else
                             {
                                 <i class="bi bi-receipt me-2"></i>
-                                <text>Generate Receipt</text>
+                                <text>Δημιουργία Απόδειξης</text>
                             }
                         </button>
 
                         <a href="/receipts" class="btn btn-outline-secondary w-100 mt-2">
-                            Cancel
+                            Ακύρωση
                         </a>
                     </div>
                 </div>
@@ -254,7 +254,7 @@
                     <div class="card-body text-center py-5">
                         <i class="bi bi-info-circle text-muted" style="font-size: 3rem;"></i>
                         <p class="text-muted mt-3 mb-0">
-                            Select at least one invoice to continue
+                            Επιλέξτε τουλάχιστον ένα τιμολόγιο για να συνεχίσετε
                         </p>
                     </div>
                 </div>

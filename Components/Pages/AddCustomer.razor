@@ -4,7 +4,7 @@
 @using Invoqs.Models
 @using Invoqs.Services
 
-<PageTitle>Add New Customer - Invoqs</PageTitle>
+<PageTitle>Προσθήκη Νέου Πελάτη - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -12,9 +12,9 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Customers</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Add New Customer</li>
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Πελάτες</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Προσθήκη Νέου Πελάτη</li>
         </ol>
     </nav>
 
@@ -23,7 +23,7 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h2 class="text-primary mb-1">Add New Customer</h2>
+                    <h2 class="text-primary mb-1">Προσθήκη Νέου Πελάτη</h2>
                 </div>
             </div>
         </div>
@@ -37,15 +37,15 @@
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white py-3">
-                        <h5 class="mb-0">Customer Information</h5>
+                        <h5 class="mb-0">Στοιχεία Πελάτη</h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
                             <!-- Customer Name -->
                             <div class="col-12">
-                                <label class="form-label required">Customer Name</label>
+                                <label class="form-label required">Όνομα Πελάτη</label>
                                 <InputText @bind-Value="newCustomer.Name" @bind-Value:after="UpdatePreview" 
-                                          class="@GetFieldErrorClass("Name")" placeholder="Enter customer or company name" />
+                                        class="@GetFieldErrorClass("Name")" placeholder="Εισάγετε όνομα πελάτη ή εταιρείας" />
                                 <ValidationMessage For="@(() => newCustomer.Name)" class="text-danger small" />
                                 @if (validationErrors?.GetFieldErrors("Name").Any() == true)
                                 {
@@ -54,14 +54,14 @@
                                         <div class="text-danger small">@error</div>
                                     }
                                 }
-                                <div class="form-text">Enter the full business name or individual customer name</div>
+                                <div class="form-text">Εισάγετε την πλήρη επωνυμία επιχείρησης ή το όνομα του ατομικού πελάτη</div>
                             </div>
 
                             <!-- Email and Phone -->
                             <div class="col-md-6">
-                                <label class="form-label required">Email Address</label>
+                                <label class="form-label required">Email</label>
                                 <InputText @bind-Value="newCustomer.Email" @bind-Value:after="UpdatePreview" 
-                                          class="@GetFieldErrorClass("Email")" type="email" placeholder="customer@example.com" />
+                                        class="@GetFieldErrorClass("Email")" type="email" placeholder="pelatis@example.com" />
                                 <ValidationMessage For="@(() => newCustomer.Email)" class="text-danger small" />
                                 @if (validationErrors?.GetFieldErrors("Email").Any() == true)
                                 {
@@ -72,10 +72,9 @@
                                 }
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label required">Phone Number</label>
+                                <label class="form-label required">Αριθμός Τηλεφώνου</label>
                                 <InputText @bind-Value="newCustomer.Phone" @bind-Value:after="UpdatePreview" 
-                                          class="@GetFieldErrorClass("Phone")" placeholder="01234 567890" />
-                                <ValidationMessage For="@(() => newCustomer.Phone)" class="text-danger small" />
+                                        class="@GetFieldErrorClass("Phone")" placeholder="01234 567890" />
                                 @if (validationErrors?.GetFieldErrors("Phone").Any() == true)
                                 {
                                     @foreach (var error in validationErrors.GetFieldErrors("Phone"))
@@ -87,9 +86,9 @@
 
                             <!-- Business Details -->
                             <div class="col-md-6">
-                                <label class="form-label">Company Registration Number</label>
+                                <label class="form-label">Αριθμός Μητρώου Εταιρείας</label>
                                 <InputText @bind-Value="newCustomer.CompanyRegistrationNumber" @bind-Value:after="UpdatePreview" 
-                                          class="@GetFieldErrorClass("CompanyRegistrationNumber")" placeholder="Optional" />
+                                        class="@GetFieldErrorClass("CompanyRegistrationNumber")" placeholder="Προαιρετικό" />
                                 @if (validationErrors?.GetFieldErrors("CompanyRegistrationNumber").Any() == true)
                                 {
                                     @foreach (var error in validationErrors.GetFieldErrors("CompanyRegistrationNumber"))
@@ -97,12 +96,12 @@
                                         <div class="text-danger small">@error</div>
                                     }
                                 }
-                                <div class="form-text">For limited companies only</div>
+                                <div class="form-text">Μόνο για εταιρείες περιορισμένης ευθύνης</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">VAT Number</label>
+                                <label class="form-label">ΑΦΜ</label>
                                 <InputText @bind-Value="newCustomer.VatNumber" @bind-Value:after="UpdatePreview" 
-                                          class="@GetFieldErrorClass("VatNumber")" placeholder="12345678A" />
+                                        class="@GetFieldErrorClass("VatNumber")" placeholder="12345678A" />
                                 @if (validationErrors?.GetFieldErrors("VatNumber").Any() == true)
                                 {
                                     @foreach (var error in validationErrors.GetFieldErrors("VatNumber"))
@@ -110,15 +109,15 @@
                                         <div class="text-danger small">@error</div>
                                     }
                                 }
-                                <div class="form-text">If VAT registered</div>
+                                <div class="form-text">Εάν είναι εγγεγραμμένος στο ΦΠΑ</div>
                             </div>
 
                             <!-- Notes -->
                             <div class="col-12">
-                                <label class="form-label">Notes</label>
+                                <label class="form-label">Σημειώσεις</label>
                                 <InputTextArea @bind-Value="newCustomer.Notes" @bind-Value:after="UpdatePreview" 
-                                              class="@GetFieldErrorClass("Notes")" rows="4" 
-                                              placeholder="Any additional notes about this customer..." />
+                                            class="@GetFieldErrorClass("Notes")" rows="4" 
+                                            placeholder="Οποιεσδήποτε πρόσθετες σημειώσεις για αυτόν τον πελάτη..." />
                                 @if (validationErrors?.GetFieldErrors("Notes").Any() == true)
                                 {
                                     @foreach (var error in validationErrors.GetFieldErrors("Notes"))
@@ -126,7 +125,7 @@
                                         <div class="text-danger small">@error</div>
                                     }
                                 }
-                                <div class="form-text">Special requirements, preferences, or important information</div>
+                                <div class="form-text">Ειδικές απαιτήσεις, προτιμήσεις ή σημαντικές πληροφορίες</div>
                             </div>
                         </div>
                     </div>
@@ -154,7 +153,7 @@
                             </div>
                             <div class="d-flex gap-2">
                                 <a href="@GetReturnUrl()" class="btn btn-outline-secondary">
-                                    Cancel
+                                    Ακύρωση
                                 </a>
                                 <button type="submit" class="btn btn-primary" disabled="@isSaving">
                                     @if (isSaving)
@@ -165,7 +164,7 @@
                                     {
                                         <i class="bi bi-check-lg me-1"></i>
                                     }
-                                    @(isSaving ? "Creating..." : "Create Customer")
+                                    @(isSaving ? "Δημιουργία..." : "Δημιουργία Πελάτη")
                                 </button>
                             </div>
                         </div>
@@ -180,7 +179,7 @@
                     <div class="card-header bg-primary text-white py-3">
                         <h6 class="mb-0 text-white">
                             <i class="bi bi-eye me-2"></i>
-                            Customer Preview
+                            Προεπισκόπηση Πελάτη
                         </h6>
                     </div>
                     <div class="card-body">
@@ -188,21 +187,21 @@
                             <div class="avatar-circle bg-primary text-white mx-auto mb-2">
                                 @GetCustomerInitials()
                             </div>
-                            <h5 class="mb-1">@(string.IsNullOrWhiteSpace(newCustomer.Name) ? "Customer Name" : newCustomer.Name)</h5>
-                            <small class="text-muted">New Customer</small>
+                            <h5 class="mb-1">@(string.IsNullOrWhiteSpace(newCustomer.Name) ? "Όνομα Πελάτη" : newCustomer.Name)</h5>
+                            <small class="text-muted">Νέος Πελάτης</small>
                         </div>
 
                         <div class="customer-details">
                             <div class="detail-row mb-2">
                                 <i class="bi bi-envelope text-muted me-2"></i>
                                 <span class="@(string.IsNullOrWhiteSpace(newCustomer.Email) ? "text-muted" : "")">
-                                    @(string.IsNullOrWhiteSpace(newCustomer.Email) ? "Email address" : newCustomer.Email)
+                                    @(string.IsNullOrWhiteSpace(newCustomer.Email) ? "Email" : newCustomer.Email)
                                 </span>
                             </div>
                             <div class="detail-row mb-2">
                                 <i class="bi bi-telephone text-muted me-2"></i>
                                 <span class="@(string.IsNullOrWhiteSpace(newCustomer.Phone) ? "text-muted" : "")">
-                                    @(string.IsNullOrWhiteSpace(newCustomer.Phone) ? "Phone number" : newCustomer.Phone)
+                                    @(string.IsNullOrWhiteSpace(newCustomer.Phone) ? "Αριθμός τηλεφώνου" : newCustomer.Phone)
                                 </span>
                             </div>
 
@@ -210,7 +209,7 @@
                             {
                                 <div class="detail-row mb-2">
                                     <i class="bi bi-building text-muted me-2"></i>
-                                    <span class="small">Co. Reg: @newCustomer.CompanyRegistrationNumber</span>
+                                    <span class="small">Αριθμός Μητρώου: @newCustomer.CompanyRegistrationNumber</span>
                                 </div>
                             }
 
@@ -218,7 +217,7 @@
                             {
                                 <div class="detail-row mb-2">
                                     <i class="bi bi-receipt text-muted me-2"></i>
-                                    <span class="small">VAT: @newCustomer.VatNumber</span>
+                                    <span class="small">ΑΦΜ: @newCustomer.VatNumber</span>
                                 </div>
                             }
 
@@ -226,7 +225,7 @@
                             {
                                 <hr class="my-3">
                                 <div class="notes-preview">
-                                    <small class="text-muted d-block mb-1">Notes:</small>
+                                    <small class="text-muted d-block mb-1">Σημειώσεις:</small>
                                     <small class="text-dark">@newCustomer.Notes</small>
                                 </div>
                             }
@@ -234,18 +233,18 @@
 
                         <hr class="my-3">
                         <div class="text-center">
-                            <small class="text-muted">Customer will be created with:</small>
+                            <small class="text-muted">Ο πελάτης θα δημιουργηθεί με:</small>
                             <div class="row g-2 mt-2">
                                 <div class="col-6">
                                     <div class="bg-light p-2 rounded">
                                         <div class="fw-bold text-success">0</div>
-                                        <small class="text-muted">Active Jobs</small>
+                                        <small class="text-muted">Ενεργές Εργασίες</small>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="bg-light p-2 rounded">
-                                        <div class="fw-bold text-primary">£0</div>
-                                        <small class="text-muted">Revenue</small>
+                                        <div class="fw-bold text-primary">€0</div>
+                                        <small class="text-muted">Έσοδα</small>
                                     </div>
                                 </div>
                             </div>

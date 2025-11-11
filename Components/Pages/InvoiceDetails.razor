@@ -3,7 +3,7 @@
 @using Invoqs.Components.UI
 @using Invoqs.Models
 
-<PageTitle>@(invoice?.InvoiceNumber ?? "Loading...") - Invoice Details - Invoqs</PageTitle>
+<PageTitle>@(invoice?.InvoiceNumber ?? "Φόρτωση...") - Λεπτομέρειες Τιμολογίου - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -11,9 +11,9 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/invoices" class="text-decoration-none">Invoices</a></li>
-            <li class="breadcrumb-item active" aria-current="page">@(invoice?.InvoiceNumber ?? "Invoice Details")</li>
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/invoices" class="text-decoration-none">Τιμολόγια</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@(invoice?.InvoiceNumber ?? "Λεπτομέρειες Τιμολογίου")</li>
         </ol>
     </nav>
 
@@ -23,28 +23,28 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
                     <div>
-                        <h2 class="text-primary mb-1">@(invoice?.InvoiceNumber ?? "Loading...")</h2>
+                        <h2 class="text-primary mb-1">@(invoice?.InvoiceNumber ?? "Φόρτωση...")</h2>
                         @if (invoice != null)
                         {
                             <span class="badge @invoice.StatusBadgeClass badge-sm">
                                 <i class="@invoice.StatusIcon me-1"></i>
-                                @invoice.Status
+                                @invoice.StatusDisplay
                             </span>
                         }
                     </div>
                     @if (invoice != null)
                     {
-                        <p class="text-muted mb-0">Created @invoice.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                        <p class="text-muted mb-0">Δημιουργήθηκε @invoice.CreatedDate.ToString("MMMM dd, yyyy")</p>
                     }
                 </div>
                 <div class="d-flex gap-2 mt-2 mt-md-0">
                     <button class="btn btn-outline-secondary" @onclick="PrintInvoice">
                         <i class="bi bi-printer me-1"></i>
-                        Print
+                        Εκτύπωση
                     </button>
                     <button class="btn btn-primary" @onclick="DownloadPdf">
                         <i class="bi bi-file-earmark-pdf me-1"></i>
-                        Download PDF
+                        Λήψη PDF
                     </button>
                 </div>
             </div>
@@ -55,7 +55,7 @@
     {
         <div class="d-flex justify-content-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">Φόρτωση...</span>
             </div>
         </div>
     }
@@ -63,11 +63,11 @@
     {
         <div class="alert alert-danger" role="alert">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            Invoice not found or an error occurred while loading.
+            Το τιμολόγιο δεν βρέθηκε ή προέκυψε σφάλμα κατά τη φόρτωση.
             <div class="mt-3">
                 <a href="/invoices" class="btn btn-primary">
                     <i class="bi bi-arrow-left me-1"></i>
-                    Back to Invoices
+                    Επιστροφή στα Τιμολόγια
                 </a>
             </div>
         </div>
@@ -99,13 +99,13 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white py-3">
                         <h5 class="mb-0">
-                            <i class="bi bi-receipt me-2"></i>Invoice Information
+                            <i class="bi bi-receipt me-2"></i>Πληροφορίες Τιμολογίου
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <h6 class="text-primary mb-3">From</h6>
+                                <h6 class="text-primary mb-3">Από</h6>
                                 <div>
                                     <strong>Your Company Name</strong><br>
                                     123 Business Street<br>
@@ -115,7 +115,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <h6 class="text-success mb-3">Bill To</h6>
+                                <h6 class="text-success mb-3">Χρέωση Σε</h6>
                                 @if (customer != null)
                                 {
                                     <div>
@@ -140,22 +140,22 @@
                         <hr class="my-4">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label fw-medium">Invoice Date</label>
+                                <label class="form-label fw-medium">Ημερομηνία Τιμολογίου</label>
                                 <div class="form-control-plaintext">@invoice?.CreatedDate.ToString("dd MMM yyyy")</div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-medium">Due Date</label>
+                                <label class="form-label fw-medium">Ημερομηνία Λήξης</label>
                                 <div class="form-control-plaintext @(invoice!.IsOverdue ? "text-danger" : "")">
                                     @invoice.DueDate.ToString("dd MMM yyyy")
                                     @if (invoice.IsOverdue)
                                     {
-                                        <small class="text-danger">(Overdue)</small>
+                                        <small class="text-danger">(Καθυστερημένο)</small>
                                     }
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-medium">Payment Terms</label>
-                                <div class="form-control-plaintext">@invoice.PaymentTermsDays days</div>
+                                <label class="form-label fw-medium">Όροι Πληρωμής</label>
+                                <div class="form-control-plaintext">@invoice.PaymentTermsDays ημέρες</div>
                             </div>
                         </div>
                     </div>
@@ -165,7 +165,7 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white py-3">
                         <h5 class="mb-0">
-                            <i class="bi bi-list-ul me-2"></i>Services Provided
+                            <i class="bi bi-list-ul me-2"></i>Υπηρεσίες που Παρασχέθηκαν
                         </h5>
                     </div>
                     <div class="card-body">
@@ -173,9 +173,9 @@
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Description</th>
-                                        <th>Date</th>
-                                        <th class="text-end">Amount</th>
+                                        <th>Περιγραφή</th>
+                                        <th>Ημερομηνία</th>
+                                        <th class="text-end">Ποσό</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -192,7 +192,7 @@
                                                 }
                                             </td>
                                             <td class="text-end">
-                                                <span class="fw-medium">£@item.LineTotal.ToString("N2")</span>
+                                                <span class="fw-medium">€@item.LineTotal.ToString("N2")</span>
                                             </td>
                                         </tr>
                                     }
@@ -206,7 +206,7 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white py-3">
                         <h5 class="mb-0">
-                            <i class="bi bi-calculator me-2"></i>Invoice Total
+                            <i class="bi bi-calculator me-2"></i>Σύνολο Τιμολογίου
                         </h5>
                     </div>
                     <div class="card-body">
@@ -214,7 +214,7 @@
                             <div class="col-md-6">
                                 @if (!string.IsNullOrWhiteSpace(invoice.Notes))
                                 {
-                                    <label class="form-label fw-medium">Notes</label>
+                                    <label class="form-label fw-medium">Σημειώσεις</label>
                                     <div class="border rounded p-3 bg-light">
                                         @invoice.Notes
                                     </div>
@@ -223,17 +223,17 @@
                             <div class="col-md-6">
                                 <div class="border rounded p-3 bg-light">
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span>Subtotal:</span>
-                                        <span>£@invoice.Subtotal.ToString("N2")</span>
+                                        <span>Υποσύνολο:</span>
+                                        <span>€@invoice.Subtotal.ToString("N2")</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span>VAT (@(invoice.VatRate)%):</span>
-                                        <span>£@invoice.VatAmount.ToString("N2")</span>
+                                        <span>ΦΠΑ (@(invoice.VatRate)%):</span>
+                                        <span>€@invoice.VatAmount.ToString("N2")</span>
                                     </div>
                                     <hr>
                                     <div class="d-flex justify-content-between">
-                                        <strong>Total:</strong>
-                                        <strong class="text-primary">£@invoice.Total.ToString("N2")</strong>
+                                        <strong>Σύνολο:</strong>
+                                        <strong class="text-primary">€@invoice.Total.ToString("N2")</strong>
                                     </div>
                                 </div>
                             </div>
@@ -247,23 +247,23 @@
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-success text-white py-3">
                             <h5 class="mb-0">
-                                <i class="bi bi-check-circle me-2"></i>Payment Received
+                                <i class="bi bi-check-circle me-2"></i>Πληρωμή Ελήφθη
                             </h5>
                         </div>
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label class="form-label fw-medium">Payment Date</label>
+                                    <label class="form-label fw-medium">Ημερομηνία Πληρωμής</label>
                                     <div class="form-control-plaintext">@invoice.PaidDate.Value.ToString("dd MMM yyyy")</div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-medium">Payment Method</label>
-                                    <div class="form-control-plaintext">@(invoice.PaymentMethod ?? "Not specified")</div>
+                                    <label class="form-label fw-medium">Μέθοδος Πληρωμής</label>
+                                    <div class="form-control-plaintext">@(invoice.PaymentMethod ?? "Δεν καθορίστηκε")</div>
                                 </div>
                                 @if (!string.IsNullOrWhiteSpace(invoice.PaymentReference))
                                 {
                                     <div class="col-md-4">
-                                        <label class="form-label fw-medium">Payment Reference</label>
+                                        <label class="form-label fw-medium">Αναφορά Πληρωμής</label>
                                         <div class="form-control-plaintext">@invoice.PaymentReference</div>
                                     </div>
                                 }
@@ -280,7 +280,7 @@
                 {
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h6 class="mb-0">Invoice Actions</h6>
+                            <h6 class="mb-0">Ενέργειες Τιμολογίου</h6>
                         </div>
                         <div class="card-body">
                             @if (invoice.Status == InvoiceStatus.Draft)
@@ -288,7 +288,7 @@
                                 <div class="d-grid gap-2">
                                     <a href="/invoice/@invoice.Id/edit?returnUrl=@Uri.EscapeDataString($"/invoice/{invoice.Id}")" class="btn btn-primary btn-sm">
                                         <i class="bi bi-pencil me-1"></i>
-                                        Edit Invoice
+                                        Επεξεργασία Τιμολογίου
                                     </a>
                                     
                                     <button class="btn btn-success btn-sm" @onclick="() => showSendConfirmation = true" disabled="@isProcessing">
@@ -297,7 +297,7 @@
                                             <span class="spinner-border spinner-border-sm me-2"></span>
                                         }
                                         <i class="bi bi-send me-1"></i>
-                                        Send via Email
+                                        Αποστολή με Email
                                     </button>
                                     
                                     <button class="btn btn-info btn-sm" @onclick="() => showDeliveredConfirmation = true" disabled="@isProcessing">
@@ -306,7 +306,7 @@
                                             <span class="spinner-border spinner-border-sm me-2"></span>
                                         }
                                         <i class="bi bi-hand-thumbs-up me-1"></i>
-                                        Mark as Delivered
+                                        Σημείωση ως Παραδοθέν
                                     </button>
                                     
                                     <hr class="my-3">
@@ -321,7 +321,7 @@
                                     {
                                         <button class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteConfirmation">
                                             <i class="bi bi-trash me-1"></i>
-                                            Delete Invoice
+                                            Διαγραφή Τιμολογίου
                                         </button>
                                     }
                                 </div>
@@ -338,13 +338,13 @@
                                                 <span class="spinner-border spinner-border-sm me-2"></span>
                                             }
                                             <i class="bi bi-send me-1"></i>
-                                            Send via Email
+                                            Αποστολή με Email
                                         </button>
                                     }
                                     
                                     <button class="btn btn-success btn-sm" @onclick="() => showMarkAsPaidConfirmation = true">
                                         <i class="bi bi-check-circle me-1"></i>
-                                        Mark as Paid
+                                        Σημείωση ως Πληρωμένο
                                     </button>
                                     
                                     @* Show "Resend Invoice" button ONLY if invoice has been sent (IsSent = true) *@
@@ -357,14 +357,14 @@
                                                 <span class="spinner-border spinner-border-sm me-2"></span>
                                             }
                                             <i class="bi bi-envelope me-1"></i>
-                                            Resend Invoice
+                                            Επαναποστολή Τιμολογίου
                                         </button>
                                     }
                                     
                                     <hr class="my-3">
                                     <button class="btn btn-outline-danger btn-sm" @onclick="() => showCancelModal = true">
                                         <i class="bi bi-x-circle me-1"></i>
-                                        Cancel Invoice
+                                        Ακύρωση Τιμολογίου
                                     </button>
                                 </div>
                             }
@@ -375,20 +375,20 @@
                 <!-- Invoice Summary -->
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white py-3">
-                        <h6 class="mb-0">Invoice Summary</h6>
+                        <h6 class="mb-0">Σύνοψη Τιμολογίου</h6>
                     </div>
                     <div class="card-body">
                         <div class="row text-center g-3">
                             <div class="col-6">
                                 <div class="border rounded p-2">
-                                    <div class="h4 text-primary mb-1">£@invoice.Total.ToString("N0")</div>
-                                    <small class="text-muted">Total Amount</small>
+                                    <div class="h4 text-primary mb-1">€@invoice.Total.ToString("N0")</div>
+                                    <small class="text-muted">Συνολικό Ποσό</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="border rounded p-2">
                                     <div class="h4 text-info mb-1">@invoice.LineItems.Count</div>
-                                    <small class="text-muted">Line Items</small>
+                                    <small class="text-muted">Εργασίες</small>
                                 </div>
                             </div>
                             @if (invoice.Status != InvoiceStatus.Paid && invoice.Status != InvoiceStatus.Cancelled)
@@ -399,7 +399,7 @@
                                             @(invoice.DaysUntilDue > 0 ? invoice.DaysUntilDue : Math.Abs(invoice.DaysUntilDue))
                                         </div>
                                         <small class="text-muted">
-                                            @(invoice.IsOverdue ? "Days Overdue" : "Days Until Due")
+                                            @(invoice.IsOverdue ? "Ημέρες Καθυστέρησης" : "Ημέρες μέχρι τη Λήξη")
                                         </small>
                                     </div>
                                 </div>
@@ -408,7 +408,7 @@
                             {
                                 <button class="btn btn-primary btn-sm" @onclick="GoToCreateReceipt">
                                     <i class="bi bi-receipt me-1"></i>
-                                    Create Receipt
+                                    Δημιουργία Απόδειξης
                                 </button>
                             }
                         </div>
@@ -418,20 +418,20 @@
                 <!-- Invoice Details -->
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white py-3">
-                        <h6 class="mb-0">Invoice Details</h6>
+                        <h6 class="mb-0">Λεπτομέρειες Τιμολογίου</h6>
                     </div>
                     <div class="card-body">
                         <div class="small">
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Status:</span>
-                                <span class="badge @invoice.StatusBadgeClass ms-2">@invoice.Status</span>
+                                <span class="text-muted">Κατάσταση:</span>
+                                <span class="badge @invoice.StatusBadgeClass ms-2">@invoice.StatusDisplay</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Created:</span>
+                                <span class="text-muted">Δημιουργήθηκε:</span>
                                 <span class="fw-medium">@invoice.CreatedDate.ToString("dd/MM/yyyy")</span>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted">VAT Rate:</span>
+                                <span class="text-muted">Συντελεστής ΦΠΑ:</span>
                                 <span class="fw-medium">@invoice.VatRate%</span>
                             </div>
                         </div>
@@ -444,10 +444,10 @@
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
                             <h6 class="mb-0">
-                                Customer Details
+                                Λεπτομέρειες Πελάτη
                                 @if (isCustomerDeleted)
                                 {
-                                    <i class="bi bi-exclamation-triangle text-warning ms-2" title="Customer has been deleted"></i>
+                                    <i class="bi bi-exclamation-triangle text-warning ms-2" title="Ο πελάτης έχει διαγραφεί"></i>
                                 }
                             </h6>
                         </div>
@@ -456,13 +456,13 @@
                             {
                                 <div class="alert alert-warning mb-3">
                                     <i class="bi bi-exclamation-triangle me-2"></i>
-                                    <strong>Customer Deleted:</strong> The customer associated with this invoice has been removed from the system.
+                                    <strong>Ο Πελάτης Διαγράφηκε:</strong> Ο πελάτης που σχετίζεται με αυτό το τιμολόγιο έχει αφαιρεθεί από το σύστημα.
                                 </div>
                             }
                             
                             <div class="small">
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Name:</span>
+                                    <span class="text-muted">Όνομα:</span>
                                     <span class="fw-medium @(isCustomerDeleted ? "text-muted text-decoration-line-through" : "")">
                                         @customer.Name
                                     </span>
@@ -484,7 +484,7 @@
                                 @if (!string.IsNullOrEmpty(customer.Phone))
                                 {
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-muted">Phone:</span>
+                                        <span class="text-muted">Τηλέφωνο:</span>
                                         @if (isCustomerDeleted)
                                         {
                                             <span class="fw-medium text-muted">@customer.Phone</span>
@@ -496,11 +496,11 @@
                                     </div>
                                 }
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Created:</span>
+                                    <span class="text-muted">Δημιουργήθηκε:</span>
                                     <span class="fw-medium">@customer.CreatedDate.ToString("dd/MM/yyyy")</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Last Updated:</span>
+                                    <span class="text-muted">Τελευταία Ενημέρωση:</span>
                                     <span class="fw-medium">@((customer.UpdatedDate ?? customer.CreatedDate).ToString("dd/MM/yyyy"))</span>
                                 </div>
 
@@ -513,7 +513,7 @@
                                             <div class="mb-1">
                                                 <span class="text-success fw-normal">
                                                     <i class="bi bi-briefcase me-1"></i>
-                                                    @((customer.ActiveJobs + customer.NewJobs)) ongoing jobs
+                                                    @((customer.ActiveJobs + customer.NewJobs)) εργασίες σε εξέλιξη
                                                 </span>
                                             </div>
                                         }
@@ -522,7 +522,7 @@
                                             <div class="mb-1">
                                                 <span class="text-muted">
                                                     <i class="bi bi-check-circle me-1"></i>
-                                                    Last job completed
+                                                    Τελευταία εργασία ολοκληρώθηκε
                                                 </span>
                                             </div>
                                         }
@@ -531,7 +531,7 @@
                                             <div class="mb-1">
                                                 <span class="text-muted">
                                                     <i class="bi bi-clock-history me-1"></i>
-                                                    No jobs yet
+                                                    Δεν υπάρχουν εργασίες ακόμα
                                                 </span>
                                             </div>
                                         }
@@ -543,7 +543,7 @@
                                         <div class="mb-1">
                                             <span class="text-warning">
                                                 <i class="bi bi-exclamation-circle me-1"></i>
-                                                @customer.UninvoicedJobs uninvoiced jobs
+                                                @customer.UninvoicedJobs εργασίες χωρίς τιμολόγηση
                                             </span>
                                         </div>
                                     }
@@ -552,8 +552,7 @@
                                     {
                                         <div>
                                             <span class="text-danger">
-                                                <i class="bi bi-currency-pound me-1"></i>
-                                                @customer.UnpaidInvoices unpaid (@customer.OutstandingAmount.ToString("C"))
+                                                @customer.UnpaidInvoices απλήρωτα (€@customer.OutstandingAmount.ToString("C"))
                                             </span>
                                         </div>
                                     }
@@ -561,8 +560,8 @@
                                 else
                                 {
                                     <div class="d-flex justify-content-between">
-                                        <span class="text-muted">Status:</span>
-                                        <span class="badge bg-secondary ms-2">Deleted</span>
+                                        <span class="text-muted">Κατάσταση:</span>
+                                        <span class="badge bg-secondary ms-2">Διαγραμμένος</span>
                                     </div>
                                 }
                             </div>
@@ -575,7 +574,7 @@
                 {
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h6 class="mb-0">Quick Actions</h6>
+                            <h6 class="mb-0">Γρήγορες Ενέργειες</h6>
                         </div>
                         <div class="card-body">
                             <div class="d-grid gap-2">
@@ -584,15 +583,15 @@
                                     <!-- Primary Customer Actions (only show for active customers) -->
                                     <a href="/customer/@customer.Id" class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-person me-1"></i>
-                                        View Customer
+                                        Προβολή Πελάτη
                                     </a>
                                     <a href="/customer/@customer.Id/jobs" class="btn btn-outline-secondary btn-sm">
                                         <i class="bi bi-briefcase me-1"></i>
-                                        Customer Jobs
+                                        Εργασίες Πελάτη
                                     </a>
                                     <a href="/customer/@customer.Id/invoices" class="btn btn-outline-dark btn-sm">
                                         <i class="bi bi-file-earmark-text me-1"></i>
-                                        Customer Invoices
+                                        Τιμολόγια Πελάτη
                                     </a>
                                     
                                     <hr class="my-2">
@@ -600,15 +599,15 @@
                                     <!-- Creation Actions with customer pre-selected -->
                                     <a href="/customer/@customer.Id/job/new?returnUrl=@Uri.EscapeDataString($"/invoice/{Id}")" class="btn btn-outline-success btn-sm">
                                         <i class="bi bi-plus-lg me-1"></i>
-                                        Create New Job
+                                        Δημιουργία Νέας Εργασίας
                                     </a>
                                     <a href="/customer/@customer.Id/invoice/new" class="btn btn-outline-info btn-sm">
                                         <i class="bi bi-receipt me-1"></i>
-                                        Create Invoice
+                                        Δημιουργία Τιμολογίου
                                     </a>
                                     <a href="/receipts/new?customerId=@customer.Id" class="btn btn-outline-warning btn-sm">
                                         <i class="bi bi-receipt-cutoff me-1"></i>
-                                        Create Receipt
+                                        Δημιουργία Απόδειξης
                                     </a>
                                 }
                                 else
@@ -616,16 +615,16 @@
                                     <!-- Global creation links (no customer pre-selected) -->
                                     <a href="/invoice/new" class="btn btn-outline-info btn-sm">
                                         <i class="bi bi-receipt me-1"></i>
-                                        Create Invoice
+                                        Δημιουργία Τιμολογίου
                                     </a>
                                     <a href="/receipts/new" class="btn btn-outline-success btn-sm">
                                         <i class="bi bi-receipt-cutoff me-1"></i>
-                                        Create Receipt
+                                        Δημιουργία Απόδειξης
                                     </a>
                                     
                                     <div class="text-muted text-center mt-2 small">
                                         <i class="bi bi-info-circle me-1"></i>
-                                        Customer-specific actions unavailable
+                                        Οι ενέργειες για συγκεκριμένο πελάτη δεν είναι διαθέσιμες
                                     </div>
                                 }
                             </div>
@@ -644,16 +643,16 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Mark Invoice as Paid</h5>
+                    <h5 class="modal-title">Σημείωση Τιμολογίου ως Πληρωμένο</h5>
                     <button type="button" class="btn-close" @onclick="HideMarkAsPaidConfirmation"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Mark as Paid?</h5>
+                        <h5 class="mt-3">Σημείωση ως Πληρωμένο;</h5>
                         <p class="text-muted">
-                            This will mark invoice <strong>@invoice?.InvoiceNumber</strong> as paid.
-                            Total amount: <strong>£@invoice?.Total.ToString("N2")</strong>
+                            Αυτή η ενέργεια θα σημειώσει το τιμολόγιο <strong>@invoice?.InvoiceNumber</strong> ως πληρωμένο.
+                            Συνολικό ποσό: <strong>€@invoice?.Total.ToString("N2")</strong>
                         </p>
                     </div>
 
@@ -661,29 +660,29 @@
                     <div class="mt-3">
                         <div class="row">
                             <div class="col-6">
-                                <label class="form-label">Payment Date:</label>
+                                <label class="form-label">Ημερομηνία Πληρωμής:</label>
                                 <input type="date" class="form-control" @bind="paymentDate" />
                             </div>
                             <div class="col-6">
-                                <label class="form-label">Payment Method:</label>
+                                <label class="form-label">Μέθοδος Πληρωμής:</label>
                                 <select class="form-select" @bind="paymentMethod">
-                                    <option value="Bank Transfer">Bank Transfer</option>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Cheque">Cheque</option>
-                                    <option value="Credit Card">Credit Card</option>
-                                    <option value="Other">Other</option>
+                                    <option value="Bank Transfer">Τραπεζική Μεταφορά</option>
+                                    <option value="Cash">Μετρητά</option>
+                                    <option value="Cheque">Επιταγή</option>
+                                    <option value="Credit Card">Πιστωτική Κάρτα</option>
+                                    <option value="Other">Άλλο</option>
                                 </select>
                             </div>
                         </div>
                         <div class="mt-2">
-                            <label class="form-label">Payment Reference (optional):</label>
+                            <label class="form-label">Αναφορά Πληρωμής (προαιρετικό):</label>
                             <input type="text" class="form-control" @bind="paymentReference"
-                                placeholder="Transaction ID, check number, etc." />
+                                placeholder="Αναγνωριστικό συναλλαγής, αριθμός επιταγής, κλπ." />
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideMarkAsPaidConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideMarkAsPaidConfirmation">Ακύρωση</button>
                     <button type="button" class="btn btn-success" @onclick="ConfirmMarkAsPaid" disabled="@isMarkingPaid">
                         @if (isMarkingPaid)
                         {
@@ -693,7 +692,7 @@
                         {
                             <i class="bi bi-check-circle me-1"></i>
                         }
-                        @(isMarkingPaid ? "Processing..." : "Mark as Paid")
+                        @(isMarkingPaid ? "Επεξεργασία..." : "Σημείωση ως Πληρωμένο")
                     </button>
                 </div>
             </div>
@@ -708,27 +707,25 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Cancel Invoice</h5>
+                    <h5 class="modal-title">Ακύρωση Τιμολογίου</h5>
                     <button type="button" class="btn-close" @onclick="() => showCancelModal = false"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-triangle me-2"></i>
-                        <strong>Warning!</strong> This action cannot be undone.
+                        <strong>Προειδοποίηση!</strong> Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
                     </div>
-                    <p>Are you sure you want to cancel invoice <strong>@invoice?.InvoiceNumber</strong>?</p>
-                    <p class="text-muted">This will mark the invoice as cancelled and make the associated jobs available for
-                        invoicing again.</p>
+                    <p>Είστε σίγουροι ότι θέλετε να ακυρώσετε το τιμολόγιο <strong>@invoice?.InvoiceNumber</strong>;</p>
+                    <p class="text-muted">Αυτή η ενέργεια θα σημειώσει το τιμολόγιο ως ακυρωμένο και θα κάνει τις σχετικές εργασίες διαθέσιμες για τιμολόγηση ξανά.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="() => showCancelModal = false">Keep
-                        Invoice</button>
+                    <button type="button" class="btn btn-secondary" @onclick="() => showCancelModal = false">Διατήρηση Τιμολογίου</button>
                     <button type="button" class="btn btn-danger" @onclick="CancelInvoice" disabled="@isProcessing">
                         @if (isProcessing)
                         {
                             <span class="spinner-border spinner-border-sm me-2"></span>
                         }
-                        Cancel Invoice
+                        Ακύρωση Τιμολογίου
                     </button>
                 </div>
             </div>
@@ -743,57 +740,57 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">@(invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "Resend" : "Send") Invoice</h5>
+                    <h5 class="modal-title">@(invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "Επαναποστολή" : "Αποστολή") Τιμολογίου</h5>
                     <button type="button" class="btn-close" @onclick="() => showSendConfirmation = false"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-envelope text-primary" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">@(invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "Resend" : "Send") Invoice to Customer?</h5>
+                        <h5 class="mt-3">@(invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "Επαναποστολή" : "Αποστολή") Τιμολογίου στον Πελάτη;</h5>
                         <p class="text-muted">
-                            This will @(invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "resend" : "send") invoice
-                            <strong>@invoice?.InvoiceNumber</strong> to
+                            Αυτή η ενέργεία θα @(invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "επαναποστείλει" : "αποστείλει") το τιμολόγιο
+                            <strong>@invoice?.InvoiceNumber</strong> στον/στην
                             <strong>@invoice?.CustomerName</strong>.
                         </p>
                         @if (!string.IsNullOrEmpty(invoice?.CustomerEmail))
                         {
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle me-2"></i>
-                                Invoice will be sent to: <strong>@invoice.CustomerEmail</strong>
+                                Το τιμολόγιο θα σταλεί στο: <strong>@invoice.CustomerEmail</strong>
                             </div>
                         }
                         else
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Warning:</strong> Customer email address is not available.
+                                <strong>Προειδοποίηση:</strong> Η διεύθυνση email του πελάτη δεν είναι διαθέσιμη.
                             </div>
                         }
                         @if (invoice?.Status == InvoiceStatus.Draft)
                         {
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle me-2"></i>
-                                This invoice is currently in draft status. Sending will finalize the invoice.
+                                Αυτό το τιμολόγιο είναι αυτή τη στιγμή σε κατάσταση προσχεδίου. Η αποστολή θα οριστικοποιήσει το τιμολόγιο.
                             </div>
                         }
                         @if ((invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue) && invoice.SentDate.HasValue)
                         {
                             <div class="alert alert-secondary">
                                 <i class="bi bi-clock-history me-2"></i>
-                                Previously sent on: <strong>@invoice.SentDate.Value.ToString("dd MMM yyyy 'at' HH:mm")</strong>
+                                Στάλθηκε προηγουμένως στις: <strong>@invoice.SentDate.Value.ToString("dd MMM yyyy 'at' HH:mm")</strong>
                             </div>
                         }
                         @if (invoice?.Total > 1000)
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>High Value Invoice:</strong> This invoice is for £@invoice.Total.ToString("N2"). Please verify all details are correct.
+                                <strong>Τιμολόγιο Υψηλής Αξίας:</strong> Αυτό το τιμολόγιο είναι για €@invoice.Total.ToString("N2"). Παρακαλώ επαληθεύστε ότι όλες οι λεπτομέρειες είναι σωστές.
                             </div>
                         }
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="() => showSendConfirmation = false">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="() => showSendConfirmation = false">Ακύρωση</button>
                     <button type="button" class="btn btn-success" @onclick="ConfirmSend" 
                         disabled="@(isProcessing || string.IsNullOrEmpty(invoice?.CustomerEmail))">
                         @if (isProcessing)
@@ -804,7 +801,7 @@
                         {
                             <i class="bi bi-send me-1"></i>
                         }
-                        @(isProcessing ? "Sending..." : (invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "Resend Invoice" : "Send Invoice"))
+                        @(isProcessing ? "Αποστολή..." : (invoice!.Status == InvoiceStatus.Sent || invoice.Status == InvoiceStatus.Delivered || invoice.Status == InvoiceStatus.Overdue ? "Επαναποστολή Τιμολογίου" : "Αποστολή Τιμολογίου"))
                     </button>
                 </div>
             </div>
@@ -819,25 +816,25 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Delete Invoice</h5>
+                    <h5 class="modal-title">Διαγραφή Τιμολογίου</h5>
                     <button type="button" class="btn-close" @onclick="() => showDeleteModal = false"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Are you sure?</h5>
+                        <h5 class="mt-3">Είστε σίγουροι;</h5>
                         <p class="text-muted">
-                            This will permanently delete invoice <strong>@invoice?.InvoiceNumber</strong>.
-                            This action cannot be undone.
+                            Αυτή η ενέργεια θα διαγράψει οριστικά το τιμολόγιο <strong>@invoice?.InvoiceNumber</strong>.
+                            Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
                         </p>
                         <div class="alert alert-warning">
                             <i class="bi bi-exclamation-triangle me-2"></i>
-                            Deleting this invoice will make the associated jobs available for invoicing again.
+                            Η διαγραφή αυτού του τιμολογίου θα κάνει τις σχετικές εργασίες διαθέσιμες για τιμολόγηση ξανά.
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="() => showDeleteModal = false">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="() => showDeleteModal = false">Ακύρωση</button>
                     <button type="button" class="btn btn-danger" @onclick="DeleteInvoice" disabled="@isDeleting">
                         @if (isDeleting)
                         {
@@ -847,7 +844,7 @@
                         {
                             <i class="bi bi-trash me-1"></i>
                         }
-                        @(isDeleting ? "Deleting..." : "Delete Invoice")
+                        @(isDeleting ? "Διαγραφή..." : "Διαγραφή Τιμολογίου")
                     </button>
                 </div>
             </div>
@@ -862,25 +859,25 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Mark Invoice as Delivered</h5>
+                    <h5 class="modal-title">Σημείωση Τιμολογίου ως Παραδοθέν</h5>
                     <button type="button" class="btn-close" @onclick="() => showDeliveredConfirmation = false"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-hand-thumbs-up text-info" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Mark as Delivered?</h5>
+                        <h5 class="mt-3">Σημείωση ως Παραδοθέν;</h5>
                         <p class="text-muted">
-                            This will mark invoice <strong>@invoice?.InvoiceNumber</strong> as hand-delivered to the customer.
-                            The invoice status will be changed to "Delivered".
+                            Αυτή η ενέργεια θα σημειώσει το τιμολόγιο <strong>@invoice?.InvoiceNumber</strong> ως παραδοθέν στον πελάτη.
+                            Η κατάσταση του τιμολογίου θα αλλάξει σε "Παραδοθέν".
                         </p>
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
-                            You can still send this invoice via email later if needed.
+                            Μπορείτε ακόμα να στείλετε αυτό το τιμολόγιο με email αργότερα αν χρειαστεί.
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="() => showDeliveredConfirmation = false">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="() => showDeliveredConfirmation = false">Ακύρωση</button>
                     <button type="button" class="btn btn-info" @onclick="ConfirmDeliver" disabled="@isProcessing">
                         @if (isProcessing)
                         {
@@ -890,7 +887,7 @@
                         {
                             <i class="bi bi-hand-thumbs-up me-1"></i>
                         }
-                        @(isProcessing ? "Processing..." : "Mark as Delivered")
+                        @(isProcessing ? "Επεξεργασία..." : "Σημείωση ως Παραδοθέν")
                     </button>
                 </div>
             </div>

@@ -4,7 +4,7 @@
 @using Invoqs.Components.UI
 @using Invoqs.Models
 
-<PageTitle>Dashboard - Invoqs</PageTitle>
+<PageTitle>Πίνακας Ελέγχου - Invoqs</PageTitle>
 
 <Navbar OnUserLoaded="HandleUserLoaded" />
 
@@ -14,24 +14,24 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h2 class="text-primary mb-1">Good @GetTimeOfDay(), @currentUser!</h2>
+                    <h2 class="text-primary mb-1">@GetTimeOfDay(), @currentUser!</h2>
                 </div>
                 <div class="d-flex gap-2 mt-2 mt-md-0">
                     <button class="btn btn-primary" @onclick="@(() => NavigateToPage("/customer/new"))">
                         <i class="bi bi-plus-lg me-1"></i>
-                        New Customer
+                        Νέος Πελάτης
                     </button>
                     <button class="btn btn-success" @onclick="@(() => NavigateToPage("/job/new"))">
                         <i class="bi bi-calendar-plus me-1"></i>
-                        New Job
+                        Νέα Εργασία
                     </button>
                     <button class="btn btn-info" @onclick="@(() => NavigateToPage("/invoice/new"))">
                         <i class="bi bi-receipt me-1"></i>
-                        Create Invoice
+                        Δημιουργία Τιμολογίου
                     </button>
                     <button class="btn btn-secondary" @onclick="@(() => NavigateToPage("/receipts/new"))">
                         <i class="bi bi-receipt-cutoff me-1"></i>
-                        Create Receipt
+                        Δημιουργία Απόδειξης
                     </button>
                 </div>
             </div>
@@ -42,7 +42,7 @@
     {
         <div class="d-flex justify-content-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading dashboard...</span>
+                <span class="visually-hidden">Φόρτωση...</span>
             </div>
         </div>
     }
@@ -55,14 +55,14 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <h3 class="mb-1">£@dashboardData.WeekRevenue.ToString("N0")</h3>
-                                <p class="mb-0 small">This Week's Revenue</p>
+                                <h3 class="mb-1">€@dashboardData.WeekRevenue.ToString("N0")</h3>
+                                <p class="mb-0 small">Έσοδα Εβδομάδας</p>
                                 <small class="opacity-75">
                                     <i class="bi bi-arrow-up me-1"></i>
-                                    @dashboardData.RevenueGrowth% vs last week
+                                    @dashboardData.RevenueGrowth% σε σχέση με την προηγούμενη εβδομάδα
                                 </small>
                             </div>
-                            <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                            <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                         </div>
                     </div>
                 </div>
@@ -73,9 +73,9 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h3 class="mb-1">@dashboardData.ActiveJobs</h3>
-                                <p class="mb-0 small">Active Jobs</p>
+                                <p class="mb-0 small">Ενεργές Εργασίες</p>
                                 <small class="opacity-75">
-                                    @dashboardData.JobsScheduledToday scheduled today
+                                    @dashboardData.JobsScheduledToday προγραμματισμένες σήμερα
                                 </small>
                             </div>
                             <i class="bi bi-calendar-check fs-1 opacity-75"></i>
@@ -89,9 +89,9 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h3 class="mb-1">@dashboardData.TotalCustomers</h3>
-                                <p class="mb-0 small">Total Customers</p>
+                                <p class="mb-0 small">Σύνολο Πελατών</p>
                                 <small class="opacity-75">
-                                    @dashboardData.NewCustomersThisWeek new this week
+                                    @dashboardData.NewCustomersThisWeek νέοι αυτή την εβδομάδα
                                 </small>
                             </div>
                             <i class="bi bi-people fs-1 opacity-75"></i>
@@ -105,9 +105,9 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h3 class="mb-1">@dashboardData.PendingInvoices</h3>
-                                <p class="mb-0 small">Pending Invoices</p>
+                                <p class="mb-0 small">Εκκρεμή Τιμολόγια</p>
                                 <small class="opacity-75">
-                                    £@dashboardData.PendingAmount.ToString("N0") outstanding
+                                    €@dashboardData.PendingAmount.ToString("N0") οφειλόμενα
                                 </small>
                             </div>
                             <i class="bi bi-receipt fs-1 opacity-75"></i>
@@ -122,14 +122,14 @@
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white py-3">
-                        <h5 class="mb-0">Service Breakdown</h5>
+                        <h5 class="mb-0">Ανάλυση Υπηρεσιών</h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-4">
                             <div class="col-md-4">
                                 <div class="text-center">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-muted">Skip Rentals</span>
+                                        <span class="text-muted">Ενοικιάσεις Skip</span>
                                         <span class="fw-bold fs-5">@dashboardData.SkipRentals</span>
                                     </div>
                                     <div class="progress" style="height: 8px;">
@@ -142,7 +142,7 @@
                             <div class="col-md-4">
                                 <div class="text-center">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-muted">Sand Delivery</span>
+                                        <span class="text-muted">Παράδοση Άμμου</span>
                                         <span class="fw-bold fs-5">@dashboardData.SandDeliveries</span>
                                     </div>
                                     <div class="progress" style="height: 8px;">
@@ -155,7 +155,7 @@
                             <div class="col-md-4">
                                 <div class="text-center">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-muted">Fork Lift Service</span>
+                                        <span class="text-muted">Υπηρεσία Forklift</span>
                                         <span class="fw-bold fs-5">@dashboardData.ForkLiftServices</span>
                                     </div>
                                     <div class="progress" style="height: 8px;">
@@ -169,7 +169,7 @@
                         <hr class="my-3">
                         <div class="text-center">
                             <h4 class="text-primary mb-1">@dashboardData.ActiveJobs</h4>
-                            <small class="text-muted">Total Active Jobs</small>
+                            <small class="text-muted">Σύνολο Ενεργών Εργασιών</small>
                         </div>
                     </div>
                 </div>
@@ -181,7 +181,7 @@
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white py-3">
-                        <h5 class="mb-0">Quick Actions</h5>
+                        <h5 class="mb-0">Γρήγορες Ενέργειες</h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
@@ -189,28 +189,28 @@
                                 <button class="btn btn-outline-primary w-100 h-100"
                                     @onclick="@(() => NavigateToPage("/customers"))">
                                     <i class="bi bi-people d-block fs-2 mb-2"></i>
-                                    <small>Manage Customers</small>
+                                    <small>Διαχείριση Πελατών</small>
                                 </button>
                             </div>
                             <div class="col-md-3 col-sm-6">
                                 <button class="btn btn-outline-success w-100 h-100"
                                     @onclick="@(() => NavigateToPage("/jobs"))">
                                     <i class="bi bi-briefcase d-block fs-2 mb-2"></i>
-                                    <small>Manage Jobs</small>
+                                    <small>Διαχείριση Εργασιών</small>
                                 </button>
                             </div>
                             <div class="col-md-3 col-sm-6">
                                 <button class="btn btn-outline-info w-100 h-100"
                                     @onclick="@(() => NavigateToPage("/invoices"))">
                                     <i class="bi bi-file-text d-block fs-2 mb-2"></i>
-                                    <small>Manage Invoices</small>
+                                    <small>Διαχείριση Τιμολογίων</small>
                                 </button>
                             </div>
                             <div class="col-md-3 col-sm-6">
                                 <button class="btn btn-outline-secondary w-100 h-100"
                                     @onclick="@(() => NavigateToPage("/receipts"))">
                                     <i class="bi bi-receipt-cutoff d-block fs-2 mb-2"></i>
-                                    <small>Manage Receipts</small>
+                                    <small>Διαχείριση Αποδείξεων</small>
                                 </button>
                             </div>
                         </div>

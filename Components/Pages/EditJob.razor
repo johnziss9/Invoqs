@@ -3,7 +3,7 @@
 @using Invoqs.Components.UI
 @using Invoqs.Models
 
-<PageTitle>Edit Job - @(job?.Title ?? "Loading...") - Invoqs</PageTitle>
+<PageTitle>Επεξεργασία Εργασίας - @(job?.Title ?? "Φόρτωση...") - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -11,9 +11,9 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/jobs" class="text-decoration-none">Jobs</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Edit Job</li>
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/jobs" class="text-decoration-none">Εργασίες</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Επεξεργασία Εργασίας</li>
         </ol>
     </nav>
 
@@ -32,8 +32,8 @@
     {
         <div class="alert alert-warning mb-3">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            <strong>Customer Deleted:</strong> This job belongs to a deleted customer (@job.CustomerName).
-            You can still edit the job details, but the customer information is no longer available.
+            <strong>Ο Πελάτης Διαγράφηκε:</strong> Αυτή η εργασία ανήκει σε διαγραμμένο πελάτη (@job.CustomerName).
+            Μπορείτε ακόμα να επεξεργαστείτε τις λεπτομέρειες της εργασίας, αλλά οι πληροφορίες του πελάτη δεν είναι πλέον διαθέσιμες.
         </div>
     }
 
@@ -42,8 +42,8 @@
     {
         <div class="alert alert-warning mb-3">
             <i class="bi bi-exclamation-circle me-2"></i>
-            <strong>Limited Editing:</strong> This job has been invoiced. Only status and notes can be modified.
-            <a href="/invoice/@job.InvoiceId" class="alert-link ms-2">View Invoice →</a>
+            <strong>Περιορισμένη Επεξεργασία:</strong> Αυτή η εργασία έχει τιμολογηθεί. Μόνο η κατάσταση και οι σημειώσεις μπορούν να τροποποιηθούν.
+            <a href="/invoice/@job.InvoiceId" class="alert-link ms-2">Προβολή Τιμολογίου</a>
         </div>
     }
 
@@ -52,10 +52,10 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h2 class="text-primary mb-1">Edit Job</h2>
+                    <h2 class="text-primary mb-1">Επεξεργασία Εργασίας</h2>
                     @if (customer != null)
                     {
-                        <p class="text-muted mb-0">Customer: @customer.Name</p>
+                        <p class="text-muted mb-0">Πελάτης: @customer.Name</p>
                     }
                 </div>
             </div>
@@ -66,8 +66,8 @@
     {
         <div class="alert alert-warning">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            <strong>Warning:</strong> This job has been cancelled. 
-            Deleting will permanently remove it from your records.
+            <strong>Προειδοποίηση:</strong> Αυτή η εργασία έχει ακυρωθεί. 
+            Η διαγραφή θα την αφαιρέσει οριστικά από τα αρχεία σας.
         </div>
     }
 
@@ -75,7 +75,7 @@
     {
         <div class="d-flex justify-content-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">Φόρτωση...</span>
             </div>
         </div>
     }
@@ -83,7 +83,7 @@
     {
         <div class="alert alert-danger" role="alert">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            Job not found or an error occurred while loading.
+            Η εργασία δεν βρέθηκε ή προέκυψε σφάλμα κατά τη φόρτωση.
         </div>
     }
     else
@@ -96,14 +96,14 @@
                 <div class="col-lg-8">
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h5 class="mb-0">Job Information</h5>
+                            <h5 class="mb-0">Πληροφορίες Εργασίας</h5>
                         </div>
                         <div class="card-body">
                             <div class="row g-3">
                                 <!-- Job Title -->
                                 <div class="col-12">
-                                    <label class="form-label required">Job Title</label>
-                                    <InputText @bind-Value="job.Title" class="@GetFieldErrorClass("Title")" placeholder="Enter job title" disabled="@isInvoiced" />
+                                    <label class="form-label required">Τίτλος Εργασίας</label>
+                                    <InputText @bind-Value="job.Title" class="@GetFieldErrorClass("Title")" placeholder="Εισάγετε τίτλο εργασίας" disabled="@isInvoiced" />
                                     <ValidationMessage For="@(() => job.Title)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Title").Any() == true)
                                     {
@@ -116,12 +116,12 @@
 
                                 <!-- Job Type and Status -->
                                 <div class="col-md-6">
-                                    <label class="form-label required">Job Type</label>
+                                    <label class="form-label required">Τύπος Εργασίας</label>
                                     <InputSelect @bind-Value="job.Type" class="@(validationErrors?.GetFieldErrors("Type").Any() == true ? "form-select is-invalid" : "form-select")" @bind-Value:after="OnJobTypeChanged" disabled="@isInvoiced">
-                                        <option value="">-- Select Job Type --</option>
-                                        <option value="@JobType.SkipRental">Skip Rental</option>
-                                        <option value="@JobType.SandDelivery">Sand Delivery</option>
-                                        <option value="@JobType.ForkLiftService">Fork Lift Service</option>
+                                        <option value="">-- Επιλέξτε Τύπο Εργασίας --</option>
+                                        <option value="@JobType.SkipRental">Ενοικίαση Skip</option>
+                                        <option value="@JobType.SandDelivery">Παράδοση Άμμου</option>
+                                        <option value="@JobType.ForkLiftService">Υπηρεσία Forklift</option>
                                     </InputSelect>
                                     <ValidationMessage For="@(() => job.Type)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Type").Any() == true)
@@ -133,33 +133,33 @@
                                     }
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label required">Status</label>
+                                    <label class="form-label required">Κατάσταση</label>
                                     <InputSelect @bind-Value="job.Status" class="form-select">
                                         @{
                                             var currentStatus = job.Status;
                                         }
                                         
                                         @* Always show current status *@
-                                        <option value="@currentStatus" selected>@currentStatus (Current)</option>
+                                        <option value="@currentStatus" selected>@currentStatus (Τρέχουσα)</option>
                                         
                                         @* Show valid transitions based on current status *@
                                         @if (currentStatus == JobStatus.New)
                                         {
-                                            <option value="@JobStatus.Active">Active</option>
-                                            <option value="@JobStatus.Cancelled">Cancelled</option>
+                                            <option value="@JobStatus.Active">Ενεργή</option>
+                                            <option value="@JobStatus.Cancelled">Ακυρωμένη</option>
                                         }
                                         else if (currentStatus == JobStatus.Active)
                                         {
-                                            <option value="@JobStatus.Completed">Completed</option>
-                                            <option value="@JobStatus.Cancelled">Cancelled</option>
+                                            <option value="@JobStatus.Completed">Ολοκληρωμένη</option>
+                                            <option value="@JobStatus.Cancelled">Ακυρωμένη</option>
                                         }
                                         else if (currentStatus == JobStatus.Completed)
                                         {
-                                            <option value="@JobStatus.Active">Active (Reopen)</option>
+                                            <option value="@JobStatus.Active">Ενεργή (Επαναφορά)</option>
                                         }
                                         else if (currentStatus == JobStatus.Cancelled)
                                         {
-                                            <option value="@JobStatus.New">New (Reactivate)</option>
+                                            <option value="@JobStatus.New">Νέα (Επανενεργοποίηση)</option>
                                         }
                                     </InputSelect>
                                     <ValidationMessage For="@(() => job.Status)" class="text-danger small" />
@@ -173,17 +173,17 @@
                                     <div class="col-12">
                                         <div class="alert alert-info py-2">
                                             <i class="bi bi-info-circle me-2"></i>
-                                            <strong>Skip Rental Details</strong>
+                                            <strong>Λεπτομέρειες Ενοικίασης Skip</strong>
                                         </div>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label required">Skip Type</label>
+                                        <label class="form-label required">Τύπος Skip</label>
                                         <InputSelect @bind-Value="job.SkipType" class="@(validationErrors?.GetFieldErrors("SkipType").Any() == true ? "form-select is-invalid" : "form-select")" @bind-Value:after="OnSkipTypeChanged" disabled="@isInvoiced">
-                                            <option value="">-- Select Skip Type --</option>
-                                            <option value="SmallSkip">Small Skip</option>
-                                            <option value="LargeSkip">Large Skip</option>
-                                            <option value="Hook">Hook</option>
+                                            <option value="">-- Επιλέξτε Τύπο Skip --</option>
+                                            <option value="SmallSkip">Μικρό Skip</option>
+                                            <option value="LargeSkip">Μεγάλο Skip</option>
+                                            <option value="Hook">Γάντζος</option>
                                         </InputSelect>
                                         <ValidationMessage For="@(() => job.SkipType)" class="text-danger small" />
                                         @if (validationErrors?.GetFieldErrors("SkipType").Any() == true)
@@ -198,10 +198,10 @@
                                     @if (job.SkipType == "SmallSkip" || job.SkipType == "LargeSkip")
                                     {
                                         <div class="col-md-6">
-                                            <label class="form-label required">Skip Number</label>
+                                            <label class="form-label required">Αριθμός Skip</label>
                                             <InputText @bind-Value="job.SkipNumber" class="@GetFieldErrorClass("SkipNumber")" 
-                                                    placeholder="e.g., SK-001" disabled="@isInvoiced" />
-                                            <div class="form-text">Enter the skip identification number</div>
+                                                    placeholder="π.χ., SK-001" disabled="@isInvoiced" />
+                                            <div class="form-text">Εισάγετε τον αριθμό αναγνώρισης του skip</div>
                                             <ValidationMessage For="@(() => job.SkipNumber)" class="text-danger small" />
                                             @if (validationErrors?.GetFieldErrors("SkipNumber").Any() == true)
                                             {
@@ -220,18 +220,18 @@
                                     <div class="col-12">
                                         <div class="alert alert-info py-2">
                                             <i class="bi bi-info-circle me-2"></i>
-                                            <strong>Sand Delivery Details</strong>
+                                            <strong>Λεπτομέρειες Παράδοσης Άμμου</strong>
                                         </div>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label required">Material Type</label>
+                                        <label class="form-label required">Τύπος Υλικού</label>
                                         <InputSelect @bind-Value="job.SandMaterialType" class="@(validationErrors?.GetFieldErrors("SandMaterialType").Any() == true ? "form-select is-invalid" : "form-select")" disabled="@isInvoiced">
-                                            <option value="">-- Select Material --</option>
-                                            <option value="Sand">Sand</option>
-                                            <option value="CrushedStone">Crushed Stone</option>
-                                            <option value="SandMixedWithCrushedStone">Sand Mixed with Crushed Stone</option>
-                                            <option value="Soil">Soil</option>
+                                            <option value="">-- Επιλέξτε Υλικό --</option>
+                                            <option value="Sand">Άμμος</option>
+                                            <option value="CrushedStone">Τσακίλι</option>
+                                            <option value="SandMixedWithCrushedStone">Άμμος Ανακατεμένη με Τσακίλι</option>
+                                            <option value="Soil">Χώμα</option>
                                         </InputSelect>
                                         <ValidationMessage For="@(() => job.SandMaterialType)" class="text-danger small" />
                                         @if (validationErrors?.GetFieldErrors("SandMaterialType").Any() == true)
@@ -244,11 +244,11 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label required">Delivery Method</label>
+                                        <label class="form-label required">Μέθοδος Παράδοσης</label>
                                         <InputSelect @bind-Value="job.SandDeliveryMethod" class="@(validationErrors?.GetFieldErrors("SandDeliveryMethod").Any() == true ? "form-select is-invalid" : "form-select")" disabled="@isInvoiced">
-                                            <option value="">-- Select Method --</option>
-                                            <option value="InBags">In Bags</option>
-                                            <option value="ByTruck">By Truck</option>
+                                            <option value="">-- Επιλέξτε Μέθοδο --</option>
+                                            <option value="InBags">Σε Σάκους</option>
+                                            <option value="ByTruck">Με Φορτηγό</option>
                                         </InputSelect>
                                         <ValidationMessage For="@(() => job.SandDeliveryMethod)" class="text-danger small" />
                                         @if (validationErrors?.GetFieldErrors("SandDeliveryMethod").Any() == true)
@@ -267,16 +267,16 @@
                                     <div class="col-12">
                                         <div class="alert alert-info py-2">
                                             <i class="bi bi-info-circle me-2"></i>
-                                            <strong>Forklift Service Details</strong>
+                                            <strong>Λεπτομέρειες Υπηρεσίας Forklift</strong>
                                         </div>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label required">Forklift Size</label>
+                                        <label class="form-label required">Μέγεθος Forklift</label>
                                         <InputSelect @bind-Value="job.ForkliftSize" class="@(validationErrors?.GetFieldErrors("ForkliftSize").Any() == true ? "form-select is-invalid" : "form-select")" disabled="@isInvoiced">
-                                            <option value="">-- Select Size --</option>
-                                            <option value="17m">17m</option>
-                                            <option value="25m">25m</option>
+                                            <option value="">-- Επιλέξτε Μέγεθος --</option>
+                                            <option value="17m">17μ</option>
+                                            <option value="25m">25μ</option>
                                         </InputSelect>
                                         <ValidationMessage For="@(() => job.ForkliftSize)" class="text-danger small" />
                                         @if (validationErrors?.GetFieldErrors("ForkliftSize").Any() == true)
@@ -291,7 +291,7 @@
 
                                 <!-- Address with Autocomplete -->
                                 <div class="col-12">
-                                    <label class="form-label required">Service Address</label>
+                                    <label class="form-label required">Διεύθυνση Υπηρεσίας</label>
                                     <div class="position-relative">
                                         <input type="text" 
                                                class="@GetFieldErrorClass("Address")" 
@@ -299,7 +299,7 @@
                                                @oninput="OnAddressInput"
                                                @onfocus="@(() => { if (addressSuggestions.Any()) showAddressSuggestions = true; })"
                                                @onblur="HideAddressSuggestions"
-                                               placeholder="Start typing an address..."
+                                               placeholder="Αρχίστε να πληκτρολογείτε μια διεύθυνση..."
                                                autocomplete="off"
                                                disabled="@isInvoiced" />
                                         
@@ -307,7 +307,7 @@
                                         {
                                             <div class="position-absolute end-0 top-50 translate-middle-y me-2">
                                                 <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                                    <span class="visually-hidden">Searching...</span>
+                                                    <span class="visually-hidden">Αναζήτηση...</span>
                                                 </div>
                                             </div>
                                         }
@@ -325,7 +325,7 @@
                                             </div>
                                         }
                                     </div>
-                                    <div class="form-text">Start typing to see previous addresses, or enter a new one</div>
+                                    <div class="form-text">Αρχίστε να πληκτρολογείτε για να δείτε προηγούμενες διευθύνσεις, ή εισάγετε μια νέα</div>
                                     <ValidationMessage For="@(() => job.Address)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Address").Any() == true)
                                     {
@@ -338,7 +338,7 @@
 
                                 <!-- Start Date and Price -->
                                 <div class="col-md-6">
-                                    <label class="form-label required">Start Date</label>
+                                    <label class="form-label required">Ημερομηνία Έναρξης</label>
                                     <InputDate @bind-Value="job.StartDate" class="@GetFieldErrorClass("StartDate")" disabled="@isInvoiced" />
                                     <ValidationMessage For="@(() => job.StartDate)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("StartDate").Any() == true)
@@ -350,7 +350,7 @@
                                     }
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label required">Price (£)</label>
+                                    <label class="form-label required">Τιμή (€)</label>
                                     <InputNumber @bind-Value="job.Price" class="@GetFieldErrorClass("Price")" 
                                             placeholder="0.00" step="0.01" disabled="@isInvoiced" />
                                     <ValidationMessage For="@(() => job.Price)" class="text-danger small" />
@@ -365,9 +365,9 @@
 
                                 <!-- Description -->
                                 <div class="col-12">
-                                    <label class="form-label">Description</label>
+                                    <label class="form-label">Περιγραφή</label>
                                     <InputTextArea @bind-Value="job.Description" class="@GetFieldErrorClass("Description")" rows="3" 
-                                                placeholder="Additional details about this job (e.g., skip size, sand type, special requirements)..." disabled="@isInvoiced" />
+                                                placeholder="Πρόσθετες λεπτομέρειες για αυτή την εργασία (π.χ. ειδικές απαιτήσεις)..." disabled="@isInvoiced" />
                                     <ValidationMessage For="@(() => job.Description)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Description").Any() == true)
                                     {
@@ -379,9 +379,9 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label">Internal Notes</label>
+                                    <label class="form-label">Εσωτερικές Σημειώσεις</label>
                                     <InputTextArea @bind-Value="job.Notes" class="@GetFieldErrorClass("Notes")" rows="2" 
-                                                placeholder="Internal notes (not visible to customer)..." />
+                                                placeholder="Εσωτερικές σημειώσεις (δεν είναι ορατές στον πελάτη)..." />
                                     <ValidationMessage For="@(() => job.Notes)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Notes").Any() == true)
                                     {
@@ -417,14 +417,14 @@
                                 </div>
                                 <div class="d-flex gap-2">
                                     <a href="@GetReturnUrl()" class="btn btn-outline-secondary">
-                                        Cancel
+                                        Ακύρωση
                                     </a>
                                     <button type="submit" class="btn btn-primary" disabled="@(isSaving || isInvoiced)">
                                         @if (isSaving)
                                         {
                                             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                         }
-                                        @(isSaving ? "Saving..." : isInvoiced ? "Cannot Save (Invoiced)" : "Save Changes")
+                                        @(isSaving ? "Αποθήκευση..." : isInvoiced ? "Δεν Μπορεί να Αποθηκευτεί (Τιμολογημένη)" : "Αποθήκευση Αλλαγών")
                                     </button>
                                 </div>
                             </div>
@@ -437,26 +437,26 @@
                     <!-- Job Status -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h6 class="mb-0">Job Status</h6>
+                            <h6 class="mb-0">Κατάσταση Εργασίας</h6>
                         </div>
                         <div class="card-body text-center">
                             <div class="mb-3">
                                 <span class="badge bg-@job.StatusColor fs-6 px-3 py-2">
                                     <i class="@job.StatusIcon me-2"></i>
-                                    @job.Status
+                                    @job.StatusDisplay
                                 </span>
                             </div>
                             <div class="row text-center g-3">
                                 <div class="col-6">
                                     <div class="border rounded p-2">
                                         <div class="h5 text-primary mb-1">@job.DurationDays</div>
-                                        <small class="text-muted">Days</small>
+                                        <small class="text-muted">Ημέρες</small>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="border rounded p-2">
-                                        <div class="h5 text-success mb-1">£@job.Price.ToString("N2")</div>
-                                        <small class="text-muted">Price</small>
+                                        <div class="h5 text-success mb-1">€@job.Price.ToString("N2")</div>
+                                        <small class="text-muted">Τιμή</small>
                                     </div>
                                 </div>
                             </div>
@@ -468,12 +468,12 @@
                     {
                         <div class="card border-0 shadow-sm mb-4">
                             <div class="card-header bg-white py-3">
-                                <h6 class="mb-0">Customer Information</h6>
+                                <h6 class="mb-0">Πληροφορίες Πελάτη</h6>
                             </div>
                             <div class="card-body">
                                 <div class="small">
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-muted">Name:</span>
+                                        <span class="text-muted">Όνομα:</span>
                                         <span class="fw-medium">@customer.Name</span>
                                     </div>
                                     @if (!string.IsNullOrEmpty(customer.Email))
@@ -486,16 +486,16 @@
                                     @if (!string.IsNullOrEmpty(customer.Phone))
                                     {
                                         <div class="d-flex justify-content-between mb-2">
-                                            <span class="text-muted">Phone:</span>
+                                            <span class="text-muted">Τηλέφωνο:</span>
                                             <a href="tel:@customer.Phone" class="fw-medium text-decoration-none">@customer.Phone</a>
                                         </div>
                                     }
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-muted">Created:</span>
+                                        <span class="text-muted">Δημιουργήθηκε:</span>
                                         <span class="fw-medium">@customer.CreatedDate.ToString("dd/MM/yyyy")</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-muted">Last Updated:</span>
+                                        <span class="text-muted">Τελευταία Ενημέρωση:</span>
                                         <span class="fw-medium">@((customer.UpdatedDate ?? customer.CreatedDate).ToString("dd/MM/yyyy"))</span>
                                     </div>
 
@@ -506,7 +506,7 @@
                                             <div class="mb-1">
                                                 <span class="text-success">
                                                     <i class="bi bi-briefcase me-1"></i>
-                                                    @((customer.ActiveJobs + customer.NewJobs)) ongoing jobs
+                                                    @((customer.ActiveJobs + customer.NewJobs)) εργασίες σε εξέλιξη
                                                 </span>
                                             </div>
                                         }
@@ -515,7 +515,7 @@
                                             <div class="mb-1">
                                                 <span class="text-muted">
                                                     <i class="bi bi-check-circle me-1"></i>
-                                                    Last job completed
+                                                    Τελευταία εργασία ολοκληρώθηκε
                                                 </span>
                                             </div>
                                         }
@@ -524,7 +524,7 @@
                                             <div class="mb-1">
                                                 <span class="text-muted">
                                                     <i class="bi bi-clock-history me-1"></i>
-                                                    No jobs yet
+                                                    Δεν υπάρχουν εργασίες ακόμα
                                                 </span>
                                             </div>
                                         }
@@ -536,7 +536,7 @@
                                         <div class="mb-1">
                                             <span class="text-warning">
                                                 <i class="bi bi-exclamation-circle me-1"></i>
-                                                @customer.UninvoicedJobs uninvoiced jobs
+                                                @customer.UninvoicedJobs εργασίες χωρίς τιμολόγηση
                                             </span>
                                         </div>
                                     }
@@ -545,8 +545,7 @@
                                     {
                                         <div>
                                             <span class="text-danger">
-                                                <i class="bi bi-currency-pound me-1"></i>
-                                                @customer.UnpaidInvoices unpaid (@customer.OutstandingAmount.ToString("C"))
+                                                @customer.UnpaidInvoices απλήρωτα (€@customer.OutstandingAmount.ToString("N2"))
                                             </span>
                                         </div>
                                     }
@@ -558,20 +557,20 @@
                     <!-- Job Details -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h6 class="mb-0">Job Details</h6>
+                            <h6 class="mb-0">Λεπτομέρειες Εργασίας</h6>
                         </div>
                         <div class="card-body">
                             <div class="small">
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Created:</span>
+                                    <span class="text-muted">Δημιουργήθηκε:</span>
                                     <span class="fw-medium">@job.CreatedDate.ToString("dd/MM/yyyy")</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Last Updated:</span>
+                                    <span class="text-muted">Τελευταία Ενημέρωση:</span>
                                     <span class="fw-medium">@((job.UpdatedDate ?? job.CreatedDate).ToString("dd/MM/yyyy"))</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Job Type:</span>
+                                    <span class="text-muted">Τύπος Εργασίας:</span>
                                     <span class="badge bg-light text-dark">
                                         <i class="@job.TypeIcon me-1"></i>
                                         @job.TypeDisplayName
@@ -584,7 +583,7 @@
                     <!-- Quick Actions -->
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-white py-3">
-                            <h6 class="mb-0">Quick Actions</h6>
+                            <h6 class="mb-0">Γρήγορες Ενέργειες</h6>
                         </div>
                         <div class="card-body">
                             <div class="d-grid gap-2">
@@ -592,7 +591,7 @@
                                 {
                                     <a href="/customer/@customer.Id/jobs" class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-person me-1"></i>
-                                        View Customer Jobs
+                                        Προβολή Εργασιών Πελάτη
                                     </a>
                                 }
                                 
@@ -602,7 +601,7 @@
                                     {
                                         <button type="button" class="btn btn-success" @onclick="GenerateInvoice">
                                             <i class="bi bi-file-earmark-text me-1"></i>
-                                            Generate Invoice
+                                            Δημιουργία Τιμολογίου
                                         </button>
                                     }
                                 }
@@ -610,14 +609,14 @@
                                 {
                                     <button type="button" class="btn btn-outline-success btn-sm" @onclick="() => QuickStatusChange(JobStatus.Active)">
                                         <i class="bi bi-play-circle me-1"></i>
-                                        Start Job
+                                        Έναρξη Εργασίας
                                     </button>
                                 }
                                 else if (job?.Status == JobStatus.Active)
                                 {
                                     <button type="button" class="btn btn-outline-success btn-sm" @onclick="() => QuickStatusChange(JobStatus.Completed)">
                                         <i class="bi bi-check-circle me-1"></i>
-                                        Mark Completed
+                                        Σημείωση ως Ολοκληρωμένη
                                     </button>
                                 }
                                 
@@ -625,7 +624,7 @@
                                 {
                                     <div class="text-muted text-center py-2 small">
                                         <i class="bi bi-info-circle me-1"></i>
-                                        Customer-specific actions unavailable
+                                        Οι ενέργειες για συγκεκριμένο πελάτη δεν είναι διαθέσιμες
                                     </div>
                                 }
                                 
@@ -643,7 +642,7 @@
                                 {
                                     <button type="button" class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteConfirmation">
                                         <i class="bi bi-trash me-1"></i>
-                                        Delete Job
+                                        Διαγραφή Εργασίας
                                     </button>
                                 }
                             </div>
@@ -662,53 +661,53 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Delete Job</h5>
+                    <h5 class="modal-title">Διαγραφή Εργασίας</h5>
                     <button type="button" class="btn-close" @onclick="HideDeleteConfirmation"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Are you sure?</h5>
+                        <h5 class="mt-3">Είστε σίγουροι;</h5>
                         <p class="text-muted">
-                            This will permanently delete the job <strong>@job?.Title</strong>.
-                            This action cannot be undone.
+                            Αυτή η ενέργεια θα διαγράψει οριστικά την εργασία <strong>@job?.Title</strong>.
+                            Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
                         </p>
                         @if (isInvoiced)
                         {
                             <div class="alert alert-danger">
                                 <i class="bi bi-x-circle me-2"></i>
-                                <strong>Cannot Delete:</strong> This job has been invoiced and cannot be deleted. 
-                                Remove it from the invoice first.
+                                <strong>Δεν Μπορεί να Διαγραφεί:</strong> Αυτή η εργασία έχει τιμολογηθεί και δεν μπορεί να διαγραφεί. 
+                                Αφαιρέστε την από το τιμολόγιο πρώτα.
                             </div>
                         }
                         else if (job?.Status == JobStatus.Completed)
                         {
                             <div class="alert alert-danger">
                                 <i class="bi bi-x-circle me-2"></i>
-                                <strong>Cannot Delete:</strong> Completed jobs cannot be deleted. 
-                                They must be preserved for audit trail and financial reporting.
+                                <strong>Δεν Μπορεί να Διαγραφεί:</strong> Οι ολοκληρωμένες εργασίες δεν μπορούν να διαγραφούν. 
+                                Πρέπει να διατηρηθούν για ίχνος ελέγχου και οικονομική αναφορά.
                             </div>
                         }
                         else if (job?.Status == JobStatus.Active)
                         {
                             <div class="alert alert-danger">
                                 <i class="bi bi-x-circle me-2"></i>
-                                <strong>Cannot Delete:</strong> Active jobs cannot be deleted. 
-                                Please mark the job as cancelled first.
+                                <strong>Δεν Μπορεί να Διαγραφεί:</strong> Οι ενεργές εργασίες δεν μπορούν να διαγραφούν. 
+                                Παρακαλώ σημειώστε την εργασία ως ακυρωμένη πρώτα.
                             </div>
                         }
                         else if (job?.Status == JobStatus.Cancelled)
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Warning:</strong> This job has been cancelled. 
-                                Deleting will permanently remove it from your records.
+                                <strong>Προειδοποίηση:</strong> Αυτή η εργασία έχει ακυρωθεί. 
+                                Η διαγραφή θα την αφαιρέσει οριστικά από τα αρχεία σας.
                             </div>
                         }
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Ακύρωση</button>
                     <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
                         @if (isDeleting)
                         {
@@ -718,7 +717,7 @@
                         {
                             <i class="bi bi-trash me-1"></i>
                         }
-                        @(isDeleting ? "Deleting..." : "Delete Job")
+                        @(isDeleting ? "Διαγραφή..." : "Διαγραφή Εργασίας")
                     </button>
                 </div>
             </div>

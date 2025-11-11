@@ -21,7 +21,7 @@
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge @Invoice.StatusBadgeClass">
                         <i class="@Invoice.StatusIcon me-1"></i>
-                        @Invoice.Status
+                        @Invoice.StatusDisplay
                     </span>
                 </div>
                 <div class="dropdown">
@@ -33,10 +33,10 @@
                         {
                             <!-- Draft actions: Edit, Send, Delete -->
                             <li><a class="dropdown-item" href="/invoice/@Invoice.Id/edit">
-                                    <i class="bi bi-pencil me-2"></i>Edit Invoice
+                                    <i class="bi bi-pencil me-2"></i>Επεξεργασία Τιμολογίου
                                 </a></li>
                             <li><button class="dropdown-item" @onclick="ShowSendConfirmation">
-                                    <i class="bi bi-send me-2"></i>Send via Email
+                                    <i class="bi bi-send me-2"></i>Αποστολή με Email
                                 </button></li>
                             <li><hr class="dropdown-divider"></li>
                             @if (Invoice.Status != InvoiceStatus.Draft)
@@ -48,7 +48,7 @@
                             else
                             {
                                 <li><button class="dropdown-item text-danger" @onclick="ShowDeleteConfirmation">
-                                        <i class="bi bi-trash me-2"></i>Delete
+                                        <i class="bi bi-trash me-2"></i>Διαγραφή
                                     </button></li>
                             }
                         }
@@ -56,23 +56,23 @@
                         {
                             <!-- Sent/Delivered/Overdue actions: Mark as Paid, Cancel -->
                             <li><button class="dropdown-item text-success" @onclick="ShowMarkAsPaidConfirmation">
-                                    <i class="bi bi-check-circle me-2"></i>Mark as Paid
+                                    <i class="bi bi-check-circle me-2"></i>Σήμανση ως Πληρωμένο
                                 </button></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><button class="dropdown-item text-danger" @onclick="ShowCancelConfirmation">
-                                    <i class="bi bi-x-circle me-2"></i>Cancel Invoice
+                                    <i class="bi bi-x-circle me-2"></i>Ακύρωση Τιμολογίου
                                 </button></li>
                         }
                         else if (Invoice.Status == InvoiceStatus.Paid)
                         {
                             <!-- Paid invoice - informational only -->
                             <li><span class="dropdown-item-text text-muted">
-                                    Paid on @Invoice.PaidDate?.ToString("dd/MM/yyyy")
+                                    Πληρώθηκε στις @Invoice.PaidDate?.ToString("dd/MM/yyyy")
                                 </span></li>
                             @if (!string.IsNullOrEmpty(Invoice.PaymentMethod))
                             {
                                 <li><span class="dropdown-item-text text-muted">
-                                        via @Invoice.PaymentMethod
+                                        μέσω @Invoice.PaymentMethod
                                     </span></li>
                             }
                         }
@@ -80,7 +80,7 @@
                         {
                             <!-- Cancelled invoice - informational only -->
                             <li><span class="dropdown-item-text text-muted">
-                                    No actions available
+                                    Δεν υπάρχουν διαθέσιμες ενέργειες
                                 </span></li>
                         }
                     </ul>
@@ -99,12 +99,12 @@
                     {
                         <h6 class="mb-0">
                             <span class="text-decoration-line-through">@Invoice.CustomerName</span>
-                            <span class="text-danger ms-2">(Deleted)</span>
+                            <span class="text-danger ms-2">(Διαγράφηκε)</span>
                         </h6>
                     }
                     else
                     {
-                        <h6 class="mb-0">@(Invoice.CustomerName ?? "Unknown Customer")</h6>
+                        <h6 class="mb-0">@(Invoice.CustomerName ?? "Άγνωστος Πελάτης")</h6>
                     }
                     <small class="text-muted">@(Invoice.CustomerEmail ?? "")</small>
                 </div>
@@ -116,14 +116,14 @@
             <div class="detail-item mb-2">
                 <i class="bi bi-calendar text-muted me-2"></i>
                 <span class="text-muted small">
-                    Created: @Invoice.CreatedDate.ToString("dd/MM/yyyy")
+                    Δημιουργήθηκε: @Invoice.CreatedDate.ToString("dd/MM/yyyy")
                 </span>
             </div>
 
             <div class="detail-item mb-2">
                 <i class="bi bi-calendar-event text-muted me-2"></i>
                 <span class="text-muted small @(Invoice.IsOverdue ? "text-danger fw-bold" : "")">
-                    Due: @Invoice.DueDate.ToString("dd/MM/yyyy")
+                    Λήξη: @Invoice.DueDate.ToString("dd/MM/yyyy")
                 </span>
             </div>
 
@@ -132,7 +132,7 @@
                 <div class="detail-item mb-2">
                     <i class="bi bi-check-circle text-success me-2"></i>
                     <span class="text-success small">
-                        Paid: @Invoice.PaidDate.Value.ToString("dd/MM/yyyy")
+                        Πληρώθηκε: @Invoice.PaidDate.Value.ToString("dd/MM/yyyy")
                     </span>
                 </div>
             }
@@ -140,7 +140,7 @@
             <div class="detail-item mb-2">
                 <i class="bi bi-receipt text-muted me-2"></i>
                 <span class="text-muted small">
-                    @Invoice.LineItems.Count job(s) • @Invoice.VatRate% VAT
+                    @Invoice.LineItems.Count εργασία(ες) • @Invoice.VatRate% ΦΠΑ
                 </span>
             </div>
 
@@ -157,16 +157,16 @@
         <div class="invoice-totals mb-3">
             <div class="row text-center">
                 <div class="col-4">
-                    <div class="stat-number text-muted small">£@Invoice.Subtotal.ToString("N2")</div>
-                    <div class="stat-label text-muted small">Subtotal</div>
+                    <div class="stat-number text-muted small">€@Invoice.Subtotal.ToString("N2")</div>
+                    <div class="stat-label text-muted small">Υποσύνολο</div>
                 </div>
                 <div class="col-4">
-                    <div class="stat-number text-muted small">£@Invoice.VatAmount.ToString("N2")</div>
-                    <div class="stat-label text-muted small">VAT</div>
+                    <div class="stat-number text-muted small">€@Invoice.VatAmount.ToString("N2")</div>
+                    <div class="stat-label text-muted small">ΦΠΑ</div>
                 </div>
                 <div class="col-4">
-                    <div class="stat-number text-success fw-bold">£@Invoice.Total.ToString("N2")</div>
-                    <div class="stat-label text-muted small">Total</div>
+                    <div class="stat-number text-success fw-bold">€@Invoice.Total.ToString("N2")</div>
+                    <div class="stat-label text-muted small">Σύνολο</div>
                 </div>
             </div>
         </div>
@@ -185,7 +185,7 @@
             <div class="d-flex gap-2">
                 <a href="/invoice/@Invoice.Id" class="btn btn-primary btn-sm flex-fill">
                     <i class="bi bi-eye me-1"></i>
-                    View Details
+                    Προβολή Λεπτομερειών
                 </a>
             </div>
         </div>
@@ -199,36 +199,36 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Send Invoice</h5>
+                    <h5 class="modal-title">Αποστολή Τιμολογίου</h5>
                     <button type="button" class="btn-close" @onclick="HideSendConfirmation"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-envelope text-primary" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Send Invoice?</h5>
+                        <h5 class="mt-3">Αποστολή Τιμολογίου;</h5>
                         <p class="text-muted">
-                            This will send invoice <strong>@Invoice.InvoiceNumber</strong> to the customer.
-                            The invoice status will be changed to "Sent".
+                            Αυτό θα στείλει το τιμολόγιο <strong>@Invoice.InvoiceNumber</strong> στον πελάτη.
+                            Η κατάσταση του τιμολογίου θα αλλάξει σε "Απεσταλμένο".
                         </p>
                         @if (Invoice.Status == InvoiceStatus.Draft)
                         {
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle me-2"></i>
-                                This invoice is currently in draft status. Sending will finalize the invoice.
+                                Αυτό το τιμολόγιο είναι προς το παρόν σε κατάσταση πρόχειρου. Η αποστολή θα οριστικοποιήσει το τιμολόγιο.
                             </div>
                         }
                         @if (Invoice.Total > 1000)
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>High Value Invoice:</strong> This invoice is for £@Invoice.Total.ToString("N2"). Please
-                                verify all details are correct.
+                                <strong>Τιμολόγιο Υψηλής Αξίας:</strong> Αυτό το τιμολόγιο είναι για €@Invoice.Total.ToString("N2"). Παρακαλώ
+                                επαληθεύστε ότι όλες οι λεπτομέρειες είναι σωστές.
                             </div>
                         }
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideSendConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideSendConfirmation">Ακύρωση</button>
                     <button type="button" class="btn btn-success" @onclick="ConfirmSend" disabled="@isSending">
                         @if (isSending)
                         {
@@ -238,7 +238,7 @@
                         {
                             <i class="bi bi-send me-1"></i>
                         }
-                        @(isSending ? "Sending..." : "Send Invoice")
+                        @(isSending ? "Αποστολή..." : "Αποστολή Τιμολογίου")
                     </button>
                 </div>
             </div>
@@ -253,25 +253,25 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Delete Draft Invoice</h5>
+                    <h5 class="modal-title">Διαγραφή Πρόχειρου Τιμολογίου</h5>
                     <button type="button" class="btn-close" @onclick="HideDeleteConfirmation"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Delete this draft invoice?</h5>
+                        <h5 class="mt-3">Διαγραφή αυτού του πρόχειρου τιμολογίου;</h5>
                         <p class="text-muted">
-                            This will permanently delete draft invoice <strong>@Invoice.InvoiceNumber</strong>.
-                            The associated jobs will be available for re-invoicing.
+                            Αυτό θα διαγράψει οριστικά το πρόχειρο τιμολόγιο <strong>@Invoice.InvoiceNumber</strong>.
+                            Οι συσχετισμένες εργασίες θα είναι διαθέσιμες για επανατιμολόγηση.
                         </p>
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
-                            This invoice is still in draft status and has not been sent to the customer.
+                            Αυτό το τιμολόγιο είναι ακόμα σε κατάσταση πρόχειρου και δεν έχει σταλεί στον πελάτη.
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Keep Draft</button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Διατήρηση Πρόχειρου</button>
                     <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
                         @if (isDeleting)
                         {
@@ -281,7 +281,7 @@
                         {
                             <i class="bi bi-trash me-1"></i>
                         }
-                        @(isDeleting ? "Deleting..." : "Delete Draft")
+                        @(isDeleting ? "Διαγραφή..." : "Διαγραφή Πρόχειρου")
                     </button>
                 </div>
             </div>
@@ -296,44 +296,44 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Cancel Invoice</h5>
+                    <h5 class="modal-title">Ακύρωση Τιμολογίου</h5>
                     <button type="button" class="btn-close" @onclick="HideCancelConfirmation"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-x-circle text-warning" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Cancel this invoice?</h5>
+                        <h5 class="mt-3">Ακύρωση αυτού του τιμολογίου;</h5>
                         <p class="text-muted">
-                            This will cancel invoice <strong>@Invoice.InvoiceNumber</strong> and mark it as no longer valid.
-                            The associated jobs will be available for re-invoicing.
+                            Αυτό θα ακυρώσει το τιμολόγιο <strong>@Invoice.InvoiceNumber</strong> και θα το σημειώσει ως μη έγκυρο.
+                            Οι συσχετισμένες εργασίες θα είναι διαθέσιμες για επανατιμολόγηση.
                         </p>
                         <div class="alert alert-warning">
                             <i class="bi bi-exclamation-triangle me-2"></i>
-                            <strong>Notice:</strong> This invoice has already been sent to the customer.
-                            A cancellation notification will be sent automatically.
+                            <strong>Σημείωση:</strong> Αυτό το τιμολόγιο έχει ήδη σταλεί στον πελάτη.
+                            Μια ειδοποίηση ακύρωσης θα σταλεί αυτόματα.
                         </div>
                     </div>
 
                     <!-- Cancellation Reason -->
                     <div class="mt-3">
-                        <label class="form-label">Reason for cancellation:</label>
+                        <label class="form-label">Λόγος ακύρωσης:</label>
                         <select class="form-select" @bind="cancellationReason">
-                            <option value="">Select a reason...</option>
-                            <option value="Customer Request">Customer Request</option>
-                            <option value="Service Not Completed">Service Not Completed</option>
-                            <option value="Pricing Error">Pricing Error</option>
-                            <option value="Duplicate Invoice">Duplicate Invoice</option>
-                            <option value="Other">Other</option>
+                            <option value="">Επιλέξτε λόγο...</option>
+                            <option value="Customer Request">Αίτημα Πελάτη</option>
+                            <option value="Service Not Completed">Υπηρεσία Δεν Ολοκληρώθηκε</option>
+                            <option value="Pricing Error">Λάθος Τιμολόγησης</option>
+                            <option value="Duplicate Invoice">Διπλό Τιμολόγιο</option>
+                            <option value="Other">Άλλο</option>
                         </select>
                         @if (cancellationReason == "Other")
                         {
                             <textarea class="form-control mt-2" @bind="customCancellationReason"
-                                placeholder="Please specify the reason..." rows="3"></textarea>
+                                placeholder="Παρακαλώ προσδιορίστε τον λόγο..." rows="3"></textarea>
                         }
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideCancelConfirmation">Keep Invoice</button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideCancelConfirmation">Διατήρηση Τιμολογίου</button>
                     <button type="button" class="btn btn-warning" @onclick="ConfirmCancel"
                         disabled="@(isCancelling || string.IsNullOrEmpty(cancellationReason))">
                         @if (isCancelling)
@@ -344,7 +344,7 @@
                         {
                             <i class="bi bi-x-circle me-1"></i>
                         }
-                        @(isCancelling ? "Cancelling..." : "Cancel Invoice")
+                        @(isCancelling ? "Ακύρωση..." : "Ακύρωση Τιμολογίου")
                     </button>
                 </div>
             </div>
@@ -359,16 +359,16 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Mark Invoice as Paid</h5>
+                    <h5 class="modal-title">Σήμανση Τιμολογίου ως Πληρωμένο</h5>
                     <button type="button" class="btn-close" @onclick="HideMarkAsPaidConfirmation"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Mark as Paid?</h5>
+                        <h5 class="mt-3">Σήμανση ως Πληρωμένο;</h5>
                         <p class="text-muted">
-                            This will mark invoice <strong>@Invoice.InvoiceNumber</strong> as paid.
-                            Total amount: <strong>£@Invoice.Total.ToString("N2")</strong>
+                            Αυτό θα σημειώσει το τιμολόγιο <strong>@Invoice.InvoiceNumber</strong> ως πληρωμένο.
+                            Συνολικό ποσό: <strong>€@Invoice.Total.ToString("N2")</strong>
                         </p>
                     </div>
 
@@ -376,29 +376,29 @@
                     <div class="mt-3">
                         <div class="row">
                             <div class="col-6">
-                                <label class="form-label">Payment Date:</label>
+                                <label class="form-label">Ημερομηνία Πληρωμής:</label>
                                 <input type="date" class="form-control" @bind="paymentDate" />
                             </div>
                             <div class="col-6">
-                                <label class="form-label">Payment Method:</label>
+                                <label class="form-label">Μέθοδος Πληρωμής:</label>
                                 <select class="form-select" @bind="paymentMethod">
-                                    <option value="Bank Transfer">Bank Transfer</option>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Cheque">Cheque</option>
-                                    <option value="Credit Card">Credit Card</option>
-                                    <option value="Other">Other</option>
+                                    <option value="Bank Transfer">Τραπεζική Μεταφορά</option>
+                                    <option value="Cash">Μετρητά</option>
+                                    <option value="Cheque">Επιταγή</option>
+                                    <option value="Credit Card">Πιστωτική Κάρτα</option>
+                                    <option value="Other">Άλλο</option>
                                 </select>
                             </div>
                         </div>
                         <div class="mt-2">
-                            <label class="form-label">Payment Reference (optional):</label>
+                            <label class="form-label">Αναφορά Πληρωμής (προαιρετικό):</label>
                             <input type="text" class="form-control" @bind="paymentReference"
-                                placeholder="Transaction ID, check number, etc." />
+                                placeholder="Αριθμός συναλλαγής, αριθμός επιταγής, κλπ." />
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideMarkAsPaidConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideMarkAsPaidConfirmation">Ακύρωση</button>
                     <button type="button" class="btn btn-success" @onclick="ConfirmMarkAsPaid" disabled="@isMarkingPaid">
                         @if (isMarkingPaid)
                         {
@@ -408,7 +408,7 @@
                         {
                             <i class="bi bi-check-circle me-1"></i>
                         }
-                        @(isMarkingPaid ? "Processing..." : "Mark as Paid")
+                        @(isMarkingPaid ? "Επεξεργασία..." : "Σήμανση ως Πληρωμένο")
                     </button>
                 </div>
             </div>
@@ -423,25 +423,25 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Mark Invoice as Delivered</h5>
+                    <h5 class="modal-title">Σήμανση Τιμολογίου ως Παραδομένο</h5>
                     <button type="button" class="btn-close" @onclick="HideDeliveredConfirmation"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-hand-thumbs-up text-info" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Mark as Delivered?</h5>
+                        <h5 class="mt-3">Σήμανση ως Παραδομένο;</h5>
                         <p class="text-muted">
-                            This will mark invoice <strong>@Invoice.InvoiceNumber</strong> as hand-delivered to the customer.
-                            The invoice status will be changed to "Delivered".
+                            Αυτό θα σημειώσει το τιμολόγιο <strong>@Invoice.InvoiceNumber</strong> ως παραδομένο στον πελάτη.
+                            Η κατάσταση του τιμολογίου θα αλλάξει σε "Παραδομένο".
                         </p>
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
-                            You can still send this invoice via email later if needed.
+                            Μπορείτε ακόμα να στείλετε αυτό το τιμολόγιο μέσω email αργότερα αν χρειαστεί.
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideDeliveredConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeliveredConfirmation">Ακύρωση</button>
                     <button type="button" class="btn btn-info" @onclick="ConfirmDeliver" disabled="@isMarkingDelivered">
                         @if (isMarkingDelivered)
                         {
@@ -451,7 +451,7 @@
                         {
                             <i class="bi bi-hand-thumbs-up me-1"></i>
                         }
-                        @(isMarkingDelivered ? "Processing..." : "Mark as Delivered")
+                        @(isMarkingDelivered ? "Επεξεργασία..." : "Σήμανση ως Παραδομένο")
                     </button>
                 </div>
             </div>

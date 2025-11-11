@@ -22,14 +22,14 @@
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="/customer/@Customer.Id/jobs"><i class="bi bi-calendar-check me-2"></i>Customer Jobs</a></li>
-                    <li><a class="dropdown-item" href="/customer/@Customer.Id/invoices"><i class="bi bi-file-earmark-text me-2"></i>Customer Invoices</a></li>
-                    <li><a class="dropdown-item" href="/customer/@Customer.Id/receipts"><i class="bi bi-receipt-cutoff me-2"></i>Customer Receipts</a></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/jobs"><i class="bi bi-calendar-check me-2"></i>Εργασίες Πελάτη</a></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/invoices"><i class="bi bi-file-earmark-text me-2"></i>Τιμολόγια Πελάτη</a></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/receipts"><i class="bi bi-receipt-cutoff me-2"></i>Αποδείξεις Πελάτη</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="/customer/@Customer.Id/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)"><i class="bi bi-file-earmark-plus me-2"></i>Create Invoice</a></li>
-                    <li><a class="dropdown-item" href="/receipt/new?customerId=@Customer.Id&returnUrl=@Uri.EscapeDataString(Navigation.Uri)"><i class="bi bi-receipt me-2"></i>Create Receipt</a></li>
+                    <li><a class="dropdown-item" href="/customer/@Customer.Id/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)"><i class="bi bi-file-earmark-plus me-2"></i>Δημιουργία Τιμολογίου</a></li>
+                    <li><a class="dropdown-item" href="/receipt/new?customerId=@Customer.Id&returnUrl=@Uri.EscapeDataString(Navigation.Uri)"><i class="bi bi-receipt me-2"></i>Δημιουργία Απόδειξης</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" @onclick="() => EditCustomer(Customer.Id)"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                    <li><a class="dropdown-item" @onclick="() => EditCustomer(Customer.Id)"><i class="bi bi-pencil me-2"></i>Επεξεργασία</a></li>
                     <li><hr class="dropdown-divider"></li>
                     @if (Customer.ActiveJobs > 0)
                     {
@@ -40,7 +40,7 @@
                     else
                     {
                         <li><button class="dropdown-item text-danger" @onclick="ShowDeleteConfirmation">
-                                <i class="bi bi-trash me-2"></i>Delete
+                                <i class="bi bi-trash me-2"></i>Διαγραφή
                             </button></li>
                     }
                 </ul>
@@ -64,15 +64,15 @@
             <div class="row text-center">
                 <div class="col-4">
                     <div class="stat-number text-primary fw-bold">@Customer.ActiveJobs</div>
-                    <div class="stat-label text-muted small">Active Jobs</div>
+                    <div class="stat-label text-muted small">Ενεργές Εργασίες</div>
                 </div>
                 <div class="col-4">
                     <div class="stat-number text-success fw-bold">@Customer.CompletedJobs</div>
-                    <div class="stat-label text-muted small">Completed</div>
+                    <div class="stat-label text-muted small">Ολοκληρωμένες</div>
                 </div>
                 <div class="col-4">
-                    <div class="stat-number text-warning fw-bold">£@Customer.TotalRevenue.ToString("N0")</div>
-                    <div class="stat-label text-muted small">Revenue</div>
+                    <div class="stat-number text-warning fw-bold">€@Customer.TotalRevenue.ToString("N0")</div>
+                    <div class="stat-label text-muted small">Έσοδα</div>
                 </div>
             </div>
         </div>
@@ -81,7 +81,7 @@
             <div class="d-grid">
                 <a href="/customer/@Customer.Id" class="btn btn-primary btn-sm">
                     <i class="bi bi-eye me-1"></i>
-                    View Details
+                    Προβολή Λεπτομερειών
                 </a>
             </div>
         </div>
@@ -95,28 +95,28 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Delete Customer</h5>
+                    <h5 class="modal-title">Διαγραφή Πελάτη</h5>
                     <button type="button" class="btn-close" @onclick="HideDeleteConfirmation"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Are you sure?</h5>
+                        <h5 class="mt-3">Είστε σίγουροι;</h5>
                         <p class="text-muted">
-                            This will permanently delete <strong>@Customer.Name</strong> and all associated data.
-                            This action cannot be undone.
+                            Αυτό θα διαγράψει οριστικά τον/την <strong>@Customer.Name</strong> και όλα τα σχετικά δεδομένα.
+                            Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
                         </p>
                         @if (Customer.ActiveJobs > 0 || Customer.CompletedJobs > 0)
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                This customer has @(Customer.ActiveJobs + Customer.CompletedJobs) associated jobs which will remain in the system.
+                                Αυτός ο πελάτης έχει @(Customer.ActiveJobs + Customer.CompletedJobs) συσχετισμένες εργασίες που θα παραμείνουν στο σύστημα.
                             </div>
                         }
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Ακύρωση</button>
                     <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
                         @if (isDeleting)
                         {
@@ -126,7 +126,7 @@
                         {
                             <i class="bi bi-trash me-1"></i>
                         }
-                        @(isDeleting ? "Deleting..." : "Delete Customer")
+                        @(isDeleting ? "Διαγραφή..." : "Διαγραφή Πελάτη")
                     </button>
                 </div>
             </div>

@@ -3,7 +3,7 @@
 @using Invoqs.Models
 @using Invoqs.Services
 
-<PageTitle>Login - Invoqs</PageTitle>
+<PageTitle>Invoqs</PageTitle>
 
 <div class="login-container">
     <div class="container">
@@ -15,7 +15,7 @@
                         <div class="logo-text mb-3">
                             <h1 class="text-primary mb-0">Invoqs</h1>
                         </div>
-                        <p class="text-muted mb-0">Professional Invoice Management</p>
+                        <p class="text-muted mb-0">Επαγγελματική Διαχείριση Τιμολογίων</p>
                     </div>
 
                     <!-- Login Form -->
@@ -26,11 +26,11 @@
 
                                 <!-- Email Field -->
                                 <div class="mb-3">
-                                    <label class="form-label required">Email Address</label>
+                                    <label class="form-label required">Email</label>
                                     <InputText @bind-Value="loginModel.Email" 
                                               class="form-control" 
                                               type="email" 
-                                              placeholder="Enter your email" 
+                                              placeholder="Εισάγετε το email σας" 
                                               autocomplete="email"
                                               disabled="@isLoggingIn" />
                                     <ValidationMessage For="@(() => loginModel.Email)" class="text-danger small" />
@@ -38,11 +38,11 @@
 
                                 <!-- Password Field -->
                                 <div class="mb-4">
-                                    <label class="form-label required">Password</label>
+                                    <label class="form-label required">Κωδικός Πρόσβασης</label>
                                     <InputText @bind-Value="loginModel.Password" 
                                               class="form-control" 
                                               type="password" 
-                                              placeholder="Enter your password"
+                                              placeholder="Εισάγετε τον κωδικό σας"
                                               autocomplete="current-password"
                                               disabled="@isLoggingIn" />
                                     <ValidationMessage For="@(() => loginModel.Password)" class="text-danger small" />
@@ -64,14 +64,14 @@
                                         {
                                             <span>
                                                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                Signing In...
+                                                Σύνδεση...
                                             </span>
                                         }
                                         else
                                         {
                                             <span>
                                                 <i class="bi bi-box-arrow-in-right me-2"></i>
-                                                Sign In
+                                                Σύνδεση
                                             </span>
                                         }
                                     </button>
@@ -83,7 +83,7 @@
                     <!-- Footer -->
                     <div class="text-center mt-4">
                         <small class="text-muted">
-                            &copy; @DateTime.Now.Year Invoqs. Professional business solutions.
+                            Invoqs. Επαγγελματικές επιχειρηματικές λύσεις.
                         </small>
                     </div>
                 </div>

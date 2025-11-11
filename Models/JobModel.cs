@@ -106,6 +106,15 @@ namespace Invoqs.Models
             _ => "bi-clock"
         };
 
+        public string StatusDisplay => Status switch
+        {
+            JobStatus.New => "Νέα",
+            JobStatus.Active => "Ενεργή",
+            JobStatus.Completed => "Ολοκληρωμένη",
+            JobStatus.Cancelled => "Ακυρωμένη",
+            _ => Status.ToString()
+        };
+
         public string TypeIcon => Type switch
         {
             JobType.SkipRental => "/images/icons/skip.png",
@@ -116,42 +125,42 @@ namespace Invoqs.Models
 
         public string TypeDisplayName => Type switch
         {
-            JobType.SkipRental => "Skip Rental",
-            JobType.SandDelivery => "Sand Delivery",
-            JobType.ForkLiftService => "Fork Lift Service",
-            _ => "Unknown"
+            JobType.SkipRental => "Ενοικίαση Skip",
+            JobType.SandDelivery => "Παράδοση Άμμου",
+            JobType.ForkLiftService => "Υπηρεσία Forklift",
+            _ => "Άγνωστο"
         };
 
         // ===== JOB TYPE SPECIFIC DISPLAY HELPERS =====
         
         public string SkipTypeDisplay => SkipType switch
         {
-            "SmallSkip" => "Small Skip",
-            "LargeSkip" => "Large Skip",
-            "Hook" => "Hook",
+            "SmallSkip" => "Μικρό Skip",
+            "LargeSkip" => "Μεγάλο Skip",
+            "Hook" => "Γάντζος",
             _ => ""
         };
         
         public string SandMaterialTypeDisplay => SandMaterialType switch
         {
-            "Sand" => "Sand",
-            "CrushedStone" => "Crushed Stone",
-            "SandMixedWithCrushedStone" => "Sand Mixed with Crushed Stone",
-            "Soil" => "Soil",
+            "Sand" => "Άμμος",
+            "CrushedStone" => "Τσακίλι",
+            "SandMixedWithCrushedStone" => "Άμμος Αναμεμειγμένη με Τσακίλι",
+            "Soil" => "Χώμα",
             _ => ""
         };
         
         public string SandDeliveryMethodDisplay => SandDeliveryMethod switch
         {
-            "InBags" => "In Bags",
-            "ByTruck" => "By Truck",
+            "InBags" => "Σε Σακιά",
+            "ByTruck" => "Με Φορτηγό",
             _ => ""
         };
         
         public string ForkliftSizeDisplay => ForkliftSize switch
         {
-            "17m" => "17m",
-            "25m" => "25m",
+            "17m" => "17μ",
+            "25m" => "25μ",
             _ => ""
         };
 
@@ -160,7 +169,7 @@ namespace Invoqs.Models
         // Invoice integration helper properties and methods
         public bool CanBeInvoiced => Status == JobStatus.Completed && !IsInvoiced;
 
-        public string FormattedPrice => $"£{Price:N2}";
+        public string FormattedPrice => $"€{Price:N2}";
 
         public void MarkAsInvoiced(int invoiceId)
         {
