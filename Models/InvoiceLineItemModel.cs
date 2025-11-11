@@ -35,8 +35,8 @@ namespace Invoqs.Models
         public string? JobAddress { get; set; }
 
         // Computed properties for UI display
-        public string FormattedUnitPrice => $"£{UnitPrice:N2}";
-        public string FormattedLineTotal => $"£{LineTotal:N2}";
+        public string FormattedUnitPrice => $"€{UnitPrice:N2}";
+        public string FormattedLineTotal => $"€{LineTotal:N2}";
 
         // Helper method to create line item from job
         public static InvoiceLineItemModel FromJob(JobModel job)

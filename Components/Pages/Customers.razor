@@ -3,7 +3,7 @@
 @using Invoqs.Components.UI
 @using Invoqs.Models
 
-<PageTitle>Customers - Invoqs</PageTitle>
+<PageTitle>Πελάτες - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -11,8 +11,8 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Customers</li>
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Πελάτες</li>
         </ol>
     </nav>
 
@@ -31,12 +31,12 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h2 class="text-primary mb-1">Customers</h2>
+                    <h2 class="text-primary mb-1">Πελάτες</h2>
                 </div>
                 <div class="d-flex gap-2 mt-2 mt-md-0">
                     <a href="/customer/new" class="btn btn-primary">
                         <i class="bi bi-plus-lg me-1"></i>
-                        Add Customer
+                        Προσθήκη Πελάτη
                     </a>
                 </div>
             </div>
@@ -50,34 +50,34 @@
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-6 col-lg-4">
-                            <label class="form-label small text-muted">Search Customers</label>
+                            <label class="form-label small text-muted">Αναζήτηση Πελατών</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                 <input type="text" class="form-control" @bind="searchTerm" @bind:event="oninput"
-                                    placeholder="Search by name, email, or phone...">
+                                    placeholder="Αναζήτηση με όνομα, email ή τηλέφωνο...">
                             </div>
                         </div>
                         <div class="col-md-3 col-lg-2">
-                            <label class="form-label small text-muted">Sort By</label>
+                            <label class="form-label small text-muted">Ταξινόμηση</label>
                             <select class="form-select" @bind="sortBy">
-                                <option value="name">Name</option>
-                                <option value="created">Date Added</option>
-                                <option value="revenue">Revenue</option>
-                                <option value="jobs">Total Jobs</option>
+                                <option value="name">Όνομα</option>
+                                <option value="created">Ημερομηνία Προσθήκης</option>
+                                <option value="revenue">Έσοδα</option>
+                                <option value="jobs">Σύνολο Εργασιών</option>
                             </select>
                         </div>
                         <div class="col-md-3 col-lg-2">
-                            <label class="form-label small text-muted">Filter</label>
+                            <label class="form-label small text-muted">Φίλτρο</label>
                             <select class="form-select" @bind="filterBy">
-                                <option value="all">All Customers</option>
-                                <option value="active">Active Jobs</option>
-                                <option value="inactive">No Active Jobs</option>
+                                <option value="all">Όλοι οι Πελάτες</option>
+                                <option value="active">Με Ενεργές Εργασίες</option>
+                                <option value="inactive">Χωρίς Ενεργές Εργασίες</option>
                             </select>
                         </div>
                         <div class="row mt-3">
                             <div class="col-12">
                                 <small class="text-muted">
-                                    Showing @filteredCustomers.Count() of @customers.Count customers
+                                    Εμφάνιση @filteredCustomers.Count() από @customers.Count πελάτες
                                 </small>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@customers.Count</h3>
-                            <p class="mb-0 small">Total Customers</p>
+                            <p class="mb-0 small">Σύνολο Πελατών</p>
                         </div>
                         <i class="bi bi-people fs-1 opacity-75"></i>
                     </div>
@@ -108,7 +108,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@customers.Sum(c => c.ActiveJobs)</h3>
-                            <p class="mb-0 small">Active Jobs</p>
+                            <p class="mb-0 small">Ενεργές Εργασίες</p>
                         </div>
                         <i class="bi bi-calendar-check fs-1 opacity-75"></i>
                     </div>
@@ -121,7 +121,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@customers.Sum(c => c.CompletedJobs)</h3>
-                            <p class="mb-0 small">Completed Jobs</p>
+                            <p class="mb-0 small">Ολοκληρωμένες Εργασίες</p>
                         </div>
                         <i class="bi bi-check-circle fs-1 opacity-75"></i>
                     </div>
@@ -133,10 +133,10 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">£@customers.Sum(c => c.TotalRevenue).ToString("N0")</h3>
-                            <p class="mb-0 small">Total Revenue of Completed Jobs</p>
+                            <h3 class="mb-0">€@customers.Sum(c => c.TotalRevenue).ToString("N0")</h3>
+                            <p class="mb-0 small">Συνολικά Έσοδα Ολοκληρωμένων Εργασιών</p>
                         </div>
-                        <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                        <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                     </div>
                 </div>
             </div>
@@ -159,11 +159,11 @@
     {
         <div class="text-center py-5">
             <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
-            <h4 class="text-muted mt-3">No customers found</h4>
-            <p class="text-muted">Try adjusting your search or filter criteria</p>
+            <h4 class="text-muted mt-3">Δεν βρέθηκαν πελάτες</h4>
+            <p class="text-muted">Δοκιμάστε να προσαρμόσετε τα κριτήρια αναζήτησης ή φίλτρου</p>
             <button class="btn btn-primary" @onclick="ShowAddCustomerModal">
                 <i class="bi bi-plus-lg me-1"></i>
-                Add Your First Customer
+                Προσθήκη Πρώτου Πελάτη
             </button>
         </div>
     }

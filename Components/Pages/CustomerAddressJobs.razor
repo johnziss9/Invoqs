@@ -4,7 +4,7 @@
 @using Invoqs.Models
 @inherits CustomerAddressJobsBase
 
-<PageTitle>Jobs at @Address - @customerName - Invoqs</PageTitle>
+<PageTitle>Εργασίες στη @Address - @customerName - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -12,9 +12,9 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Customers</a></li>
-            <li class="breadcrumb-item"><a href="/customer/@CustomerId/jobs" class="text-decoration-none">@customerName Jobs</a></li>
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Πελάτες</a></li>
+            <li class="breadcrumb-item"><a href="/customer/@CustomerId/jobs" class="text-decoration-none">Εργασίες @customerName</a></li>
             <li class="breadcrumb-item active" aria-current="page">@Address</li>
         </ol>
     </nav>
@@ -25,18 +25,18 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
                     <h2 class="text-primary mb-1">
-                        <i class="bi bi-geo-alt me-2"></i>Jobs at @Address
+                        <i class="bi bi-geo-alt me-2"></i>Εργασίες στη @Address
                     </h2>
-                    <p class="text-muted mb-0">Customer: @customerName • @filteredJobs.Count() of @jobs.Count jobs</p>
+                    <p class="text-muted mb-0">Πελάτης: @customerName • @filteredJobs.Count() από @jobs.Count εργασίες</p>
                 </div>
                 <div class="d-flex gap-2 mt-2 mt-md-0">
                     <a href="/customer/@CustomerId" class="btn btn-outline-secondary">
                         <i class="bi bi-person-fill me-1"></i>
-                        View Customer
+                        Προβολή Πελάτη
                     </a>
                     <a href="/customer/@CustomerId/job/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" class="btn btn-primary">
                         <i class="bi bi-plus-lg me-1"></i>
-                        Add Job
+                        Προσθήκη Εργασίας
                     </a>
                 </div>
             </div>
@@ -47,7 +47,7 @@
     {
         <div class="d-flex justify-content-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">Φόρτωση...</span>
             </div>
         </div>
     }
@@ -90,11 +90,11 @@
                                     <div class="text-end text-muted small">
                                         @if (!string.IsNullOrEmpty(customer.CompanyRegistrationNumber))
                                         {
-                                            <div>Reg: @customer.CompanyRegistrationNumber</div>
+                                            <div>Αριθμός Μητρώου: @customer.CompanyRegistrationNumber</div>
                                         }
                                         @if (!string.IsNullOrEmpty(customer.VatNumber))
                                         {
-                                            <div>VAT: @customer.VatNumber</div>
+                                            <div>ΑΦΜ: @customer.VatNumber</div>
                                         }
                                     </div>
                                 }
@@ -113,7 +113,7 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.New)</h3>
-                                <p class="mb-0 small">New Jobs</p>
+                                <p class="mb-0 small">Νέες Εργασίες</p>
                             </div>
                             <i class="bi bi-clock fs-1 opacity-75"></i>
                         </div>
@@ -126,7 +126,7 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Active)</h3>
-                                <p class="mb-0 small">Active Jobs</p>
+                                <p class="mb-0 small">Ενεργές Εργασίες</p>
                             </div>
                             <i class="bi bi-play-circle fs-1 opacity-75"></i>
                         </div>
@@ -139,7 +139,7 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Completed)</h3>
-                                <p class="mb-0 small">Completed</p>
+                                <p class="mb-0 small">Ολοκληρωμένες</p>
                             </div>
                             <i class="bi bi-check-circle fs-1 opacity-75"></i>
                         </div>
@@ -152,7 +152,7 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Cancelled)</h3>
-                                <p class="mb-0 small">Cancelled</p>
+                                <p class="mb-0 small">Ακυρωμένες</p>
                             </div>
                             <i class="bi bi-x-circle fs-1 opacity-75"></i>
                         </div>
@@ -165,7 +165,7 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <h3 class="mb-0">@jobs.Count</h3>
-                                <p class="mb-0 small">Total Jobs</p>
+                                <p class="mb-0 small">Σύνολο Εργασιών</p>
                             </div>
                             <i class="bi bi-briefcase fs-1 opacity-75"></i>
                         </div>
@@ -177,10 +177,10 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h3 class="mb-0">£@jobs.Where(j => j.Status == JobStatus.Completed).Sum(j => j.Price).ToString("N0")</h3>
-                                <p class="mb-0 small">Revenue</p>
+                                <h3 class="mb-0">€@jobs.Where(j => j.Status == JobStatus.Completed).Sum(j => j.Price).ToString("N0")</h3>
+                                <p class="mb-0 small">Έσοδα</p>
                             </div>
-                            <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                            <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                         </div>
                     </div>
                 </div>
@@ -194,49 +194,47 @@
                     <div class="card-body">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-6 col-lg-4">
-                                <label class="form-label small text-muted">Search Jobs</label>
+                                <label class="form-label small text-muted">Αναζήτηση Εργασιών</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                                     <input type="text" class="form-control" @bind="searchTerm" @bind:event="oninput"
-                                        placeholder="Search by title or description...">
+                                        placeholder="Αναζήτηση με τίτλο ή περιγραφή...">
                                 </div>
                             </div>
+                            <label class="form-label small text-muted">Κατάσταση</label>
+                            <select class="form-select" @bind="statusFilter">
+                                <option value="all">Όλες οι Καταστάσεις</option>
+                                <option value="new">Νέες</option>
+                                <option value="active">Ενεργές</option>
+                                <option value="completed">Ολοκληρωμένες</option>
+                                <option value="cancelled">Ακυρωμένες</option>
+                            </select>
                             <div class="col-md-3 col-lg-2">
-                                <label class="form-label small text-muted">Status</label>
-                                <select class="form-select" @bind="statusFilter">
-                                    <option value="all">All Status</option>
-                                    <option value="new">New</option>
-                                    <option value="active">Active</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 col-lg-2">
-                                <label class="form-label small text-muted">Type</label>
+                                <label class="form-label small text-muted">Τύπος</label>
                                 <select class="form-select" @bind="typeFilter">
-                                    <option value="all">All Types</option>
-                                    <option value="skip">Skip Rental</option>
-                                    <option value="sand">Sand Delivery</option>
-                                    <option value="cliff">Fork Lift Service</option>
+                                    <option value="all">Όλοι οι Τύποι</option>
+                                    <option value="skip">Ενοικίαση Skip</option>
+                                    <option value="sand">Παράδοση Άμμου</option>
+                                    <option value="cliff">Υπηρεσία Forklift</option>
                                 </select>
                             </div>
                             <div class="col-md-3 col-lg-2">
-                                <label class="form-label small text-muted">Sort By</label>
+                                <label class="form-label small text-muted">Ταξινόμηση Κατά</label>
                                 <select class="form-select" @bind="sortBy">
-                                    <option value="startDate">Start Date</option>
-                                    <option value="endDate">End Date</option>
-                                    <option value="status">Status</option>
-                                    <option value="type">Type</option>
-                                    <option value="price">Price</option>
+                                    <option value="startDate">Ημερομηνία Έναρξης</option>
+                                    <option value="endDate">Ημερομηνία Λήξης</option>
+                                    <option value="status">Κατάσταση</option>
+                                    <option value="type">Τύπος</option>
+                                    <option value="price">Τιμή</option>
                                 </select>
                             </div>
                             <div class="row mt-3">
                             <div class="col-12">
                                 <small class="text-muted">
-                                    Showing @filteredJobs.Count() of @jobs.Count jobs at this address
+                                    Εμφάνιση @filteredJobs.Count() από @jobs.Count εργασίες σε αυτήν τη διεύθυνση
                                     @if (!string.IsNullOrWhiteSpace(searchTerm) || statusFilter != "all" || typeFilter != "all")
                                     {
-                                        <span> • <button class="btn btn-link btn-sm p-0 text-decoration-none" @onclick="ClearFilters">Clear filters</button></span>
+                                        <span> • <button class="btn btn-link btn-sm p-0 text-decoration-none" @onclick="ClearFilters">Καθαρισμός φίλτρων</button></span>
                                     }
                                 </small>
                             </div>
@@ -271,12 +269,12 @@
                         <div class="card border-0 shadow-sm">
                             <div class="card-body text-center py-5">
                                 <i class="bi bi-receipt text-muted" style="font-size: 3rem;"></i>
-                                <h5 class="text-muted mt-3">Ready for Invoicing</h5>
-                                <p class="text-muted mb-3">@jobs.Count(j => j.CanBeInvoiced) completed job(s) at this address can be invoiced.</p>
+                                <h5 class="text-muted mt-3">Έτοιμες για Τιμολόγηση</h5>
+                                <p class="text-muted mb-3">@jobs.Count(j => j.CanBeInvoiced) ολοκληρωμένη(ες) εργασία(ες) σε αυτήν τη διεύθυνση μπορούν να τιμολογηθούν.</p>
                                 <a href="/customer/@CustomerId/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" 
                                 class="btn btn-success">
                                     <i class="bi bi-plus-lg me-1"></i>
-                                    Create Invoice for Address
+                                    Δημιουργία Τιμολογίου για Διεύθυνση
                                 </a>
                             </div>
                         </div>
@@ -289,11 +287,11 @@
             <!-- Empty State -->
             <div class="text-center py-5">
                 <i class="bi bi-briefcase text-muted" style="font-size: 4rem;"></i>
-                <h4 class="text-muted mt-3">No jobs found at this address</h4>
-                <p class="text-muted">Create the first job for this location</p>
+                <h4 class="text-muted mt-3">Δεν βρέθηκαν εργασίες σε αυτήν τη διεύθυνση</h4>
+                <p class="text-muted">Δημιουργήστε την πρώτη εργασία για αυτήν την τοποθεσία</p>
                 <a href="/customer/@CustomerId/job/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)" class="btn btn-primary">
                     <i class="bi bi-plus-lg me-1"></i>
-                    Add First Job
+                    Προσθήκη Πρώτης Εργασίας
                 </a>
             </div>
         }

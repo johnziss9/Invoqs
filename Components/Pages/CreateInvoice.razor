@@ -4,7 +4,7 @@
 @using Invoqs.Components.UI
 @using Invoqs.Models
 
-<PageTitle>Create Invoice - @(selectedCustomer?.Name ?? "New Invoice") - Invoqs</PageTitle>
+<PageTitle>Δημιουργία Τιμολογίου - @(selectedCustomer?.Name ?? "Νέο Τιμολόγιο") - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -12,29 +12,26 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
             @if (CustomerId > 0 || selectedCustomer != null)
             {
-                <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Customers</a></li>
+                <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Πελάτες</a></li>
                 @if (CustomerId > 0)
                 {
-                    <li class="breadcrumb-item"><a href="/customer/@CustomerId"
-                            class="text-decoration-none">@(selectedCustomer?.Name ?? "Customer")</a></li>
-                    <li class="breadcrumb-item"><a href="/customer/@CustomerId/jobs" class="text-decoration-none">Jobs</a></li>
+                    <li class="breadcrumb-item"><a href="/customer/@CustomerId" class="text-decoration-none">@(selectedCustomer?.Name ?? "Πελάτης")</a></li>
+                    <li class="breadcrumb-item"><a href="/customer/@CustomerId/jobs" class="text-decoration-none">Εργασίες</a></li>
                 }
                 else if (selectedCustomer != null)
                 {
-                    <li class="breadcrumb-item"><a href="/customer/@selectedCustomer.Id"
-                            class="text-decoration-none">@selectedCustomer.Name</a></li>
-                    <li class="breadcrumb-item"><a href="/customer/@selectedCustomer.Id/jobs"
-                            class="text-decoration-none">Jobs</a></li>
+                    <li class="breadcrumb-item"><a href="/customer/@selectedCustomer.Id" class="text-decoration-none">@selectedCustomer.Name</a></li>
+                    <li class="breadcrumb-item"><a href="/customer/@selectedCustomer.Id/jobs" class="text-decoration-none">Εργασίες</a></li>
                 }
             }
             else
             {
-                <li class="breadcrumb-item"><a href="/invoices" class="text-decoration-none">Invoices</a></li>
+                <li class="breadcrumb-item"><a href="/invoices" class="text-decoration-none">Τιμολόγια</a></li>
             }
-            <li class="breadcrumb-item active" aria-current="page">Create Invoice</li>
+            <li class="breadcrumb-item active" aria-current="page">Δημιουργία Τιμολογίου</li>
         </ol>
     </nav>
 
@@ -43,14 +40,14 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h2 class="text-primary mb-1">Create Invoice</h2>
+                    <h2 class="text-primary mb-1">Δημιουργία Τιμολογίου</h2>
                     @if (selectedCustomer != null)
                     {
-                        <p class="text-muted mb-0">Customer: @selectedCustomer.Name</p>
+                        <p class="text-muted mb-0">Πελάτης: @selectedCustomer.Name</p>
                     }
                     else
                     {
-                        <p class="text-muted mb-0">Select a customer and completed jobs to include in the invoice</p>
+                        <p class="text-muted mb-0">Επιλέξτε έναν πελάτη και ολοκληρωμένες εργασίες για να συμπεριληφθούν στο τιμολόγιο</p>
                     }
                 </div>
             </div>
@@ -61,7 +58,7 @@
     {
         <div class="d-flex justify-content-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">Φόρτωση...</span>
             </div>
         </div>
     }
@@ -69,7 +66,7 @@
     {
         <div class="alert alert-danger" role="alert">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            Customer not found.
+            Ο πελάτης δεν βρέθηκε.
         </div>
     }
     else
@@ -81,7 +78,7 @@
                     <!-- Invoice Information -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h5 class="mb-0">Invoice Information</h5>
+                            <h5 class="mb-0">Στοιχεία Τιμολογίου</h5>
                         </div>
                         <div class="card-body">
                             <div class="row g-3">
@@ -89,10 +86,10 @@
                                 @if (CustomerId == 0)
                                 {
                                     <div class="col-12">
-                                        <label class="form-label required">Customer</label>
+                                        <label class="form-label required">Πελάτης</label>
                                         <InputSelect @bind-Value="newInvoice.CustomerId" class="@(validationErrors?.GetFieldErrors("CustomerId").Any() == true ? "form-select is-invalid" : "form-select")"
                                             @bind-Value:after="OnCustomerChanged">
-                                            <option value="0">-- Select Customer --</option>
+                                            <option value="0">-- Επιλέξτε Πελάτη --</option>
                                             @foreach (var customer in customers)
                                             {
                                                 <option value="@customer.Id">@customer.Name</option>
@@ -110,7 +107,7 @@
                                 }
 
                                 <div class="col-md-6">
-                                    <label class="form-label">Due Date</label>
+                                    <label class="form-label">Ημερομηνία Λήξης</label>
                                     <InputDate @bind-Value="newInvoice.DueDate" class="@GetFieldErrorClass("DueDate")" />
                                     <ValidationMessage For="@(() => newInvoice.DueDate)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("DueDate").Any() == true)
@@ -122,7 +119,7 @@
                                     }
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">VAT Rate (%)</label>
+                                    <label class="form-label">ΦΠΑ (%)</label>
                                     <InputNumber @bind-Value="newInvoice.VatRate" @bind-Value:after="RecalculateTotals"
                                         class="@GetFieldErrorClass("VatRate")" step="0.01" />
                                     @if (validationErrors?.GetFieldErrors("VatRate").Any() == true)
@@ -132,12 +129,11 @@
                                             <div class="text-danger small">@error</div>
                                         }
                                     }
-                                    <div class="form-text">Rate automatically set based on job types</div>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">Notes</label>
+                                    <label class="form-label">Σημειώσεις</label>
                                     <InputTextArea @bind-Value="newInvoice.Notes" class="@GetFieldErrorClass("Notes")" rows="3"
-                                        placeholder="Any additional notes for this invoice..." />
+                                        placeholder="Οποιεσδήποτε πρόσθετες σημειώσεις για αυτό το τιμολόγιο..." />
                                     @if (validationErrors?.GetFieldErrors("Notes").Any() == true)
                                     {
                                         @foreach (var error in validationErrors.GetFieldErrors("Notes"))
@@ -155,14 +151,14 @@
                     {
                         <div class="alert alert-info" role="alert">
                             <i class="bi bi-info-circle me-2"></i>
-                            Please select a customer to view available jobs for invoicing.
+                            Παρακαλώ επιλέξτε έναν πελάτη για να δείτε τις διαθέσιμες εργασίες προς τιμολόγηση.
                         </div>
                     }
                     else if (!availableJobs.Any())
                     {
                         <div class="alert alert-info" role="alert">
                             <i class="bi bi-info-circle me-2"></i>
-                            No completed jobs available for invoicing. Jobs must be completed before they can be invoiced.
+                            Δεν υπάρχουν ολοκληρωμένες εργασίες διαθέσιμες για τιμολόγηση. Οι εργασίες πρέπει να ολοκληρωθούν πριν μπορούν να τιμολογηθούν.
                         </div>
                     }
                     else
@@ -174,17 +170,17 @@
                                     <div class="card-body">
                                         <div class="row g-3 align-items-end">
                                             <div class="col-md-3">
-                                                <label class="form-label small text-muted">Start Date</label>
+                                                <label class="form-label small text-muted">Ημερομηνία Έναρξης</label>
                                                 <InputDate @bind-Value="filterStartDate" @bind-Value:after="FilterJobs"
                                                     class="form-control" />
                                             </div>
                                             <div class="col-md-3">
-                                                <label class="form-label small text-muted">End Date</label>
+                                                <label class="form-label small text-muted">Ημερομηνία Λήξης</label>
                                                 <InputDate @bind-Value="filterEndDate" @bind-Value:after="FilterJobs"
                                                     class="form-control" />
                                             </div>
                                             <div class="col-md-3">
-                                                <label class="form-label small text-muted">Address</label>
+                                                <label class="form-label small text-muted">Διεύθυνση</label>
                                                 <select @bind="filterAddress" @bind:after="FilterJobs" class="form-select">
                                                     <option value="">All Addresses</option>
                                                     @foreach (var address in GetUniqueAddresses())
@@ -194,22 +190,22 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-3">
-                                                <label class="form-label small text-muted">Job Type</label>
+                                                <label class="form-label small text-muted">Τύπος Εργασίας</label>
                                                 <select @bind="filterJobType" @bind:after="FilterJobs" class="form-select">
-                                                    <option value="">All Types</option>
-                                                    <option value="SkipRental">Skip Rental</option>
-                                                    <option value="SandDelivery">Sand Delivery</option>
-                                                    <option value="ForkLiftService">Fork Lift Service</option>
+                                                    <option value="">Όλοι οι Τύποι</option>
+                                                    <option value="SkipRental">Ενοικίαση Skip</option>
+                                                    <option value="SandDelivery">Παράδοση Άμμου</option>
+                                                    <option value="ForkLiftService">Υπηρεσία Forklift</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-3">
-                                                <label class="form-label small text-muted">Actions</label>
+                                                <label class="form-label small text-muted">Ενέργειες</label>
                                                 <div class="btn-group w-100" role="group">
                                                     <button type="button" class="btn btn-outline-primary btn-sm" @onclick="SelectAllVisible">
-                                                        Select All
+                                                        Επιλογή Όλων
                                                     </button>
                                                     <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="ClearAllSelected">
-                                                        Clear All
+                                                        Καθαρισμός Όλων
                                                     </button>
                                                 </div>
                                             </div>
@@ -217,7 +213,7 @@
                                         <div class="row mt-3">
                                             <div class="col-12">
                                                 <small class="text-muted">
-                                                    @filteredJobs.Count() of @availableJobs.Count jobs shown
+                                                    @filteredJobs.Count() από @availableJobs.Count εργασίες εμφανίζονται
                                                 </small>
                                             </div>
                                         </div>
@@ -229,14 +225,14 @@
                         <!-- Available Jobs -->
                         <div class="card border-0 shadow-sm mb-4">
                             <div class="card-header bg-white py-3">
-                                <h5 class="mb-0">Available Jobs (@selectedJobIds.Count selected)</h5>
+                                <h5 class="mb-0">Διαθέσιμες Εργασίες (@selectedJobIds.Count επιλεγμένες)</h5>
                             </div>
                             <div class="card-body">
                                 @if (!filteredJobs.Any())
                                 {
                                     <div class="text-center py-4 text-muted">
                                         <i class="bi bi-funnel" style="font-size: 3rem;"></i>
-                                        <p class="mt-2">No jobs match the current filters</p>
+                                        <p class="mt-2">Δεν υπάρχουν εργασίες που να ταιριάζουν με τα τρέχοντα φίλτρα</p>
                                     </div>
                                 }
                                 else
@@ -270,7 +266,7 @@
                                                                 </div>
                                                                 <div class="text-end">
                                                                     <div class="h5 mb-1 text-success">@job.FormattedPrice</div>
-                                                                    <small class="text-muted">excl. VAT</small>
+                                                                    <small class="text-muted">χωρίς ΦΠΑ</small>
                                                                 </div>
                                                             </div>
                                                             @if (!string.IsNullOrEmpty(job.Description))
@@ -303,7 +299,7 @@
                                 </div>
                                 <div class="d-flex gap-2">
                                     <a href="@GetReturnUrl()" class="btn btn-outline-secondary">
-                                        Cancel
+                                        Ακύρωση
                                     </a>
                                     <button type="submit" class="btn btn-primary"
                                         disabled="@(!selectedJobIds.Any() || isSaving)">
@@ -316,7 +312,7 @@
                                         {
                                             <i class="bi bi-plus-lg me-1"></i>
                                         }
-                                        @(isSaving ? "Creating..." : "Create Invoice")
+                                        @(isSaving ? "Δημιουργία..." : "Δημιουργία Τιμολογίου")
                                     </button>
                                 </div>
                             </div>
@@ -331,12 +327,12 @@
                     {
                         <div class="card border-0 shadow-sm mb-4">
                             <div class="card-header bg-white py-3">
-                                <h6 class="mb-0">Customer Information</h6>
+                                <h6 class="mb-0">Στοιχεία Πελάτη</h6>
                             </div>
                             <div class="card-body">
                                 <div class="small">
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-muted">Name:</span>
+                                        <span class="text-muted">Όνομα:</span>
                                         <span class="fw-medium">@selectedCustomer.Name</span>
                                     </div>
                                     @if (!string.IsNullOrEmpty(selectedCustomer.Email))
@@ -349,16 +345,16 @@
                                     @if (!string.IsNullOrEmpty(selectedCustomer.Phone))
                                     {
                                         <div class="d-flex justify-content-between mb-2">
-                                            <span class="text-muted">Phone:</span>
+                                            <span class="text-muted">Τηλέφωνο:</span>
                                             <a href="tel:@selectedCustomer.Phone" class="fw-medium text-decoration-none">@selectedCustomer.Phone</a>
                                         </div>
                                     }
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-muted">Created:</span>
+                                        <span class="text-muted">Δημιουργήθηκε:</span>
                                         <span class="fw-medium">@selectedCustomer.CreatedDate.ToString("dd/MM/yyyy")</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-muted">Last Updated:</span>
+                                        <span class="text-muted">Τελευταία Ενημέρωση:</span>
                                         <span class="fw-medium">@((selectedCustomer.UpdatedDate ?? selectedCustomer.CreatedDate).ToString("dd/MM/yyyy"))</span>
                                     </div>
                                     <!-- Work Status -->
@@ -368,7 +364,7 @@
                                             <div class="mb-1">
                                                 <span class="text-success">
                                                     <i class="bi bi-briefcase me-1"></i>
-                                                    @((selectedCustomer.ActiveJobs + selectedCustomer.NewJobs)) ongoing jobs
+                                                    @((selectedCustomer.ActiveJobs + selectedCustomer.NewJobs)) εργασίες σε εξέλιξη
                                                 </span>
                                             </div>
                                         }
@@ -377,7 +373,7 @@
                                             <div class="mb-1">
                                                 <span class="text-muted">
                                                     <i class="bi bi-check-circle me-1"></i>
-                                                    Last job completed
+                                                    Τελευταία εργασία ολοκληρώθηκε
                                                 </span>
                                             </div>
                                         }
@@ -386,7 +382,7 @@
                                             <div class="mb-1">
                                                 <span class="text-muted">
                                                     <i class="bi bi-clock-history me-1"></i>
-                                                    No jobs yet
+                                                    Δεν υπάρχουν εργασίες ακόμα
                                                 </span>
                                             </div>
                                         }
@@ -397,7 +393,7 @@
                                             <div>
                                                 <span class="text-warning">
                                                     <i class="bi bi-exclamation-circle me-1"></i>
-                                                    @selectedCustomer.UninvoicedJobs uninvoiced jobs
+                                                    @selectedCustomer.UninvoicedJobs μη τιμολογημένες εργασίες
                                                 </span>
                                             </div>
                                         }
@@ -406,8 +402,7 @@
                                         {
                                             <div>
                                                 <span class="text-danger">
-                                                    <i class="bi bi-currency-pound me-1"></i>
-                                                    @selectedCustomer.UnpaidInvoices unpaid (@selectedCustomer.OutstandingAmount.ToString("C"))
+                                                    @selectedCustomer.UnpaidInvoices απλήρωτα (€@selectedCustomer.OutstandingAmount.ToString("N2"))
                                                 </span>
                                             </div>
                                         }
@@ -420,38 +415,38 @@
                     <!-- Invoice Summary -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white py-3">
-                            <h6 class="mb-0">Invoice Summary</h6>
+                            <h6 class="mb-0">Σύνοψη Τιμολογίου</h6>
                         </div>
                         <div class="card-body">
                             @if (!selectedJobIds.Any())
                             {
                                 <div class="text-center py-4 text-muted">
                                     <i class="bi bi-receipt" style="font-size: 3rem;"></i>
-                                    <p class="mt-2">Select jobs to create invoice</p>
+                                    <p class="mt-2">Επιλέξτε εργασίες για να δημιουργήσετε τιμολόγιο</p>
                                 </div>
                             }
                             else
                             {
                                 <div class="invoice-summary">
                                     <div class="summary-row">
-                                        <span>Jobs Selected:</span>
+                                        <span>Εργασίες Επιλεγμένες:</span>
                                         <span class="fw-bold">@selectedJobIds.Count</span>
                                     </div>
                                     <div class="summary-row">
-                                        <span>Subtotal:</span>
-                                        <span class="fw-bold">£@newInvoice.Subtotal.ToString("N2")</span>
+                                        <span>Υποσύνολο:</span>
+                                        <span class="fw-bold">€@newInvoice.Subtotal.ToString("N2")</span>
                                     </div>
                                     <div class="summary-row">
-                                        <span>VAT (@newInvoice.VatRate.ToString("N1")%):</span>
-                                        <span class="fw-bold">£@newInvoice.VatAmount.ToString("N2")</span>
+                                        <span>ΦΠΑ (@newInvoice.VatRate.ToString("N1")%):</span>
+                                        <span class="fw-bold">€@newInvoice.VatAmount.ToString("N2")</span>
                                     </div>
                                     <hr>
                                     <div class="summary-row fs-5">
-                                        <span class="fw-bold">Total:</span>
-                                        <span class="fw-bold text-primary">£@newInvoice.Total.ToString("N2")</span>
+                                        <span class="fw-bold">Σύνολο:</span>
+                                        <span class="fw-bold text-primary">€@newInvoice.Total.ToString("N2")</span>
                                     </div>
                                     <div class="mt-3">
-                                        <small class="text-muted">Due: @newInvoice.DueDate.ToString("dd MMMM yyyy")</small>
+                                        <small class="text-muted">Λήξη: @newInvoice.DueDate.ToString("dd MMMM yyyy")</small>
                                     </div>
                                 </div>
                             }

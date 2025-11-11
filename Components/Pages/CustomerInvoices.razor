@@ -3,7 +3,7 @@
 @using Invoqs.Components.UI
 @using Invoqs.Models
 
-<PageTitle>Customer Invoices - @customerName - Invoqs</PageTitle>
+<PageTitle>Τιμολόγια Πελάτη - @customerName - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -11,11 +11,11 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Customers</a></li>
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Πελάτες</a></li>
             <li class="breadcrumb-item"><a href="/customer/@CustomerId" class="text-decoration-none">@customerName</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">Invoices</li>
+            <li class="breadcrumb-item active" aria-current="page">Τιμολόγια</li>
         </ol>
     </nav>
 
@@ -24,20 +24,20 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h2 class="text-primary mb-1">Invoices for @customerName</h2>
-                    <p class="text-muted mb-0">@customerInvoices.Count total invoices • £@totalValue.ToString("N2")
-                        total value</p>
+                    <h2 class="text-primary mb-1">Τιμολόγια για @customerName</h2>
+                    <p class="text-muted mb-0">@customerInvoices.Count συνολικά τιμολόγια • €@totalValue.ToString("N2")
+                        συνολική αξία</p>
                 </div>
                 <div class="d-flex gap-2 mt-2 mt-md-0">
                     <button class="btn btn-outline-secondary"
                         @onclick="@(() => Navigation.NavigateTo($"/customer/{CustomerId}"))">
                         <i class="bi bi-arrow-left me-1"></i>
-                        Back to Customer
+                        Επιστροφή στον Πελάτη
                     </button>
                     <a href="/customer/@CustomerId/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)"
                         class="btn btn-primary">
                         <i class="bi bi-plus-lg me-1"></i>
-                        Create Invoice
+                        Δημιουργία Τιμολογίου
                     </a>
                 </div>
             </div>
@@ -75,11 +75,11 @@
                                 <div class="text-end text-muted small">
                                     @if (!string.IsNullOrEmpty(customer.CompanyRegistrationNumber))
                                     {
-                                        <div>Reg: @customer.CompanyRegistrationNumber</div>
+                                        <div>Αριθμός Μητρώου: @customer.CompanyRegistrationNumber</div>
                                     }
                                     @if (!string.IsNullOrEmpty(customer.VatNumber))
                                     {
-                                        <div>VAT: @customer.VatNumber</div>
+                                        <div>ΑΦΜ: @customer.VatNumber</div>
                                     }
                                 </div>
                             }
@@ -98,7 +98,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@customerInvoices.Count(i => i.Status == InvoiceStatus.Draft)</h3>
-                            <p class="mb-0 small">Draft</p>
+                            <p class="mb-0 small">Πρόχειρο</p>
                         </div>
                         <i class="bi bi-file-earmark fs-1 opacity-75"></i>
                     </div>
@@ -111,7 +111,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@customerInvoices.Count(i => i.Status == InvoiceStatus.Sent)</h3>
-                            <p class="mb-0 small">Sent</p>
+                            <p class="mb-0 small">Απεσταλμένο</p>
                         </div>
                         <i class="bi bi-send fs-1 opacity-75"></i>
                     </div>
@@ -124,7 +124,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@customerInvoices.Count(i => i.Status == InvoiceStatus.Paid)</h3>
-                            <p class="mb-0 small">Paid</p>
+                            <p class="mb-0 small">Πληρωμένο</p>
                         </div>
                         <i class="bi bi-check-circle fs-1 opacity-75"></i>
                     </div>
@@ -137,7 +137,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@customerInvoices.Count(i => i.Status == InvoiceStatus.Overdue)</h3>
-                            <p class="mb-0 small">Overdue</p>
+                            <p class="mb-0 small">Καθυστερημένο</p>
                         </div>
                         <i class="bi bi-exclamation-triangle fs-1 opacity-75"></i>
                     </div>
@@ -150,7 +150,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@customerInvoices.Count</h3>
-                            <p class="mb-0 small">Total</p>
+                            <p class="mb-0 small">Σύνολο</p>
                         </div>
                         <i class="bi bi-receipt fs-1 opacity-75"></i>
                     </div>
@@ -162,10 +162,10 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">£@totalOutstanding.ToString("N0")</h3>
-                            <p class="mb-0 small">Outstanding</p>
+                            <h3 class="mb-0">€@totalOutstanding.ToString("N0")</h3>
+                            <p class="mb-0 small">Οφειλόμενο</p>
                         </div>
-                        <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                        <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                     </div>
                 </div>
             </div>
@@ -179,53 +179,53 @@
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-6 col-lg-4">
-                            <label class="form-label small text-muted">Search Invoices</label>
+                            <label class="form-label small text-muted">Αναζήτηση Τιμολογίων</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                 <input type="text" class="form-control" 
                                     @bind="searchTerm" 
                                     @bind:event="oninput"
-                                    placeholder="Search by invoice number...">
+                                    placeholder="Αναζήτηση με αριθμό τιμολογίου...">
                             </div>
                         </div>
                         <div class="col-md-3 col-lg-2">
-                            <label class="form-label small text-muted">Status</label>
+                            <label class="form-label small text-muted">Κατάσταση</label>
                             <select class="form-select" @bind="statusFilter" @bind:after="FilterInvoices">
-                                <option value="">All Statuses</option>
-                                <option value="Draft">Draft</option>
-                                <option value="Sent">Sent</option>
-                                <option value="Paid">Paid</option>
-                                <option value="Overdue">Overdue</option>
-                                <option value="Cancelled">Cancelled</option>
+                                <option value="">Όλες οι Καταστάσεις</option>
+                                <option value="Draft">Πρόχειρο</option>
+                                <option value="Sent">Απεσταλμένο</option>
+                                <option value="Paid">Πληρωμένο</option>
+                                <option value="Overdue">Καθυστερημένο</option>
+                                <option value="Cancelled">Ακυρωμένο</option>
                             </select>
                         </div>
                         <div class="col-md-3 col-lg-2">
-                            <label class="form-label small text-muted">Date Range</label>
+                            <label class="form-label small text-muted">Χρονικό Διάστημα</label>
                             <select class="form-select" @bind="dateFilter" @bind:after="FilterInvoices">
-                                <option value="all">All Time</option>
-                                <option value="thisWeek">This Week</option>
-                                <option value="thisMonth">This Month</option>
-                                <option value="lastMonth">Last Month</option>
-                                <option value="thisYear">This Year</option>
+                                <option value="all">Όλος ο Χρόνος</option>
+                                <option value="thisWeek">Αυτή την Εβδομάδα</option>
+                                <option value="thisMonth">Αυτόν τον Μήνα</option>
+                                <option value="lastMonth">Τον Προηγούμενο Μήνα</option>
+                                <option value="thisYear">Φέτος</option>
                             </select>
                         </div>
                         <div class="col-md-3 col-lg-2">
-                            <label class="form-label small text-muted">Sort By</label>
+                            <label class="form-label small text-muted">Ταξινόμηση Κατά</label>
                             <select class="form-select" @bind="sortBy" @bind:after="FilterInvoices">
-                                <option value="created">Created Date</option>
-                                <option value="due">Due Date</option>
-                                <option value="number">Invoice Number</option>
-                                <option value="total">Total Amount</option>
+                                <option value="created">Ημερομηνία Δημιουργίας</option>
+                                <option value="due">Ημερομηνία Λήξης</option>
+                                <option value="number">Αριθμός Τιμολογίου</option>
+                                <option value="total">Συνολικό Ποσό</option>
                             </select>
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-12">
                             <small class="text-muted">
-                                Showing @filteredInvoices.Count() of @customerInvoices.Count invoices
+                                Εμφάνιση @filteredInvoices.Count() από @customerInvoices.Count τιμολόγια
                                 @if (filteredInvoices.Any())
                                 {
-                                    <span class="ms-2">• Total: £@filteredInvoices.Sum(i => i.Total).ToString("N2")</span>
+                                    <span class="ms-2">• Σύνολο: €@filteredInvoices.Sum(i => i.Total).ToString("N2")</span>
                                 }
                             </small>
                         </div>
@@ -240,7 +240,7 @@
     {
         <div class="d-flex justify-content-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">Φόρτωση...</span>
             </div>
         </div>
     }
@@ -258,28 +258,28 @@
             <h4 class="text-muted mt-3">
                 @if (customerInvoices.Any())
                 {
-                    <span>No invoices match your filters</span>
+                    <span>Δεν υπάρχουν τιμολόγια που να ταιριάζουν με τα φίλτρα σας</span>
                 }
                 else
                 {
-                    <span>No invoices found for this customer</span>
+                    <span>Δεν βρέθηκαν τιμολόγια για αυτόν τον πελάτη</span>
                 }
             </h4>
             <p class="text-muted">
                 @if (customerInvoices.Any())
                 {
-                    <span>Try adjusting your search or filter criteria</span>
+                    <span>Δοκιμάστε να προσαρμόσετε την αναζήτηση ή τα κριτήρια φιλτραρίσματος</span>
                 }
                 else
                 {
-                    <span>Create the first invoice for @customerName</span>
+                    <span>Δημιουργήστε το πρώτο τιμολόγιο για @customerName</span>
                 }
             </p>
             @if (!customerInvoices.Any())
             {
                 <a href="/customer/@CustomerId/invoice/new" class="btn btn-primary mt-2">
                     <i class="bi bi-plus-lg me-1"></i>
-                    Create First Invoice
+                    Δημιουργία Πρώτου Τιμολογίου
                 </a>
             }
         </div>

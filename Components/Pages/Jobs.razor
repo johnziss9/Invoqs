@@ -3,7 +3,7 @@
 @using Invoqs.Components.UI
 @using Invoqs.Models
 
-<PageTitle>All Jobs - Invoqs</PageTitle>
+<PageTitle>Εργασίες - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -11,8 +11,8 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">All Jobs</li>
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Εργασίες</li>
         </ol>
     </nav>
 
@@ -21,20 +21,20 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h2 class="text-primary mb-1">All Jobs</h2>
+                    <h2 class="text-primary mb-1">Εργασίες</h2>
                 </div>
                 <div class="d-flex gap-2 mt-2 mt-md-0">
                     <button class="btn btn-outline-secondary" @onclick="@(() => Navigation.NavigateTo("/customers", true))">
                         <i class="bi bi-people me-1"></i>
-                        View Customers
+                        Προβολή Πελατών
                     </button>
                     <button class="btn btn-outline-primary" @onclick="CreateInvoice">
                         <i class="bi bi-receipt me-1"></i>
-                        Create Invoice
+                        Δημιουργία Τιμολογίου
                     </button>
                     <button class="btn btn-primary" @onclick="ShowAddJobModal">
                         <i class="bi bi-plus-lg me-1"></i>
-                        Add Job
+                        Προσθήκη Εργασίας
                     </button>
                 </div>
             </div>
@@ -49,7 +49,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.New)</h3>
-                            <p class="mb-0 small">New Jobs</p>
+                            <p class="mb-0 small">Νέες</p>
                         </div>
                         <i class="bi bi-clock fs-1 opacity-75"></i>
                     </div>
@@ -62,7 +62,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Active)</h3>
-                            <p class="mb-0 small">Active Jobs</p>
+                            <p class="mb-0 small">Ενεργές</p>
                         </div>
                         <i class="bi bi-play-circle fs-1 opacity-75"></i>
                     </div>
@@ -75,7 +75,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Completed)</h3>
-                            <p class="mb-0 small">Completed</p>
+                            <p class="mb-0 small">Ολοκληρωμένες</p>
                         </div>
                         <i class="bi bi-check-circle fs-1 opacity-75"></i>
                     </div>
@@ -88,7 +88,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Cancelled)</h3>
-                            <p class="mb-0 small">Cancelled</p>
+                            <p class="mb-0 small">Ακυρωμένες</p>
                         </div>
                         <i class="bi bi-x-circle fs-1 opacity-75"></i>
                     </div>
@@ -101,7 +101,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h3 class="mb-0">@jobs.Count</h3>
-                            <p class="mb-0 small">Total Jobs</p>
+                            <p class="mb-0 small">Σύνολο Εργασιών</p>
                         </div>
                         <i class="bi bi-briefcase fs-1 opacity-75"></i>
                     </div>
@@ -113,10 +113,10 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">£@jobs.Where(j => j.Status == JobStatus.Completed).Sum(j => j.Price).ToString("N0")</h3>
-                            <p class="mb-0 small">Revenue</p>
+                            <h3 class="mb-0">€@jobs.Where(j => j.Status == JobStatus.Completed).Sum(j => j.Price).ToString("N0")</h3>
+                            <p class="mb-0 small">Έσοδα</p>
                         </div>
-                        <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                        <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                     </div>
                 </div>
             </div>
@@ -130,17 +130,17 @@
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-6 col-lg-4">
-                            <label class="form-label small text-muted">Search Jobs</label>
+                            <label class="form-label small text-muted">Αναζήτηση Εργασιών</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                 <input type="text" class="form-control" @bind="searchTerm" @bind:event="oninput"
-                                    placeholder="Search by title, customer, or address...">
+                                    placeholder="Αναζήτηση με τίτλο, πελάτη ή διεύθυνση...">
                             </div>
                         </div>
                         <div class="col-md-3 col-lg-2">
-                            <label class="form-label small text-muted">Customer</label>
+                            <label class="form-label small text-muted">Πελάτης</label>
                             <select class="form-select" @bind="customerFilter">
-                                <option value="all">All Customers</option>
+                                <option value="all">Όλοι οι Πελάτες</option>
                                 @foreach (var customer in customers)
                                 {
                                     <option value="@customer.Id">@customer.Name</option>
@@ -148,41 +148,41 @@
                             </select>
                         </div>
                         <div class="col-md-3 col-lg-2">
-                            <label class="form-label small text-muted">Status</label>
+                            <label class="form-label small text-muted">Κατάσταση</label>
                             <select class="form-select" @bind="statusFilter">
-                                <option value="all">All Status</option>
-                                <option value="new">New</option>
-                                <option value="active">Active</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
+                                <option value="all">Όλες οι Καταστάσεις</option>
+                                <option value="new">Νέες</option>
+                                <option value="active">Ενεργές</option>
+                                <option value="completed">Ολοκληρωμένες</option>
+                                <option value="cancelled">Ακυρωμένες</option>
                             </select>
                         </div>
                         <div class="col-md-3 col-lg-2">
-                            <label class="form-label small text-muted">Type</label>
+                            <label class="form-label small text-muted">Τύπος</label>
                             <select class="form-select" @bind="typeFilter">
-                                <option value="all">All Types</option>
-                                <option value="skip">Skip Rental</option>
-                                <option value="sand">Sand Delivery</option>
-                                <option value="cliff">Fork Lift Service</option>
+                                <option value="all">Όλοι οι Τύποι</option>
+                                <option value="skip">Ενοικίαση Skip</option>
+                                <option value="sand">Παράδοση Άμμου</option>
+                                <option value="cliff">Υπηρεσία Forklift</option>
                             </select>
                         </div>
                         <div class="col-md-3 col-lg-2">
-                            <label class="form-label small text-muted">Sort By</label>
+                            <label class="form-label small text-muted">Ταξινόμηση</label>
                             <select class="form-select" @bind="sortBy">
-                                <option value="startDate">Start Date</option>
-                                <option value="customer">Customer</option>
-                                <option value="title">Title</option>
-                                <option value="status">Status</option>
-                                <option value="price">Price</option>
+                                <option value="startDate">Ημερομηνία Έναρξης</option>
+                                <option value="customer">Πελάτης</option>
+                                <option value="title">Τίτλος</option>
+                                <option value="status">Κατάσταση</option>
+                                <option value="price">Τιμή</option>
                             </select>
                         </div>
                         <div class="row mt-3">
                         <div class="col-12">
                             <small class="text-muted">
-                                Showing @filteredJobs.Count() of @jobs.Count jobs
+                                Εμφάνιση @filteredJobs.Count() από @jobs.Count εργασίες
                                 @if (!string.IsNullOrWhiteSpace(searchTerm) || customerFilter != "all" || statusFilter != "all" || typeFilter != "all")
                                 {
-                                    <span> • <button class="btn btn-link btn-sm p-0 text-decoration-none" @onclick="ClearFilters">Clear filters</button></span>
+                                    <span> • <button class="btn btn-link btn-sm p-0 text-decoration-none" @onclick="ClearFilters">Εκκαθάριση φίλτρων</button></span>
                                 }
                             </small>
                         </div>
@@ -212,29 +212,29 @@
     {
         <div class="text-center py-5">
             <i class="bi bi-briefcase text-muted" style="font-size: 4rem;"></i>
-            <h4 class="text-muted mt-3">No jobs found</h4>
+            <h4 class="text-muted mt-3">Δεν βρέθηκαν εργασίες</h4>
             <p class="text-muted">
                 @if (string.IsNullOrWhiteSpace(searchTerm) && customerFilter == "all" && statusFilter == "all" && typeFilter == "all")
                 {
-                    <span>No jobs have been created yet</span>
+                    <span>Δεν έχουν δημιουργηθεί εργασίες ακόμα</span>
                 }
                 else
                 {
-                    <span>No jobs match your current search and filter criteria</span>
+                    <span>Δεν υπάρχουν εργασίες που να ταιριάζουν με τα τρέχοντα κριτήρια αναζήτησης και φιλτραρίσματος</span>
                 }
             </p>
             @if (string.IsNullOrWhiteSpace(searchTerm) && customerFilter == "all" && statusFilter == "all" && typeFilter == "all")
             {
                 <button class="btn btn-primary" @onclick="ShowAddJobModal">
                     <i class="bi bi-plus-lg me-1"></i>
-                    Add First Job
+                    Προσθήκη Πρώτης Εργασίας
                 </button>
             }
             else
             {
                 <button class="btn btn-outline-primary" @onclick="ClearFilters">
                     <i class="bi bi-funnel me-1"></i>
-                    Clear Filters
+                    Εκκαθάριση Φίλτρων
                 </button>
             }
         </div>

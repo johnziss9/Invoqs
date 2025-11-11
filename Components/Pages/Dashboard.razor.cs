@@ -159,10 +159,10 @@ namespace Invoqs.Components.Pages
             var hour = DateTime.Now.Hour;
             return hour switch
             {
-                >= 5 and < 12 => "morning",
-                >= 12 and < 17 => "afternoon",
-                >= 17 and < 21 => "evening",
-                _ => "evening"
+                >= 5 and < 12 => "Καλημέρα",
+                >= 12 and < 17 => "Καλό απόγευμα",
+                >= 17 and < 21 => "Καλησπέρα",
+                _ => "Καλησπέρα"
             };
         }
 

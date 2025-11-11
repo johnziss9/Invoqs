@@ -3,7 +3,7 @@
 @using Invoqs.Components.UI
 @using Invoqs.Models
 
-<PageTitle>@(customer?.Name ?? "Loading...") - Receipts - Invoqs</PageTitle>
+<PageTitle>@(customer?.Name ?? "Φόρτωση...") - Αποδείξεις - Invoqs</PageTitle>
 
 <Navbar />
 
@@ -11,10 +11,10 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Customers</a></li>
-            <li class="breadcrumb-item"><a href="/customer/@CustomerId" class="text-decoration-none">@(customer?.Name ?? "Customer")</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Receipts</li>
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Πελάτες</a></li>
+            <li class="breadcrumb-item"><a href="/customer/@CustomerId" class="text-decoration-none">@(customer?.Name ?? "Πελάτης")</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Αποδείξεις</li>
         </ol>
     </nav>
 
@@ -23,16 +23,16 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h2 class="text-primary mb-1">@(customer?.Name ?? "Customer") - Receipts</h2>
+                    <h2 class="text-primary mb-1">@(customer?.Name ?? "Πελάτης") - Αποδείξεις</h2>
                     @if (customer != null)
                     {
-                        <p class="text-muted mb-0">Payment receipts for this customer</p>
+                        <p class="text-muted mb-0">Αποδείξεις πληρωμής για αυτόν τον πελάτη</p>
                     }
                 </div>
                 <div class="mt-2 mt-md-0">
                     <a href="/receipts/new" class="btn btn-primary">
                         <i class="bi bi-plus-lg me-2"></i>
-                        Create Receipt
+                        Δημιουργία Απόδειξης
                     </a>
                 </div>
             </div>
@@ -43,7 +43,7 @@
     {
         <div class="d-flex justify-content-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">Φόρτωση...</span>
             </div>
         </div>
     }
@@ -52,11 +52,11 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-5">
                 <i class="bi bi-receipt" style="font-size: 4rem; color: #ccc;"></i>
-                <h4 class="mt-3">No receipts yet</h4>
-                <p class="text-muted">This customer doesn't have any payment receipts</p>
+                <h4 class="mt-3">Δεν υπάρχουν αποδείξεις ακόμα</h4>
+                <p class="text-muted">Αυτός ο πελάτης δεν έχει αποδείξεις πληρωμής</p>
                 <a href="/receipts/new" class="btn btn-primary mt-3">
                     <i class="bi bi-plus-lg me-2"></i>
-                    Create Receipt
+                    Δημιουργία Απόδειξης
                 </a>
             </div>
         </div>
@@ -71,34 +71,34 @@
                         <div class="row g-3 align-items-end">
                             <!-- Search Receipts -->
                             <div class="col-md-6 col-lg-4">
-                                <label class="form-label small text-muted">Search Receipts</label>
+                                <label class="form-label small text-muted">Αναζήτηση Αποδείξεων</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                                     <input type="text" 
-                                           class="form-control" 
-                                           @bind="searchTerm" 
-                                           @bind:event="oninput"
-                                           placeholder="Search by receipt number, customer...">
+                                        class="form-control" 
+                                        @bind="searchTerm" 
+                                        @bind:event="oninput"
+                                        placeholder="Αναζήτηση με αριθμό απόδειξης, πελάτη...">
                                 </div>
                             </div>
 
                             <!-- Sort By -->
                             <div class="col-md-3 col-lg-2">
-                                <label class="form-label small text-muted">Sort By</label>
+                                <label class="form-label small text-muted">Ταξινόμηση Κατά</label>
                                 <select class="form-select" @bind="sortBy">
-                                    <option value="date">Payment Date</option>
-                                    <option value="amount">Amount</option>
-                                    <option value="created">Date Created</option>
+                                    <option value="date">Ημερομηνία Πληρωμής</option>
+                                    <option value="amount">Ποσό</option>
+                                    <option value="created">Ημερομηνία Δημιουργίας</option>
                                 </select>
                             </div>
 
                             <!-- Filter -->
                             <div class="col-md-3 col-lg-2">
-                                <label class="form-label small text-muted">Filter</label>
+                                <label class="form-label small text-muted">Φίλτρο</label>
                                 <select class="form-select" @bind="filterBy">
-                                    <option value="all">All Receipts</option>
-                                    <option value="sent">Sent</option>
-                                    <option value="notSent">Not Sent</option>
+                                    <option value="all">Όλες οι Αποδείξεις</option>
+                                    <option value="sent">Απεσταλμένες</option>
+                                    <option value="notSent">Μη Απεσταλμένες</option>
                                 </select>
                             </div>
 
@@ -106,7 +106,7 @@
                             <div class="row mt-3">
                                 <div class="col-12">
                                     <small class="text-muted">
-                                        Showing @filteredReceipts.Count() of @receipts.Count receipts
+                                        Εμφάνιση @filteredReceipts.Count() από @receipts.Count αποδείξεις
                                     </small>
                                 </div>
                             </div>
@@ -124,7 +124,7 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <h3 class="mb-0">@receipts.Count</h3>
-                                <p class="mb-0 small">Total Receipts</p>
+                                <p class="mb-0 small">Σύνολο Αποδείξεων</p>
                             </div>
                             <i class="bi bi-receipt-cutoff fs-1 opacity-75"></i>
                         </div>
@@ -137,7 +137,7 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <h3 class="mb-0">@receipts.Sum(r => r.Invoices.Count)</h3>
-                                <p class="mb-0 small">Total Invoices</p>
+                                <p class="mb-0 small">Σύνολο Τιμολογίων</p>
                             </div>
                             <i class="bi bi-file-earmark-text fs-1 opacity-75"></i>
                         </div>
@@ -149,10 +149,10 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h3 class="mb-0">£@receipts.Sum(r => r.TotalAmount).ToString("N0")</h3>
-                                <p class="mb-0 small">Total Amount</p>
+                                <h3 class="mb-0">€@receipts.Sum(r => r.TotalAmount).ToString("N0")</h3>
+                                <p class="mb-0 small">Συνολικό Ποσό</p>
                             </div>
-                            <i class="bi bi-currency-pound fs-1 opacity-75"></i>
+                            <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                         </div>
                     </div>
                 </div>
@@ -163,7 +163,7 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <h3 class="mb-0">@receipts.Count(r => r.CreatedDate >= DateTime.Today.AddDays(-30))</h3>
-                                <p class="mb-0 small">This Month</p>
+                                <p class="mb-0 small">Αυτόν τον Μήνα</p>
                             </div>
                             <i class="bi bi-calendar-check fs-1 opacity-75"></i>
                         </div>
@@ -179,10 +179,10 @@
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>Receipt #</th>
-                                <th>Invoices</th>
-                                <th>Amount</th>
-                                <th class="text-end">Created</th>
+                                <th>Αρ. Απόδειξης</th>
+                                <th>Τιμολόγια</th>
+                                <th>Ποσό</th>
+                                <th class="text-end">Δημιουργήθηκε</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -194,10 +194,10 @@
                                         <span class="fw-medium text-primary">@receipt.ReceiptNumber</span>
                                     </td>
                                     <td>
-                                        <span class="text-muted">@receipt.Invoices.Count invoice(s)</span>
+                                        <span class="text-muted">@receipt.Invoices.Count τιμολόγιο(α)</span>
                                     </td>
                                     <td>
-                                        <span class="fw-medium">£@receipt.TotalAmount.ToString("N2")</span>
+                                        <span class="fw-medium">€@receipt.TotalAmount.ToString("N2")</span>
                                     </td>
                                     <td class="text-end">
                                         <span class="fw-medium">@receipt.CreatedDate.ToString("dd/MM/yyyy")</span>
@@ -205,16 +205,16 @@
                                     <td class="text-end">
                                         <div class="btn-group btn-group-sm" role="group">
                                             <button type="button" class="btn btn-outline-primary" @onclick="() => ViewReceipt(receipt.Id)"
-                                                title="View Receipt">
+                                                title="Προβολή Απόδειξης">
                                                 <i class="bi bi-eye"></i>
                                             </button>
                                             <button type="button" class="btn btn-outline-secondary"
                                                 @onclick="() => DownloadReceipt(receipt.Id, receipt.ReceiptNumber)"
-                                                title="Download PDF">
+                                                title="Λήψη PDF">
                                                 <i class="bi bi-download"></i>
                                             </button>
                                             <button type="button" class="btn btn-outline-danger"
-                                                @onclick="() => ShowDeleteConfirmation(receipt)" title="Delete Receipt">
+                                                @onclick="() => ShowDeleteConfirmation(receipt)" title="Διαγραφή Απόδειξης">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -236,26 +236,26 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Delete Receipt</h5>
+                    <h5 class="modal-title">Διαγραφή Απόδειξης</h5>
                     <button type="button" class="btn-close" @onclick="HideDeleteConfirmation"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Are you sure?</h5>
+                        <h5 class="mt-3">Είστε σίγουροι;</h5>
                         <p class="text-muted">
-                            This will delete receipt <strong>@receiptToDelete.ReceiptNumber</strong> 
-                            for <strong>@receiptToDelete.CustomerName</strong>.
+                            Αυτό θα διαγράψει την απόδειξη <strong>@receiptToDelete.ReceiptNumber</strong> 
+                            για <strong>@receiptToDelete.CustomerName</strong>.
                         </p>
                         <div class="alert alert-warning">
                             <i class="bi bi-info-circle me-2"></i>
-                            This receipt covers @receiptToDelete.Invoices.Count invoice(s) totaling 
-                            <strong>£@receiptToDelete.TotalAmount.ToString("N2")</strong>.
+                            Αυτή η απόδειξη καλύπτει @receiptToDelete.Invoices.Count τιμολόγιο(α) συνολικού ποσού 
+                            <strong>€@receiptToDelete.TotalAmount.ToString("N2")</strong>.
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteConfirmation">Ακύρωση</button>
                     <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
                         @if (isDeleting)
                         {
@@ -265,7 +265,7 @@
                         {
                             <i class="bi bi-trash me-1"></i>
                         }
-                        @(isDeleting ? "Deleting..." : "Delete Receipt")
+                        @(isDeleting ? "Διαγραφή..." : "Διαγραφή Απόδειξης")
                     </button>
                 </div>
             </div>

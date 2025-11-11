@@ -98,6 +98,17 @@ namespace Invoqs.Models
             _ => "bi-file-earmark"
         };
 
+        public string StatusDisplay => Status switch
+        {
+            InvoiceStatus.Draft => "Πρόχειρο",
+            InvoiceStatus.Sent => "Απεσταλμένο",
+            InvoiceStatus.Delivered => "Παραδομένο",
+            InvoiceStatus.Paid => "Πληρωμένο",
+            InvoiceStatus.Overdue => "Καθυστερημένο",
+            InvoiceStatus.Cancelled => "Ακυρωμένο",
+            _ => Status.ToString()
+        };
+
         public bool IsOverdue => Status != InvoiceStatus.Paid 
             && Status != InvoiceStatus.Cancelled 
             && DueDate < DateTime.Now;
