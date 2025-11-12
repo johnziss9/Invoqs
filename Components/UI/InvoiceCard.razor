@@ -67,12 +67,12 @@
                         {
                             <!-- Paid invoice - informational only -->
                             <li><span class="dropdown-item-text text-muted">
-                                    Πληρώθηκε στις @Invoice.PaidDate?.ToString("dd/MM/yyyy")
+                                    Πληρώθηκε στις @Invoice.PaymentDate?.ToString("dd/MM/yyyy")
                                 </span></li>
                             @if (!string.IsNullOrEmpty(Invoice.PaymentMethod))
                             {
                                 <li><span class="dropdown-item-text text-muted">
-                                        μέσω @Invoice.PaymentMethod
+                                        μέσω @TranslatePaymentMethod(Invoice.PaymentMethod)
                                     </span></li>
                             }
                         }
@@ -127,12 +127,12 @@
                 </span>
             </div>
 
-            @if (Invoice.PaidDate.HasValue)
+            @if (Invoice.PaymentDate.HasValue)
             {
                 <div class="detail-item mb-2">
                     <i class="bi bi-check-circle text-success me-2"></i>
                     <span class="text-success small">
-                        Πληρώθηκε: @Invoice.PaidDate.Value.ToString("dd/MM/yyyy")
+                        Πληρώθηκε: @Invoice.PaymentDate.Value.ToString("dd/MM/yyyy")
                     </span>
                 </div>
             }

@@ -275,5 +275,20 @@ namespace Invoqs.Components.UI
                 _ => ""
             };
         }
+
+        private string TranslatePaymentMethod(string? method)
+        {
+            if (string.IsNullOrEmpty(method)) return "Δεν καθορίστηκε";
+
+            return method switch
+            {
+                "Bank Transfer" => "Τραπεζική Μεταφορά",
+                "Cash" => "Μετρητά",
+                "Cheque" => "Επιταγή",
+                "Credit Card" => "Πιστωτική Κάρτα",
+                "Other" => "Άλλο",
+                _ => method // Return as-is if not found
+            };
+        }
     }
 }

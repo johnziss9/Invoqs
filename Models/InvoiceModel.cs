@@ -36,7 +36,7 @@ namespace Invoqs.Models
         [Required]
         public DateTime DueDate { get; set; } = DateTime.Now.AddDays(30);
 
-        public DateTime? PaidDate { get; set; }
+        public DateTime? PaymentDate { get; set; }
 
         [Required]
         public InvoiceStatus Status { get; set; } = InvoiceStatus.Draft;
@@ -119,8 +119,8 @@ namespace Invoqs.Models
         {
             get
             {
-                if (Status == InvoiceStatus.Paid && PaidDate.HasValue)
-                    return $"Paid {PaidDate.Value:dd/MM/yyyy}";
+                if (Status == InvoiceStatus.Paid && PaymentDate.HasValue)
+                    return $"Paid {PaymentDate.Value:dd/MM/yyyy}";
 
                 if (IsOverdue)
                     return $"Overdue by {Math.Abs(DaysUntilDue)} days";

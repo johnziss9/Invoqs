@@ -160,14 +160,15 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<byte[]?> DownloadReceiptPdfAsync(int receiptId)
+        public async Task<byte[]?> DownloadReceiptPdfAsync(int receiptId, string userFirstName, string userLastName)
         {
             try
             {
                 var token = await _authService.GetTokenAsync();
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
-                var response = await _httpClient.GetAsync($"receipts/{receiptId}/pdf");
+                var url = $"receipts/{receiptId}/pdf?userFirstName={Uri.EscapeDataString(userFirstName)}&userLastName={Uri.EscapeDataString(userLastName)}";
+                var response = await _httpClient.GetAsync(url);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {

@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Components;
 using Invoqs.Models;
 using Invoqs.Interfaces;
 using Microsoft.JSInterop;
+using Invoqs.Services;
 
 namespace Invoqs.Components.Pages
 {
     public partial class Receipts : ComponentBase
     {
         [Inject] private IReceiptService ReceiptService { get; set; } = default!;
+        [Inject] private IAuthService AuthService { get; set; } = default!;
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
@@ -98,7 +100,12 @@ namespace Invoqs.Components.Pages
         {
             try
             {
-                var pdfBytes = await ReceiptService.DownloadReceiptPdfAsync(receiptId);
+                // Get current user info from AuthService
+                var userInfo = await AuthService.GetCurrentUserAsync();
+                var firstName = userInfo?.FirstName ?? "Unknown";
+                var lastName = userInfo?.LastName ?? "User";
+
+                var pdfBytes = await ReceiptService.DownloadReceiptPdfAsync(receiptId, firstName, lastName);
 
                 if (pdfBytes != null)
                 {

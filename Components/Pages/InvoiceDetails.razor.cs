@@ -145,7 +145,7 @@ public partial class InvoiceDetails
             if (success)
             {
                 invoice.Status = InvoiceStatus.Paid;
-                invoice.PaidDate = utcPaymentDate;
+                invoice.PaymentDate = utcPaymentDate;
                 invoice.PaymentMethod = paymentMethod;
                 invoice.PaymentReference = paymentReference;
 
@@ -501,5 +501,20 @@ public partial class InvoiceDetails
     private void GoToCreateReceipt()
     {
         Navigation.NavigateTo($"/receipts/new?customerId={customer!.Id}", true);
+    }
+
+    private string TranslatePaymentMethod(string? method)
+    {
+        if (string.IsNullOrEmpty(method)) return "Δεν καθορίστηκε";
+
+        return method switch
+        {
+            "Bank Transfer" => "Τραπεζική Μεταφορά",
+            "Cash" => "Μετρητά",
+            "Cheque" => "Επιταγή",
+            "Credit Card" => "Πιστωτική Κάρτα",
+            "Other" => "Άλλο",
+            _ => method // Return as-is if not found
+        };
     }
 }

@@ -242,7 +242,7 @@
                 </div>
 
                 <!-- Payment Information -->
-                @if (invoice.Status == InvoiceStatus.Paid && invoice.PaidDate.HasValue)
+                @if (invoice.Status == InvoiceStatus.Paid && invoice.PaymentDate.HasValue)
                 {
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-success text-white py-3">
@@ -254,11 +254,11 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label fw-medium">Ημερομηνία Πληρωμής</label>
-                                    <div class="form-control-plaintext">@invoice.PaidDate.Value.ToString("dd MMM yyyy")</div>
+                                    <div class="form-control-plaintext">@invoice.PaymentDate.Value.ToString("dd MMM yyyy")</div>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-medium">Μέθοδος Πληρωμής</label>
-                                    <div class="form-control-plaintext">@(invoice.PaymentMethod ?? "Δεν καθορίστηκε")</div>
+                                    <div class="form-control-plaintext">@TranslatePaymentMethod(invoice.PaymentMethod)</div>
                                 </div>
                                 @if (!string.IsNullOrWhiteSpace(invoice.PaymentReference))
                                 {

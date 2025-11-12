@@ -9,7 +9,7 @@ namespace Invoqs.Interfaces
         Task<List<ReceiptModel>> GetReceiptsByCustomerIdAsync(int customerId);
         Task<ReceiptModel?> CreateReceiptAsync(CreateReceiptModel model);
         Task<bool> DeleteReceiptAsync(int id);
-        Task<byte[]?> DownloadReceiptPdfAsync(int receiptId);
+        Task<byte[]?> DownloadReceiptPdfAsync(int receiptId, string userFirstName, string userLastName);
         Task<bool> SendReceiptAsync(int receiptId);
     }
 }
