@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace Invoqs.Services
 {
@@ -37,6 +38,36 @@ namespace Invoqs.Services
             }
         }
 
+        public async Task<(string FirstName, string LastName)?> GetCurrentUserAsync()
+        {
+            try
+            {
+                var userJson = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", "currentUser");
+                
+                if (string.IsNullOrEmpty(userJson))
+                    return null;
+
+                var userDoc = JsonDocument.Parse(userJson);
+                var firstName = userDoc.RootElement.GetProperty("FirstName").GetString() ?? "";
+                var lastName = userDoc.RootElement.GetProperty("LastName").GetString() ?? "";
+
+                return (firstName, lastName);
+            }
+            catch (JSDisconnectedException)
+            {
+                return null;
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving current user: {ex.Message}");
+                return null;
+            }
+        }
+
         public async Task<bool> IsAuthenticatedAsync()
         {
             var token = await GetTokenAsync();
@@ -52,11 +83,9 @@ namespace Invoqs.Services
             }
             catch (JSDisconnectedException)
             {
-                // Circuit disconnected, ignore
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("JavaScript interop calls cannot be issued"))
             {
-                // Prerendering or component being disposed, ignore localStorage calls
             }
             catch (Exception ex)
             {
@@ -68,7 +97,6 @@ namespace Invoqs.Services
 
         public void AddAuthorizationHeader(HttpClient httpClient, string? token)
         {
-            // Clear any existing authorization header
             httpClient.DefaultRequestHeaders.Authorization = null;
             
             if (!string.IsNullOrEmpty(token))

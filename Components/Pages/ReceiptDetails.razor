@@ -206,7 +206,7 @@
                                             <td>
                                                 @if (!string.IsNullOrWhiteSpace(invoice.PaymentMethod))
                                                 {
-                                                    <span class="badge bg-info">@invoice.PaymentMethod</span>
+                                                    <span class="badge bg-info">@TranslatePaymentMethod(invoice.PaymentMethod)</span>
                                                 }
                                                 else
                                                 {

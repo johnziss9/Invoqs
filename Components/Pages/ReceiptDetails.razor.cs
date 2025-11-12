@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Invoqs.Models;
 using Invoqs.Interfaces;
+using Invoqs.Services;
 
 namespace Invoqs.Components.Pages
 {
@@ -10,6 +11,7 @@ namespace Invoqs.Components.Pages
         [Parameter] public int ReceiptId { get; set; }
 
         [Inject] private IReceiptService ReceiptService { get; set; } = default!;
+        [Inject] private IAuthService AuthService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
@@ -71,7 +73,12 @@ namespace Invoqs.Components.Pages
                 isDownloading = true;
                 StateHasChanged();
 
-                var pdfBytes = await ReceiptService.DownloadReceiptPdfAsync(receiptId);
+                // Get current user info from AuthService
+                var userInfo = await AuthService.GetCurrentUserAsync();
+                var firstName = userInfo?.FirstName ?? "Unknown";
+                var lastName = userInfo?.LastName ?? "User";
+
+                var pdfBytes = await ReceiptService.DownloadReceiptPdfAsync(receiptId, firstName, lastName);
 
                 if (pdfBytes != null)
                 {
@@ -225,6 +232,21 @@ namespace Invoqs.Components.Pages
             // Show the send confirmation modal for resending
             showSendConfirmation = true;
             StateHasChanged();
+        }
+
+        private string TranslatePaymentMethod(string? method)
+        {
+            if (string.IsNullOrEmpty(method)) return "Δεν καθορίστηκε";
+
+            return method switch
+            {
+                "Bank Transfer" => "Τραπεζική Μεταφορά",
+                "Cash" => "Μετρητά",
+                "Cheque" => "Επιταγή",
+                "Credit Card" => "Πιστωτική Κάρτα",
+                "Other" => "Άλλο",
+                _ => method // Return as-is if not found
+            };
         }
     }
 }

@@ -88,14 +88,14 @@ namespace Invoqs.Components.Pages
 
                 var thisWeekInvoices = invoices.Where(i => 
                     i.Status == InvoiceStatus.Paid && 
-                    i.PaidDate.HasValue && 
-                    i.PaidDate >= oneWeekAgo).ToList();
+                    i.PaymentDate.HasValue && 
+                    i.PaymentDate >= oneWeekAgo).ToList();
 
                 var lastWeekInvoices = invoices.Where(i => 
                     i.Status == InvoiceStatus.Paid && 
-                    i.PaidDate.HasValue && 
-                    i.PaidDate >= twoWeeksAgo && 
-                    i.PaidDate < oneWeekAgo).ToList();
+                    i.PaymentDate.HasValue && 
+                    i.PaymentDate >= twoWeeksAgo && 
+                    i.PaymentDate < oneWeekAgo).ToList();
 
                 var weekRevenue = thisWeekInvoices.Sum(i => i.Total);
                 var lastWeekRevenue = lastWeekInvoices.Sum(i => i.Total);

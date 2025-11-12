@@ -6,5 +6,6 @@ namespace Invoqs.Services
         Task<bool> IsAuthenticatedAsync();
         Task LogoutAsync();
         void AddAuthorizationHeader(HttpClient httpClient, string? token);
+        Task<(string FirstName, string LastName)?> GetCurrentUserAsync();
     }
 }
