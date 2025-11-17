@@ -49,6 +49,8 @@ public partial class InvoiceDetails
 
             if (invoice != null)
             {
+                await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Λεπτομέρειες Τιμολογίου - {invoice.InvoiceNumber.Replace("'", "\\'")} - Invoqs'");
+
                 // Create customer object from invoice's flat properties
                 // This works even when the customer is soft-deleted
                 customer = new CustomerModel

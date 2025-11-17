@@ -45,6 +45,7 @@ namespace Invoqs.Components.Pages
                 if (customer != null)
                 {
                     customerName = customer.Name;
+                    await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Εργασίες στη {Address.Replace("'", "\\'")} - {customerName.Replace("'", "\\'")} - Invoqs'");
                 }
                 else
                 {

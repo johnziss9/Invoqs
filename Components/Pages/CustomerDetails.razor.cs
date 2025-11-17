@@ -59,6 +59,8 @@ namespace Invoqs.Components.Pages
 
                     // Calculate customer statistics
                     CalculateCustomerStats(allCustomerJobs);
+
+                    await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Στοιχεία Πελάτη - {customer.Name.Replace("'", "\\'")} - Invoqs'");
                 }
             }
             catch (Exception ex)

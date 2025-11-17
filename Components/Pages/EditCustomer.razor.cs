@@ -56,6 +56,10 @@ namespace Invoqs.Components.Pages
                 {
                     errorMessage = "Customer not found.";
                 }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Επεξεργασία Πελάτη - {customer.Name.Replace("'", "\\'")} - Invoqs'");
+                }
             }
             catch (Exception ex)
             {

@@ -59,6 +59,8 @@ namespace Invoqs.Components.Pages
                     return;
                 }
 
+                await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Επεξεργασία Τιμολογίου - {invoice.InvoiceNumber.Replace("'", "\\'")} - Invoqs'");
+
                 // Check if invoice can be edited
                 if (invoice.Status != InvoiceStatus.Draft)
                 {
