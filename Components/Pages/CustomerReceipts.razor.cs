@@ -65,6 +65,10 @@ namespace Invoqs.Components.Pages
                     errorMessage = "Customer not found.";
                     Navigation.NavigateTo("/customers");
                 }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Αποδείξεις Πελάτη - {customer.Name.Replace("'", "\\'")} - Invoqs'");
+                }
             }
             catch (Exception ex)
             {

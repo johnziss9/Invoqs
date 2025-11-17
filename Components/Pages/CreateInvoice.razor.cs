@@ -101,6 +101,7 @@ namespace Invoqs.Components.Pages
                 if (selectedCustomer != null)
                 {
                     newInvoice.CustomerId = CustomerId;
+                    await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Δημιουργία Τιμολογίου - {selectedCustomer.Name.Replace("'", "\\'")} - Invoqs'");
                 }
             }
         }
@@ -130,11 +131,13 @@ namespace Invoqs.Components.Pages
             if (selectedCustomer != null)
             {
                 await LoadCustomerJobs();
+                await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Δημιουργία Τιμολογίου - {selectedCustomer.Name.Replace("'", "\\'")} - Invoqs'");
             }
             else
             {
                 availableJobs.Clear();
                 filteredJobs.Clear();
+                await JSRuntime.InvokeVoidAsync("eval", "document.title = 'Δημιουργία Τιμολογίου - Invoqs'");
             }
 
             RecalculateTotals();

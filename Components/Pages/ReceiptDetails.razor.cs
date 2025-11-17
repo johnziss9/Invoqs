@@ -53,6 +53,10 @@ namespace Invoqs.Components.Pages
                 {
                     errorMessage = "Receipt not found.";
                 }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Λεπτομέρειες Απόδειξης - {receipt.ReceiptNumber.Replace("'", "\\'")} - Invoqs'");
+                }
             }
             catch (Exception ex)
             {

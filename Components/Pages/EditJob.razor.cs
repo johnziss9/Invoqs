@@ -12,6 +12,7 @@ namespace Invoqs.Components.Pages
         [Inject] private IJobService JobService { get; set; } = default!;
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
+        [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
         [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
 
@@ -62,6 +63,8 @@ namespace Invoqs.Components.Pages
                     errorMessage = "Job not found.";
                     return;
                 }
+
+                await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Επεξεργασία Εργασίας - {job.Title.Replace("'", "\\'")} - Invoqs'");
 
                 isInvoiced = job.IsInvoiced;
                 isCustomerDeleted = job.CustomerIsDeleted;

@@ -55,6 +55,8 @@ namespace Invoqs.Components.Pages
 
                 if (job != null)
                 {
+                    await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Λεπτομέρειες Εργασίας - {job.Title.Replace("'", "\\'")} - Invoqs'");
+
                     canDeleteJob = job.Status == JobStatus.New || job.Status == JobStatus.Cancelled;
 
                     // Create customer object from job's flat properties

@@ -40,6 +40,7 @@ namespace Invoqs.Components.Pages
                 if (customer != null)
                 {
                     customerName = customer.Name;
+                    await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Εργασίες Πελάτη - {customerName.Replace("'", "\\'")} - Invoqs'");
                 }
                 else
                 {
