@@ -247,12 +247,14 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        protected async Task HandleCancelInvoice(InvoiceModel invoice)
+        protected async Task HandleCancelInvoice(CancelInvoiceEventArgs args)
         {
             try
             {
-                // In a real app, you'd show a confirmation dialog
-                var success = await InvoiceService.CancelInvoiceAsync(invoice.Id, "Cancelled by user");
+                var success = await InvoiceService.CancelInvoiceAsync(
+                    args.Invoice.Id, 
+                    args.CancellationReason, 
+                    args.CancellationNotes);
 
                 if (success)
                 {
