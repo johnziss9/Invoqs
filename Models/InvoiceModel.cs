@@ -72,6 +72,9 @@ namespace Invoqs.Models
         public bool IsSent { get; set; } = false;
         public DateTime? DeliveredDate { get; set; }
         public bool IsDelivered { get; set; } = false;
+        public DateTime? CancelledDate { get; set; }
+        public string? CancellationReason { get; set; }
+        public string? CancellationNotes { get; set; }
         public bool HasReceipt { get; set; }
 
 

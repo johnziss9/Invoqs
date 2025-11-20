@@ -20,6 +20,8 @@ public partial class InvoiceDetails
     private string successMessage = string.Empty;
     private string errorMessage = string.Empty;
     private bool showCancelModal = false;
+    private string cancellationReason = "";
+    private string customCancellationReason = "";
     private bool showSendConfirmation = false;
     private bool showMarkAsPaidConfirmation = false;
     private bool isMarkingPaid = false;
@@ -195,11 +197,15 @@ public partial class InvoiceDetails
         {
             isProcessing = true;
 
-            var success = await InvoiceService.CancelInvoiceAsync(invoice.Id);
+            var finalReason = cancellationReason == "Other" ? customCancellationReason : cancellationReason;
+            var success = await InvoiceService.CancelInvoiceAsync(invoice.Id, cancellationReason, finalReason);
 
             if (success)
             {
                 invoice.Status = InvoiceStatus.Cancelled;
+                invoice.CancelledDate = DateTime.UtcNow;
+                invoice.CancellationReason = cancellationReason;
+                invoice.CancellationNotes = finalReason;
 
                 showCancelModal = false;
                 successMessage = "Invoice cancelled successfully. Associated jobs are now available for invoicing.";

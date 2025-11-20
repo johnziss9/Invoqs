@@ -11,6 +11,13 @@ namespace Invoqs.Components.UI
         public string? PaymentReference { get; set; }
     }
 
+    public class CancelInvoiceEventArgs
+    {
+        public InvoiceModel Invoice { get; set; } = new();
+        public string? CancellationReason { get; set; }
+        public string? CancellationNotes { get; set; }
+    }
+
     public partial class InvoiceCard : ComponentBase
     {
         [Inject] private NavigationManager Navigation { get; set; } = default!;
@@ -21,7 +28,7 @@ namespace Invoqs.Components.UI
         [Parameter] public EventCallback<InvoiceModel> OnMarkAsSent { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnMarkAsDelivered { get; set; }
         [Parameter] public EventCallback<MarkAsPaidEventArgs> OnMarkAsPaid { get; set; }
-        [Parameter] public EventCallback<InvoiceModel> OnCancel { get; set; }
+        [Parameter] public EventCallback<CancelInvoiceEventArgs> OnCancel { get; set; }
         [Parameter] public EventCallback<InvoiceModel> OnDelete { get; set; }
 
         private bool showSendConfirmation = false;
@@ -155,7 +162,16 @@ namespace Invoqs.Components.UI
 
             try
             {
-                await OnCancel.InvokeAsync(Invoice);
+                var finalNotes = cancellationReason == "Other" ? customCancellationReason : null;
+                
+                var args = new CancelInvoiceEventArgs
+                {
+                    Invoice = Invoice,
+                    CancellationReason = cancellationReason,
+                    CancellationNotes = finalNotes
+                };
+                
+                await OnCancel.InvokeAsync(args);
                 showCancelConfirmation = false;
             }
             finally

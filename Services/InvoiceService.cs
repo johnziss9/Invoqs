@@ -307,14 +307,21 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<bool> CancelInvoiceAsync(int invoiceId, string? reason = null)
+        public async Task<bool> CancelInvoiceAsync(int invoiceId, string? reason = null, string? notes = null)
         {
             try
             {
                 var token = await _authService.GetTokenAsync();
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
-                var response = await _httpClient.PostAsync($"invoices/{invoiceId}/cancel", null);
+                var request = new
+                {
+                    CancelledDate = DateTime.UtcNow,
+                    CancellationReason = reason,
+                    CancellationNotes = notes
+                };
+
+                var response = await _httpClient.PostAsJsonAsync($"invoices/{invoiceId}/cancel", request);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {

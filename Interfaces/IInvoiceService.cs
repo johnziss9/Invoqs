@@ -18,7 +18,7 @@ namespace Invoqs.Interfaces
         Task<bool> MarkInvoiceAsSentAsync(int invoiceId);
         Task<bool> MarkInvoiceAsDeliveredAsync(int invoiceId);
         Task<bool> MarkInvoiceAsPaidAsync(int invoiceId, DateTime paidDate, string? paymentMethod = null, string? paymentReference = null);
-        Task<bool> CancelInvoiceAsync(int invoiceId, string? reason = null);
+        Task<bool> CancelInvoiceAsync(int invoiceId, string? reason = null, string? notes = null);
 
         // Statistics
         Task<decimal> GetTotalOutstandingAsync();
