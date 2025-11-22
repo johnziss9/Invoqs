@@ -198,14 +198,16 @@ public partial class InvoiceDetails
             isProcessing = true;
 
             var finalReason = cancellationReason == "Other" ? customCancellationReason : cancellationReason;
-            var success = await InvoiceService.CancelInvoiceAsync(invoice.Id, cancellationReason, finalReason);
+            var notes = cancellationReason == "Other" ? customCancellationReason : null;
+
+            var success = await InvoiceService.CancelInvoiceAsync(invoice.Id, finalReason, notes);
 
             if (success)
             {
                 invoice.Status = InvoiceStatus.Cancelled;
                 invoice.CancelledDate = DateTime.UtcNow;
-                invoice.CancellationReason = cancellationReason;
-                invoice.CancellationNotes = finalReason;
+                invoice.CancellationReason = finalReason;
+                invoice.CancellationNotes = notes;
 
                 showCancelModal = false;
                 successMessage = "Invoice cancelled successfully. Associated jobs are now available for invoicing.";
