@@ -15,9 +15,9 @@ namespace Invoqs.Components.Pages
         // Component state
         protected string searchTerm = "";
         protected string customerFilter = "all";
-        protected string statusFilter = "all";
+        protected string invoiceFilter = "all";
         protected string typeFilter = "all";
-        protected string sortBy = "startDate";
+        protected string sortBy = "jobDate";
         protected bool isLoading = true;
         protected string errorMessage = "";
 
@@ -86,20 +86,6 @@ namespace Invoqs.Components.Pages
                     filtered = filtered.Where(j => j.CustomerId == customerId);
                 }
 
-                // Apply status filter
-                if (statusFilter != "all")
-                {
-                    var status = statusFilter switch
-                    {
-                        "new" => JobStatus.New,
-                        "active" => JobStatus.Active,
-                        "completed" => JobStatus.Completed,
-                        "cancelled" => JobStatus.Cancelled,
-                        _ => JobStatus.New
-                    };
-                    filtered = filtered.Where(j => j.Status == status);
-                }
-
                 // Apply type filter
                 if (typeFilter != "all")
                 {
@@ -113,14 +99,24 @@ namespace Invoqs.Components.Pages
                     filtered = filtered.Where(j => j.Type == type);
                 }
 
+                // Apply invoice filter
+                if (invoiceFilter != "all")
+                {
+                    filtered = invoiceFilter switch
+                    {
+                        "invoiced" => filtered.Where(j => j.IsInvoiced),
+                        "uninvoiced" => filtered.Where(j => !j.IsInvoiced),
+                        _ => filtered
+                    };
+                }
+
                 // Apply sorting
                 filtered = sortBy switch
                 {
                     "customer" => filtered.OrderBy(j => GetCustomerName(j.CustomerId)),
                     "title" => filtered.OrderBy(j => j.Title),
-                    "status" => filtered.OrderBy(j => j.Status),
                     "price" => filtered.OrderByDescending(j => j.Price),
-                    _ => filtered.OrderByDescending(j => j.StartDate)
+                    _ => filtered.OrderByDescending(j => j.JobDate)
                 };
 
                 return filtered;
@@ -136,56 +132,12 @@ namespace Invoqs.Components.Pages
         {
             searchTerm = "";
             customerFilter = "all";
-            statusFilter = "all";
             typeFilter = "all";
+            invoiceFilter = "all";
             StateHasChanged();
         }
 
         // Event handlers
-        protected async Task HandleStatusChange(JobModel job, JobStatus newStatus)
-        {
-            try
-            {
-                var originalStatus = job.Status;
-
-                var (success, errors) = await JobService.UpdateJobStatusAsync(job.Id, newStatus);
-
-                if (success)
-                {
-                    job.Status = newStatus;
-
-                    if (newStatus == JobStatus.Completed && !job.EndDate.HasValue)
-                    {
-                        job.EndDate = DateTime.Now;
-                    }
-                    else if (newStatus != JobStatus.Completed && originalStatus == JobStatus.Completed)
-                    {
-                        job.EndDate = null;
-                    }
-
-                    StateHasChanged();
-                }
-                else
-                {
-                    if (errors != null)
-                    {
-                        errorMessage = "Validation error: " + string.Join(", ", errors.GetAllErrors());
-                    }
-                    else
-                    {
-                        errorMessage = "Failed to update job status";
-                    }
-
-                    StateHasChanged();
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Error updating job status: {ex.Message}";
-                StateHasChanged();
-            }
-        }
-
         protected Task HandleEditJob(JobModel job)
         {
             Navigation.NavigateTo($"/job/{job.Id}/edit");

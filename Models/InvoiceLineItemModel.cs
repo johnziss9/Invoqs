@@ -54,17 +54,14 @@ namespace Invoqs.Models
         private static string GenerateDescription(JobModel job)
         {
             var typeDescription = job.TypeDisplayName;
-            
-            var dateRange = job.EndDate.HasValue && job.EndDate != job.StartDate
-                ? $"{job.StartDate:dd/MM/yyyy} - {job.EndDate:dd/MM/yyyy}"
-                : job.StartDate.ToString("dd/MM/yyyy");
+            var dateStr = job.JobDate.ToString("dd/MM/yyyy");
 
-            var description = $"{typeDescription} - {job.Address} ({dateRange})";
+            var description = $"{typeDescription} - {job.Address} ({dateStr})";
             
             // Add job title if it's different from type
             if (!string.IsNullOrEmpty(job.Title) && job.Title != job.TypeDisplayName)
             {
-                description = $"{job.Title} - {typeDescription} - {job.Address} ({dateRange})";
+                description = $"{job.Title} - {typeDescription} - {job.Address} ({dateStr})";
             }
 
             return description;
@@ -73,7 +70,7 @@ namespace Invoqs.Models
         // Helper method to validate job can be invoiced
         public static bool CanJobBeInvoiced(JobModel job)
         {
-            return job.Status == JobStatus.Completed && !job.IsInvoiced;
+            return !job.IsInvoiced;
         }
     }
 }

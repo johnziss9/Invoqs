@@ -70,8 +70,8 @@
                             <label class="form-label small text-muted">Φίλτρο</label>
                             <select class="form-select" @bind="filterBy">
                                 <option value="all">Όλοι οι Πελάτες</option>
-                                <option value="active">Με Ενεργές Εργασίες</option>
-                                <option value="inactive">Χωρίς Ενεργές Εργασίες</option>
+                                <option value="active">Με Τιμολογημένες Εργασίες</option>
+                                <option value="inactive">Χωρίς Τιμολογημένες Εργασίες</option>
                             </select>
                         </div>
                         <div class="row mt-3">
@@ -89,7 +89,7 @@
 
     <!-- Customer Stats Cards -->
     <div class="row mb-4">
-        <div class="col-md-3 col-sm-6 mb-3">
+        <div class="col-md-4 col-sm-6 mb-3">
             <div class="card bg-primary text-white border-0">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
@@ -102,39 +102,26 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
+        <div class="col-md-4 col-sm-6 mb-3">
             <div class="card bg-success text-white border-0">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">@customers.Sum(c => c.ActiveJobs)</h3>
-                            <p class="mb-0 small">Ενεργές Εργασίες</p>
+                            <h3 class="mb-0">@customers.Sum(c => c.TotalJobs)</h3>
+                            <p class="mb-0 small">Σύνολο Εργασιών</p>
                         </div>
-                        <i class="bi bi-calendar-check fs-1 opacity-75"></i>
+                        <i class="bi bi-briefcase fs-1 opacity-75"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
+        <div class="col-md-4 col-sm-6 mb-3">
             <div class="card bg-info text-white border-0">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">@customers.Sum(c => c.CompletedJobs)</h3>
-                            <p class="mb-0 small">Ολοκληρωμένες Εργασίες</p>
-                        </div>
-                        <i class="bi bi-check-circle fs-1 opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card bg-warning text-white border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
                             <h3 class="mb-0">€@customers.Sum(c => c.TotalRevenue).ToString("N0")</h3>
-                            <p class="mb-0 small">Συνολικά Έσοδα Ολοκληρωμένων Εργασιών</p>
+                            <p class="mb-0 small">Συνολικά Έσοδα</p>
                         </div>
                         <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                     </div>

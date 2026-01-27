@@ -237,11 +237,7 @@
                                                                     </p>
                                                                     <p class="text-muted small mb-0">
                                                                         <i class="bi bi-calendar me-1"></i>
-                                                                        @job.StartDate.ToString("dd/MM/yyyy")
-                                                                        @if (job.EndDate.HasValue && job.EndDate != job.StartDate)
-                                                                        {
-                                                                            <span> - @job.EndDate.Value.ToString("dd/MM/yyyy")</span>
-                                                                        }
+                                                                        @job.JobDate.ToString("dd/MM/yyyy")
                                                                     </p>
                                                                 </div>
                                                                 <div class="text-end">
@@ -295,11 +291,7 @@
                                                                 </p>
                                                                 <p class="text-muted small mb-0">
                                                                     <i class="bi bi-calendar me-1"></i>
-                                                                    @job.StartDate.ToString("dd/MM/yyyy")
-                                                                    @if (job.EndDate.HasValue && job.EndDate != job.StartDate)
-                                                                    {
-                                                                        <span> - @job.EndDate.Value.ToString("dd/MM/yyyy")</span>
-                                                                    }
+                                                                    @job.JobDate.ToString("dd/MM/yyyy")
                                                                 </p>
                                                             </div>
                                                             <div class="text-end">
@@ -403,37 +395,6 @@
                                         <span class="text-muted">Τελευταία Ενημέρωση:</span>
                                         <span class="fw-medium">@((selectedCustomer.UpdatedDate ??
                                                                                 selectedCustomer.CreatedDate).ToString("dd/MM/yyyy"))</span>
-                                    </div>
-
-                                    <!-- Work Status -->
-                                    <div class="pb-2 border-bottom mb-2">
-                                        @if (selectedCustomer.HasActiveWork)
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-success">
-                                                    <i class="bi bi-briefcase me-1"></i>
-                                                    @((selectedCustomer.ActiveJobs + selectedCustomer.NewJobs)) εργασίες σε εξέλιξη
-                                                </span>
-                                            </div>
-                                        }
-                                        else if (selectedCustomer.CompletedJobs > 0)
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-muted">
-                                                    <i class="bi bi-check-circle me-1"></i>
-                                                    Τελευταία εργασία ολοκληρώθηκε
-                                                </span>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-muted">
-                                                    <i class="bi bi-clock-history me-1"></i>
-                                                    Δεν υπάρχουν εργασίες ακόμα
-                                                </span>
-                                            </div>
-                                        }
                                     </div>
 
                                 <!-- Financial Status -->

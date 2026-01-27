@@ -119,29 +119,12 @@ namespace Invoqs.Components.Pages
         // Get most relevant jobs for address preview (max 10 total)
         protected List<JobModel> GetRelevantJobsForAddress(List<JobModel> addressJobs)
         {
-            var relevant = new List<JobModel>();
-
-            // Add active jobs (max 5)
-            relevant.AddRange(addressJobs.Where(j => j.Status == JobStatus.Active).Take(5));
-
-            // Add new jobs if we have space (max 3)
-            var remainingSpace = 10 - relevant.Count;
-            if (remainingSpace > 0)
-            {
-                relevant.AddRange(addressJobs.Where(j => j.Status == JobStatus.New).Take(Math.Min(3, remainingSpace)));
-            }
-
-            // Fill remaining space with recent completed jobs
-            remainingSpace = 10 - relevant.Count;
-            if (remainingSpace > 0)
-            {
-                relevant.AddRange(addressJobs
-                    .Where(j => j.Status == JobStatus.Completed)
-                    .OrderByDescending(j => j.EndDate ?? j.UpdatedDate)
-                    .Take(remainingSpace));
-            }
-
-            return relevant;
+            // Show most recent jobs, prioritising uninvoiced ones
+            return addressJobs
+                .OrderByDescending(j => !j.IsInvoiced)  // Uninvoiced first
+                .ThenByDescending(j => j.JobDate)        // Then by date
+                .Take(10)
+                .ToList();
         }
 
         protected Task HandleGenerateInvoiceForAddress(string address)

@@ -31,7 +31,7 @@
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" @onclick="() => EditCustomer(Customer.Id)"><i class="bi bi-pencil me-2"></i>Επεξεργασία</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    @if (Customer.ActiveJobs > 0)
+                    @if (Customer.UninvoicedJobs > 0)
                     {
                         <li><span class="dropdown-item-text text-muted" title="@GetDeleteDisabledReason()">
                                 <i class="bi bi-lock me-2"></i>@GetDeleteButtonText()
@@ -62,16 +62,12 @@
 
         <div class="customer-stats mb-3">
             <div class="row text-center">
-                <div class="col-4">
-                    <div class="stat-number text-primary fw-bold">@Customer.ActiveJobs</div>
-                    <div class="stat-label text-muted small">Ενεργές Εργασίες</div>
+                <div class="col-6">
+                    <div class="stat-number text-primary fw-bold">@Customer.TotalJobs</div>
+                    <div class="stat-label text-muted small">Σύνολο Εργασιών</div>
                 </div>
-                <div class="col-4">
-                    <div class="stat-number text-success fw-bold">@Customer.CompletedJobs</div>
-                    <div class="stat-label text-muted small">Ολοκληρωμένες</div>
-                </div>
-                <div class="col-4">
-                    <div class="stat-number text-warning fw-bold">€@Customer.TotalRevenue.ToString("N0")</div>
+                <div class="col-6">
+                    <div class="stat-number text-success fw-bold">€@Customer.TotalRevenue.ToString("N0")</div>
                     <div class="stat-label text-muted small">Έσοδα</div>
                 </div>
             </div>
@@ -106,11 +102,11 @@
                             Αυτό θα διαγράψει οριστικά τον/την <strong>@Customer.Name</strong> και όλα τα σχετικά δεδομένα.
                             Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
                         </p>
-                        @if (Customer.ActiveJobs > 0 || Customer.CompletedJobs > 0)
+                        @if (Customer.TotalJobs > 0)
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                Αυτός ο πελάτης έχει @(Customer.ActiveJobs + Customer.CompletedJobs) συσχετισμένες εργασίες που θα παραμείνουν στο σύστημα.
+                                Αυτός ο πελάτης έχει @Customer.TotalJobs συσχετισμένες εργασίες που θα παραμείνουν στο σύστημα.
                             </div>
                         }
                     </div>

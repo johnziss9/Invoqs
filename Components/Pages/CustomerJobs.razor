@@ -87,59 +87,7 @@
 
     <!-- Job Stats Cards -->
     <div class="row mb-4">
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-secondary text-white border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.New)</h3>
-                            <p class="mb-0 small">Νέες Εργασίες</p>
-                        </div>
-                        <i class="bi bi-clock fs-1 opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-primary text-white border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Active)</h3>
-                            <p class="mb-0 small">Ενεργές Εργασίες</p>
-                        </div>
-                        <i class="bi bi-play-circle fs-1 opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-success text-white border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Completed)</h3>
-                            <p class="mb-0 small">Ολοκληρωμένες</p>
-                        </div>
-                        <i class="bi bi-check-circle fs-1 opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="card bg-danger text-white border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Cancelled)</h3>
-                            <p class="mb-0 small">Ακυρωμένες</p>
-                        </div>
-                        <i class="bi bi-x-circle fs-1 opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="col-lg-4 col-md-6 mb-3">
             <div class="card bg-info text-white border-0">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
@@ -152,16 +100,28 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="col-lg-4 col-md-6 mb-3">
             <div class="card bg-warning text-white border-0">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">€@jobs.Where(j => j.Status == JobStatus.Completed).Sum(j =>
-                                                            j.Price).ToString("N0")</h3>
-                            <p class="mb-0 small">Έσοδα</p>
+                            <h3 class="mb-0">€@jobs.Sum(j => j.Price).ToString("N0")</h3>
+                            <p class="mb-0 small">Συνολική Αξία</p>
                         </div>
                         <i class="bi bi-currency-euro fs-1 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card bg-success text-white border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="mb-0">@jobs.Count(j => j.CanBeInvoiced)</h3>
+                            <p class="mb-0 small">Προς Τιμολόγηση</p>
+                        </div>
+                        <i class="bi bi-receipt fs-1 opacity-75"></i>
                     </div>
                 </div>
             </div>
@@ -183,29 +143,17 @@
                                 <h5 class="mb-0 fw-bold">@addressGroup.Address</h5>
                             </div>
                             <div class="row text-center">
-                                <div class="col-md-2 col-sm-4 col-6 mb-2">
-                                    <div class="fw-bold text-primary">@addressGroup.ActiveJobs</div>
-                                    <small class="text-muted">Ενεργές</small>
-                                </div>
-                                <div class="col-md-2 col-sm-4 col-6 mb-2">
-                                    <div class="fw-bold text-secondary">@addressGroup.NewJobs</div>
-                                    <small class="text-muted">Νέες</small>
-                                </div>
-                                <div class="col-md-2 col-sm-4 col-6 mb-2">
-                                    <div class="fw-bold text-success">@addressGroup.CompletedJobs</div>
-                                    <small class="text-muted">Ολοκληρωμένες</small>
-                                </div>
-                                <div class="col-md-2 col-sm-4 col-6 mb-2">
-                                    <div class="fw-bold text-danger">@addressGroup.CancelledJobs</div>
-                                    <small class="text-muted">Ακυρωμένες</small>
-                                </div>
-                                <div class="col-md-2 col-sm-4 col-6 mb-2">
+                                <div class="col-md-4 col-sm-4 col-4 mb-2">
                                     <div class="fw-bold text-info">@addressGroup.TotalJobs</div>
                                     <small class="text-muted">Σύνολο</small>
                                 </div>
-                                <div class="col-md-2 col-sm-4 col-6 mb-2">
+                                <div class="col-md-4 col-sm-4 col-4 mb-2">
                                     <div class="fw-bold text-warning">€@addressGroup.TotalRevenue.ToString("N0")</div>
                                     <small class="text-muted">Έσοδα</small>
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-4 mb-2">
+                                    <div class="fw-bold text-success">@addressGroup.Jobs.Count(j => j.CanBeInvoiced)</div>
+                                    <small class="text-muted">Προς Τιμολόγηση</small>
                                 </div>
                             </div>
                         </div>
@@ -245,20 +193,12 @@
                                 <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
                                     <div class="flex-grow-1">
                                         <div class="d-flex align-items-center mb-1">
-                                            <span class="badge bg-@job.StatusColor me-2">
-                                                <i class="@job.StatusIcon me-1"></i>
-                                                @job.StatusDisplay
-                                            </span>
                                             <h6 class="mb-0 fw-medium">@job.Title</h6>
                                         </div>
                                         <div class="text-muted small">
                                             <i class="@job.TypeIcon me-1"></i>
                                             @job.TypeDisplayName •
-                                            @job.StartDate.ToString("MMM dd, yyyy")
-                                            @if (job.EndDate.HasValue)
-                                            {
-                                                <span> - @job.EndDate.Value.ToString("MMM dd, yyyy")</span>
-                                            }
+                                            @job.JobDate.ToString("MMM dd, yyyy")
                                         </div>
                                         @if (!string.IsNullOrEmpty(job.Description))
                                         {

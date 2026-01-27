@@ -257,11 +257,7 @@
                                                                     </p>
                                                                     <p class="text-muted small mb-0">
                                                                         <i class="bi bi-calendar me-1"></i>
-                                                                        @job.StartDate.ToString("dd/MM/yyyy")
-                                                                        @if (job.EndDate.HasValue && job.EndDate != job.StartDate)
-                                                                        {
-                                                                            <span> - @job.EndDate.Value.ToString("dd/MM/yyyy")</span>
-                                                                        }
+                                                                        @job.JobDate.ToString("dd/MM/yyyy")
                                                                     </p>
                                                                 </div>
                                                                 <div class="text-end">
@@ -323,7 +319,7 @@
                 <!-- Invoice Preview Sidebar -->
                 <div class="col-lg-4">
                     <!-- Customer Info -->
-                   @if (selectedCustomer != null)
+                @if (selectedCustomer != null)
                     {
                         <div class="card border-0 shadow-sm mb-4">
                             <div class="card-header bg-white py-3">
@@ -357,56 +353,26 @@
                                         <span class="text-muted">Τελευταία Ενημέρωση:</span>
                                         <span class="fw-medium">@((selectedCustomer.UpdatedDate ?? selectedCustomer.CreatedDate).ToString("dd/MM/yyyy"))</span>
                                     </div>
-                                    <!-- Work Status -->
-                                    <div class="mb-2 pb-2 border-bottom">
-                                        @if (selectedCustomer.HasActiveWork)
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-success">
-                                                    <i class="bi bi-briefcase me-1"></i>
-                                                    @((selectedCustomer.ActiveJobs + selectedCustomer.NewJobs)) εργασίες σε εξέλιξη
-                                                </span>
-                                            </div>
-                                        }
-                                        else if (selectedCustomer.CompletedJobs > 0)
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-muted">
-                                                    <i class="bi bi-check-circle me-1"></i>
-                                                    Τελευταία εργασία ολοκληρώθηκε
-                                                </span>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-muted">
-                                                    <i class="bi bi-clock-history me-1"></i>
-                                                    Δεν υπάρχουν εργασίες ακόμα
-                                                </span>
-                                            </div>
-                                        }
-                                        
-                                        @* Financial status indicators *@
-                                        @if (selectedCustomer.UninvoicedJobs > 0)
-                                        {
-                                            <div>
-                                                <span class="text-warning">
-                                                    <i class="bi bi-exclamation-circle me-1"></i>
-                                                    @selectedCustomer.UninvoicedJobs μη τιμολογημένες εργασίες
-                                                </span>
-                                            </div>
-                                        }
-                                        
-                                        @if (selectedCustomer.UnpaidInvoices > 0)
-                                        {
-                                            <div>
-                                                <span class="text-danger">
-                                                    @selectedCustomer.UnpaidInvoices απλήρωτα (€@selectedCustomer.OutstandingAmount.ToString("N2"))
-                                                </span>
-                                            </div>
-                                        }
-                                    </div>
+                                    
+                                    @* Financial status indicators *@
+                                    @if (selectedCustomer.UninvoicedJobs > 0)
+                                    {
+                                        <div class="mt-2">
+                                            <span class="text-warning">
+                                                <i class="bi bi-exclamation-circle me-1"></i>
+                                                @selectedCustomer.UninvoicedJobs μη τιμολογημένες εργασίες
+                                            </span>
+                                        </div>
+                                    }
+                                    
+                                    @if (selectedCustomer.UnpaidInvoices > 0)
+                                    {
+                                        <div class="mt-2">
+                                            <span class="text-danger">
+                                                @selectedCustomer.UnpaidInvoices απλήρωτα (€@selectedCustomer.OutstandingAmount.ToString("N2"))
+                                            </span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>

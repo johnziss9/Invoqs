@@ -107,59 +107,7 @@
 
         <!-- Address Stats Cards -->
         <div class="row mb-4">
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-secondary text-white border-0">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.New)</h3>
-                                <p class="mb-0 small">Νέες Εργασίες</p>
-                            </div>
-                            <i class="bi bi-clock fs-1 opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-primary text-white border-0">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Active)</h3>
-                                <p class="mb-0 small">Ενεργές Εργασίες</p>
-                            </div>
-                            <i class="bi bi-play-circle fs-1 opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-success text-white border-0">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Completed)</h3>
-                                <p class="mb-0 small">Ολοκληρωμένες</p>
-                            </div>
-                            <i class="bi bi-check-circle fs-1 opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                <div class="card bg-danger text-white border-0">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h3 class="mb-0">@jobs.Count(j => j.Status == JobStatus.Cancelled)</h3>
-                                <p class="mb-0 small">Ακυρωμένες</p>
-                            </div>
-                            <i class="bi bi-x-circle fs-1 opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="col-lg-4 col-md-6 mb-3">
                 <div class="card bg-info text-white border-0">
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
@@ -172,15 +120,28 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="col-lg-4 col-md-6 mb-3">
                 <div class="card bg-warning text-white border-0">
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h3 class="mb-0">€@jobs.Where(j => j.Status == JobStatus.Completed).Sum(j => j.Price).ToString("N0")</h3>
-                                <p class="mb-0 small">Έσοδα</p>
+                                <h3 class="mb-0">€@jobs.Sum(j => j.Price).ToString("N0")</h3>
+                                <p class="mb-0 small">Συνολική Αξία</p>
                             </div>
                             <i class="bi bi-currency-euro fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card bg-success text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@jobs.Count(j => j.CanBeInvoiced)</h3>
+                                <p class="mb-0 small">Προς Τιμολόγηση</p>
+                            </div>
+                            <i class="bi bi-receipt fs-1 opacity-75"></i>
                         </div>
                     </div>
                 </div>
@@ -201,14 +162,6 @@
                                         placeholder="Αναζήτηση με τίτλο ή περιγραφή...">
                                 </div>
                             </div>
-                            <label class="form-label small text-muted">Κατάσταση</label>
-                            <select class="form-select" @bind="statusFilter">
-                                <option value="all">Όλες οι Καταστάσεις</option>
-                                <option value="new">Νέες</option>
-                                <option value="active">Ενεργές</option>
-                                <option value="completed">Ολοκληρωμένες</option>
-                                <option value="cancelled">Ακυρωμένες</option>
-                            </select>
                             <div class="col-md-3 col-lg-2">
                                 <label class="form-label small text-muted">Τύπος</label>
                                 <select class="form-select" @bind="typeFilter">
@@ -219,11 +172,17 @@
                                 </select>
                             </div>
                             <div class="col-md-3 col-lg-2">
+                                <label class="form-label small text-muted">Κατάσταση Τιμολόγησης</label>
+                                <select class="form-select" @bind="invoiceFilter">
+                                    <option value="all">Όλες</option>
+                                    <option value="invoiced">Τιμολογημένες</option>
+                                    <option value="uninvoiced">Μη Τιμολογημένες</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 col-lg-2">
                                 <label class="form-label small text-muted">Ταξινόμηση Κατά</label>
                                 <select class="form-select" @bind="sortBy">
-                                    <option value="startDate">Ημερομηνία Έναρξης</option>
-                                    <option value="endDate">Ημερομηνία Λήξης</option>
-                                    <option value="status">Κατάσταση</option>
+                                    <option value="jobDate">Ημερομηνία</option>
                                     <option value="type">Τύπος</option>
                                     <option value="price">Τιμή</option>
                                 </select>
@@ -232,7 +191,7 @@
                             <div class="col-12">
                                 <small class="text-muted">
                                     Εμφάνιση @filteredJobs.Count() από @jobs.Count εργασίες σε αυτήν τη διεύθυνση
-                                    @if (!string.IsNullOrWhiteSpace(searchTerm) || statusFilter != "all" || typeFilter != "all")
+                                    @if (!string.IsNullOrWhiteSpace(searchTerm) || typeFilter != "all" || invoiceFilter != "all")
                                     {
                                         <span> • <button class="btn btn-link btn-sm p-0 text-decoration-none" @onclick="ClearFilters">Καθαρισμός φίλτρων</button></span>
                                     }
@@ -253,7 +212,6 @@
                 {
                     <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
                         <JobCard Job="job" Customer="customer" 
-                            OnStatusChange="@(async (tuple) => await HandleStatusChange(tuple.job, tuple.status))"
                             OnEdit="@(async (job) => await HandleEditJob(job))"
                             OnDelete="@(async (job) => await HandleDeleteJob(job))"
                             OnGenerateInvoice="@(async (job) => await HandleGenerateInvoice(job))" />

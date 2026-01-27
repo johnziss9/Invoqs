@@ -163,12 +163,12 @@ namespace Invoqs.Components.Pages
 
             if (filterStartDate.HasValue)
             {
-                filteredJobs = filteredJobs.Where(j => j.StartDate.Date >= filterStartDate.Value.Date).ToList();
+                filteredJobs = filteredJobs.Where(j => j.JobDate.Date >= filterStartDate.Value.Date).ToList();
             }
 
             if (filterEndDate.HasValue)
             {
-                filteredJobs = filteredJobs.Where(j => j.StartDate.Date <= filterEndDate.Value.Date).ToList();
+                filteredJobs = filteredJobs.Where(j => j.JobDate.Date <= filterEndDate.Value.Date).ToList();
             }
 
             if (!string.IsNullOrEmpty(filterJobType) && Enum.TryParse<JobType>(filterJobType, out var jobType))
@@ -181,7 +181,7 @@ namespace Invoqs.Components.Pages
                 filteredJobs = filteredJobs.Where(j => j.Address == filterAddress).ToList();
             }
 
-            filteredJobs = filteredJobs.OrderBy(j => j.StartDate).ToList();
+            filteredJobs = filteredJobs.OrderBy(j => j.JobDate).ToList();
             StateHasChanged();
         }
 

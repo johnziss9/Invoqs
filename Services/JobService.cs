@@ -167,38 +167,6 @@ namespace Invoqs.Services
                 return (false, null);
             }
         }
-        
-        public async Task<(bool Success, ApiValidationError? ValidationErrors)> UpdateJobStatusAsync(int jobId, JobStatus newStatus)
-        {
-            try
-            {
-                var token = await _authService.GetTokenAsync();
-                _authService.AddAuthorizationHeader(_httpClient, token);
-
-                var statusDto = new { Status = newStatus };
-                var response = await _httpClient.PutAsJsonAsync($"jobs/{jobId}/status", statusDto);
-                
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
-                    await _authService.LogoutAsync();
-                    return (false, null);
-                }
-
-                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    var validationErrors = JsonSerializer.Deserialize<ApiValidationError>(errorContent, _jsonOptions);
-                    return (false, validationErrors);
-                }
-
-                return (response.IsSuccessStatusCode, null);
-            }
-            catch (HttpRequestException ex)
-            {
-                Console.WriteLine($"Error updating job status: {ex.Message}");
-                return (false, null);
-            }
-        }
 
         public async Task<bool> DeleteJobAsync(int jobId)
         {

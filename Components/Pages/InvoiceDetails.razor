@@ -189,7 +189,7 @@
                                             <td>
                                                 @if (item.Job != null)
                                                 {
-                                                    <span class="text-muted">@item.Job.StartDate.ToString("dd MMM yyyy")</span>
+                                                    <span class="text-muted">@item.Job.JobDate.ToString("dd MMM yyyy")</span>
                                                 }
                                             </td>
                                             <td class="text-end">
@@ -507,37 +507,6 @@
 
                                 @if (!isCustomerDeleted)
                                 {
-                                    <!-- Work Status -->
-                                    <div class="pb-2 border-bottom mb-2">
-                                        @if (customer.HasActiveWork)
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-success fw-normal">
-                                                    <i class="bi bi-briefcase me-1"></i>
-                                                    @((customer.ActiveJobs + customer.NewJobs)) εργασίες σε εξέλιξη
-                                                </span>
-                                            </div>
-                                        }
-                                        else if (customer.CompletedJobs > 0)
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-muted">
-                                                    <i class="bi bi-check-circle me-1"></i>
-                                                    Τελευταία εργασία ολοκληρώθηκε
-                                                </span>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-muted">
-                                                    <i class="bi bi-clock-history me-1"></i>
-                                                    Δεν υπάρχουν εργασίες ακόμα
-                                                </span>
-                                            </div>
-                                        }
-                                    </div>
-
                                     <!-- Financial Status -->
                                     @if (customer.UninvoicedJobs > 0)
                                     {

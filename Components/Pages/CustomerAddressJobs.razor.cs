@@ -17,9 +17,9 @@ namespace Invoqs.Components.Pages
 
         // Component state
         protected string searchTerm = "";
-        protected string statusFilter = "all";
         protected string typeFilter = "all";
-        protected string sortBy = "startDate";
+        protected string invoiceFilter = "all";
+        protected string sortBy = "jobDate";
         protected bool isLoading = true;
         protected string errorMessage = "";
 
@@ -97,14 +97,6 @@ namespace Invoqs.Components.Pages
                         j.TypeDisplayName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
                 }
 
-                if (statusFilter != "all")
-                {
-                    if (Enum.TryParse<JobStatus>(statusFilter, true, out var status))
-                    {
-                        filtered = filtered.Where(j => j.Status == status);
-                    }
-                }
-
                 if (typeFilter != "all")
                 {
                     if (Enum.TryParse<JobType>(typeFilter, out var type))
@@ -113,14 +105,23 @@ namespace Invoqs.Components.Pages
                     }
                 }
 
+                // Apply invoice filter
+                if (invoiceFilter != "all")
+                {
+                    filtered = invoiceFilter switch
+                    {
+                        "invoiced" => filtered.Where(j => j.IsInvoiced),
+                        "uninvoiced" => filtered.Where(j => !j.IsInvoiced),
+                        _ => filtered
+                    };
+                }
+
                 filtered = sortBy switch
                 {
-                    "startDate" => filtered.OrderByDescending(j => j.StartDate),
-                    "endDate" => filtered.OrderByDescending(j => j.EndDate ?? DateTime.MinValue),
-                    "status" => filtered.OrderBy(j => j.Status),
+                    "jobDate" => filtered.OrderByDescending(j => j.JobDate),
                     "type" => filtered.OrderBy(j => j.Type),
                     "price" => filtered.OrderByDescending(j => j.Price),
-                    _ => filtered.OrderByDescending(j => j.StartDate)
+                    _ => filtered.OrderByDescending(j => j.JobDate)
                 };
 
                 return filtered;
@@ -139,51 +140,6 @@ namespace Invoqs.Components.Pages
             return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
         }
         // Event handlers
-        protected async Task HandleStatusChange(JobModel job, JobStatus newStatus)
-        {
-            try
-            {
-                var originalStatus = job.Status;
-
-                var (success, errors) = await JobService.UpdateJobStatusAsync(job.Id, newStatus);
-
-                if (success)
-                {
-                    job.Status = newStatus;
-
-                    if (newStatus == JobStatus.Completed && !job.EndDate.HasValue)
-                    {
-                        job.EndDate = DateTime.Now;
-                    }
-                    else if (newStatus != JobStatus.Completed && originalStatus == JobStatus.Completed)
-                    {
-                        job.EndDate = null;
-                    }
-
-                    // Refresh data to update stats
-                    await LoadJobs();
-                    StateHasChanged();
-                }
-                else
-                {
-                    if (errors != null)
-                    {
-                        errorMessage = "Validation error: " + string.Join(", ", errors.GetAllErrors());
-                    }
-                    else
-                    {
-                        errorMessage = "Failed to update job status";
-                    }
-
-                    StateHasChanged();
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Error updating job status: {ex.Message}";
-                StateHasChanged();
-            }
-        }
 
         protected Task HandleEditJob(JobModel job)
         {
@@ -225,8 +181,8 @@ namespace Invoqs.Components.Pages
         protected void ClearFilters()
         {
             searchTerm = "";
-            statusFilter = "all";
             typeFilter = "all";
+            invoiceFilter = "all";
             StateHasChanged();
         }
     }

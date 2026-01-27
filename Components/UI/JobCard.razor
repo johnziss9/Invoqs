@@ -25,10 +25,6 @@
                 }
             </div>
             <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-@Job.StatusColor">
-                    <i class="@Job.StatusIcon me-1"></i>
-                    @Job.StatusDisplay
-                </span>
                 @if (Job.IsInvoiced)
                 {
                     <span class="badge bg-info text-white ms-1"
@@ -42,64 +38,6 @@
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <!-- Status Change Actions -->
-                        @{
-                            var hasStatusOptions = false;
-                            
-                            var canGoToActive = Job.Status == JobStatus.New || Job.Status == JobStatus.Cancelled;
-                            var canGoToCompleted = Job.Status == JobStatus.Active;
-                            var canGoToCancelled = Job.Status == JobStatus.New || Job.Status == JobStatus.Active;
-                            var canGoToNew = Job.Status == JobStatus.Cancelled;
-                            
-                            hasStatusOptions = canGoToActive || canGoToCompleted || canGoToCancelled || canGoToNew;
-                        }
-
-                        @if (hasStatusOptions)
-                        {
-                            <li>
-                                <h6 class="dropdown-header">Αλλαγή Κατάστασης</h6>
-                            </li>
-                            
-                            @if (canGoToNew)
-                            {
-                                <li><button class="dropdown-item"
-                                        @onclick="() => HandleStatusChange(JobStatus.New)"
-                                        @onclick:preventDefault="true">
-                                        <i class="bi bi-clock me-2"></i>Σήμανση ως Νέα
-                                    </button></li>
-                            }
-                            
-                            @if (canGoToActive)
-                            {
-                                <li><button class="dropdown-item"
-                                        @onclick="() => HandleStatusChange(JobStatus.Active)"
-                                        @onclick:preventDefault="true">
-                                        <i class="bi bi-play-circle me-2"></i>Σήμανση ως Ενεργή
-                                    </button></li>
-                            }
-                            
-                            @if (canGoToCompleted)
-                            {
-                                <li><button class="dropdown-item"
-                                        @onclick="() => HandleStatusChange(JobStatus.Completed)"
-                                        @onclick:preventDefault="true">
-                                        <i class="bi bi-check-circle me-2"></i>Σήμανση ως Ολοκληρωμένη
-                                    </button></li>
-                            }
-                            
-                            @if (canGoToCancelled)
-                            {
-                                <li><button class="dropdown-item text-danger"
-                                        @onclick="() => HandleStatusChange(JobStatus.Cancelled)"
-                                        @onclick:preventDefault="true">
-                                        <i class="bi bi-x-circle me-2"></i>Σήμανση ως Ακυρωμένη
-                                    </button></li>
-                            }
-                            
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                        }
 
                         <!-- Job Actions -->
                         <li><button class="dropdown-item" @onclick="() => HandleEditJob(Job.Id)"
@@ -113,7 +51,7 @@
                                     <i class="bi bi-file-earmark-text me-2"></i>Δημιουργία Τιμολογίου
                                 </button></li>
                         }
-                        else if (Job.Status == JobStatus.Completed && Job.IsInvoiced)
+                        else if (Job.IsInvoiced)
                         {
                             <li><span class="dropdown-item-text text-muted">
                                     <i class="bi bi-check-circle me-2"></i>Ήδη Τιμολογημένη
@@ -125,7 +63,7 @@
                         </li>
 
                         <!-- Danger Zone -->
-                        @if (Job.IsInvoiced || Job.Status == JobStatus.Active || Job.Status == JobStatus.Completed)
+                        @if (Job.IsInvoiced)
                         {
                             <li><span class="dropdown-item-text text-muted" title="@GetDeleteDisabledReason()">
                                     <i class="bi bi-lock me-2"></i>@GetDeleteButtonText()
@@ -210,12 +148,7 @@
             <div class="detail-item mb-2">
                 <i class="bi bi-calendar text-muted me-2"></i>
                 <span class="text-muted small">
-                    Έναρξη: @Job.StartDate.ToString("MMM dd, yyyy")
-                    @if (Job.EndDate.HasValue)
-                    {
-                        <br />
-                        <span>Λήξη: @Job.EndDate.Value.ToString("MMM dd, yyyy")</span>
-                    }
+                    @Job.JobDate.ToString("MMM dd, yyyy")
                 </span>
             </div>
         </div>
@@ -223,11 +156,7 @@
         <!-- Job Stats -->
         <div class="job-stats mb-3">
             <div class="row text-center">
-                <div class="col-6">
-                    <div class="stat-number text-primary fw-bold">@Job.DurationDays</div>
-                    <div class="stat-label text-muted small">Ημέρες</div>
-                </div>
-                <div class="col-6">
+                <div class="col-12">
                     <div class="stat-number text-success fw-bold">€@Job.Price.ToString("N2")</div>
                     <div class="stat-label text-muted small">Τιμή</div>
                 </div>
@@ -265,14 +194,6 @@
                                 Αυτό θα διαγράψει οριστικά την εργασία <strong>@Job.Title</strong> στο @Job.Address.
                                 Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
                             </p>
-                            @if (Job.Status == JobStatus.Cancelled)
-                            {
-                                <div class="alert alert-warning">
-                                    <i class="bi bi-exclamation-triangle me-2"></i>
-                                    <strong>Προειδοποίηση:</strong> Αυτή η εργασία έχει ακυρωθεί. 
-                                    Η διαγραφή θα την αφαιρέσει οριστικά από τα αρχεία σας.
-                                </div>
-                            }
                         </div>
                     </div>
                 </div>
