@@ -173,15 +173,15 @@
                                             <i class="@job.TypeIcon text-primary" style="font-size: 1.2rem;"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-medium">@System.Text.RegularExpressions.Regex.Replace(job.Type.ToString(), "([a-z])([A-Z])", "$1 $2")</div>
+                                            <div class="fw-medium">@job.TypeDisplayName</div>
                                             <small class="text-muted">
                                                 <i class="bi bi-geo-alt me-1"></i>@job.Address
                                             </small>
                                         </div>
                                     </div>
                                     <div class="text-end">
-                                        <span class="badge bg-@job.StatusColor">@job.StatusDisplay</span>
-                                        <div class="small text-muted mt-1">@job.StartDate.ToString("dd MMM yyyy")</div>
+                                        <div class="fw-medium text-success">€@job.Price.ToString("N2")</div>
+                                        <div class="small text-muted mt-1">@job.JobDate.ToString("dd MMM yyyy")</div>
                                     </div>
                                 </div>
                             }
@@ -218,7 +218,7 @@
                                 Επεξεργασία Πελάτη
                             </a>
                             <hr class="my-2">
-                            @if (customerStats.ActiveJobs > 0)
+                            @if (customerStats.UninvoicedJobs > 0)
                             {
                                 <button class="btn btn-outline-danger btn-sm" disabled title="@GetDeleteDisabledReason()">
                                     <i class="bi bi-lock me-1"></i>
@@ -245,31 +245,25 @@
                         <div class="row text-center g-3">
                             <div class="col-6">
                                 <div class="border rounded p-2">
-                                    <div class="h4 text-primary mb-1">@customerStats.ActiveJobs</div>
-                                    <small class="text-muted">Ενεργές</small>
+                                    <div class="h4 text-primary mb-1">@customerStats.TotalJobs</div>
+                                    <small class="text-muted">Σύνολο Εργασιών</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="border rounded p-2">
-                                    <div class="h4 text-secondary mb-1">@customerStats.NewJobs</div>
-                                    <small class="text-muted">Προγραμματισμένες</small>
+                                    <div class="h4 text-warning mb-1">@customerStats.UninvoicedJobs</div>
+                                    <small class="text-muted">Μη Τιμολογημένες</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="border rounded p-2">
-                                    <div class="h4 text-success mb-1">@customerStats.CompletedJobs</div>
-                                    <small class="text-muted">Ολοκληρωμένες</small>
+                                    <div class="h4 text-success mb-1">@customerStats.InvoicedJobs</div>
+                                    <small class="text-muted">Τιμολογημένες</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="border rounded p-2">
-                                    <div class="h4 text-danger mb-1">@customerStats.CancelledJobs</div>
-                                    <small class="text-muted">Ακυρωμένες</small>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="border rounded p-2">
-                                    <div class="h4 text-warning mb-1">€@customerStats.TotalRevenue.ToString("N0")</div>
+                                    <div class="h4 text-info mb-1">€@customerStats.TotalRevenue.ToString("N0")</div>
                                     <small class="text-muted">Συνολικά Έσοδα</small>
                                 </div>
                             </div>
@@ -291,37 +285,6 @@
                             <div class="d-flex justify-content-between mb-3">
                                 <span class="text-muted">Τελευταία Ενημέρωση:</span>
                                 <span class="fw-medium">@((customer.UpdatedDate ?? customer.CreatedDate).ToString("dd/MM/yyyy"))</span>
-                            </div>
-                            
-                            <!-- Work Status -->
-                            <div class="pb-2 border-bottom mb-2">
-                                @if (customer.HasActiveWork)
-                                {
-                                    <div class="mb-1">
-                                        <span class="text-success">
-                                            <i class="bi bi-briefcase me-1"></i>
-                                            @((customer.ActiveJobs + customer.NewJobs)) εργασίες σε εξέλιξη
-                                        </span>
-                                    </div>
-                                }
-                                else if (customer.CompletedJobs > 0)
-                                {
-                                    <div class="mb-1">
-                                        <span class="text-muted">
-                                            <i class="bi bi-check-circle me-1"></i>
-                                            Τελευταία εργασία ολοκληρώθηκε
-                                        </span>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="mb-1">
-                                        <span class="text-muted">
-                                            <i class="bi bi-clock-history me-1"></i>
-                                            Δεν υπάρχουν εργασίες ακόμα
-                                        </span>
-                                    </div>
-                                }
                             </div>
                             
                             <!-- Financial Status -->
@@ -400,11 +363,11 @@
                             Αυτό θα διαγράψει μόνιμα τον/την <strong>@customer?.Name</strong> και όλα τα σχετικά δεδομένα.
                             Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
                         </p>
-                        @if (customerStats.ActiveJobs > 0 || customerStats.CompletedJobs > 0)
+                        @if (customerStats.TotalJobs > 0)
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                Αυτός ο πελάτης έχει @(customerStats.ActiveJobs + customerStats.CompletedJobs) συσχετισμένες εργασίες που θα παραμείνουν στο σύστημα.
+                                Αυτός ο πελάτης έχει @customerStats.TotalJobs συσχετισμένες εργασίες που θα παραμείνουν στο σύστημα.
                             </div>
                         }
                     </div>

@@ -35,9 +35,9 @@ namespace Invoqs.Components.UI
 
         private void ShowDeleteConfirmation()
         {
-            if (Customer.ActiveJobs > 0)
+            if (Customer.UninvoicedJobs > 0)
             {
-                errorMessage = "Cannot delete a customer with active jobs. Please complete or cancel all active jobs first.";
+                errorMessage = "Cannot delete a customer with uninvoiced jobs. Please invoice all jobs first.";
                 StateHasChanged();
                 return;
             }
@@ -71,16 +71,16 @@ namespace Invoqs.Components.UI
 
         private string GetDeleteButtonText()
         {
-            if (Customer.ActiveJobs > 0)
-                return "Cannot Delete (Active Jobs)";
+            if (Customer.UninvoicedJobs > 0)
+                return "Cannot Delete (Uninvoiced Jobs)";
             
             return "Delete Customer";
         }
 
         private string GetDeleteDisabledReason()
         {
-            if (Customer.ActiveJobs > 0)
-                return "Cannot delete customers with active jobs. Complete or cancel all active jobs first.";
+            if (Customer.UninvoicedJobs > 0)
+                return "Cannot delete customers with uninvoiced jobs. Please invoice all jobs first.";
 
             return "";
         }

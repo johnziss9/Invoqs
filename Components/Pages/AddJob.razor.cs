@@ -80,8 +80,7 @@ namespace Invoqs.Components.Pages
             newJob = new JobModel
             {
                 CustomerId = CustomerId,
-                StartDate = DateTime.Today.AddDays(1), // Default to tomorrow
-                Status = JobStatus.New, // Default to New status
+                JobDate = DateTime.Today, // Default to today
                 Type = JobType.SkipRental, // Default type
                 CreatedDate = DateTime.Now
             };
@@ -246,30 +245,6 @@ namespace Invoqs.Components.Pages
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
 
             return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
-        }
-
-        protected string GetStatusColor(JobStatus status)
-        {
-            return status switch
-            {
-                JobStatus.New => "secondary",
-                JobStatus.Active => "primary",
-                JobStatus.Completed => "success",
-                JobStatus.Cancelled => "danger",
-                _ => "secondary"
-            };
-        }
-
-        protected string GetStatusIcon(JobStatus status)
-        {
-            return status switch
-            {
-                JobStatus.New => "bi-clock",
-                JobStatus.Active => "bi-play-circle",
-                JobStatus.Completed => "bi-check-circle",
-                JobStatus.Cancelled => "bi-x-circle",
-                _ => "bi-clock"
-            };
         }
 
         protected void OnAddressInput(ChangeEventArgs e)

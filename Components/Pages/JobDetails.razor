@@ -37,10 +37,6 @@
                     <h2 class="text-primary mb-1">@(job?.Title ?? "Φόρτωση...")</h2>
                     @if (job != null)
                     {
-                        <span class="badge bg-@job.StatusColor badge-sm">
-                            <i class="@job.StatusIcon me-1"></i>
-                            @job.StatusDisplay
-                        </span>
                         @if (job.IsInvoiced)
                         {
                             <span class="badge bg-info text-white badge-sm ms-2"
@@ -100,24 +96,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-medium">Ημερομηνία Έναρξης</label>
+                                <label class="form-label fw-medium">Ημερομηνία Εργασίας</label>
                                 <div class="form-control-plaintext">
                                     <i class="bi bi-calendar me-2"></i>
-                                    @job.StartDate.ToString("dddd, MMMM dd, yyyy")
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-medium">Ημερομηνία Λήξης</label>
-                                <div class="form-control-plaintext">
-                                    @if (job.EndDate.HasValue)
-                                    {
-                                        <i class="bi bi-calendar-check me-2"></i>
-                                        @job.EndDate.Value.ToString("dddd, MMMM dd, yyyy")
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">Δεν ολοκληρώθηκε</span>
-                                    }
+                                    @job.JobDate.ToString("dddd, dd MMMM yyyy")
                                 </div>
                             </div>
                             <div class="col-12">
@@ -131,12 +113,6 @@
                                 <label class="form-label fw-medium">Τιμή</label>
                                 <div class="form-control-plaintext">
                                     <span class="h5 text-success mb-0">€@job.Price.ToString("N2")</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-medium">Διάρκεια</label>
-                                <div class="form-control-plaintext">
-                                    @job.DurationDays ημέρες
                                 </div>
                             </div>
 
@@ -266,7 +242,8 @@
                         </div>
                     </div>
                 }
-                else if (job.Status == JobStatus.Completed)
+
+                @if (!job.IsInvoiced)
                 {
                     @if (isCustomerDeleted)
                     {
@@ -313,21 +290,7 @@
                                 Επεξεργασία Εργασίας
                             </a>
                             
-                            @if (job.Status == JobStatus.New)
-                            {
-                                <button class="btn btn-success btn-sm" @onclick="() => StartJob(job.Id)">
-                                    <i class="bi bi-play me-1"></i>
-                                    Έναρξη Εργασίας
-                                </button>
-                            }
-                            else if (job.Status == JobStatus.Active)
-                            {
-                                <button class="btn btn-warning btn-sm" @onclick="() => CompleteJob(job.Id)">
-                                    <i class="bi bi-check-circle me-1"></i>
-                                    Ολοκλήρωση
-                                </button>
-                            }
-                            else if (job.Status == JobStatus.Completed && !job.IsInvoiced)
+                            @if (!job.IsInvoiced)
                             {
                                 @if (isCustomerDeleted)
                                 {
@@ -346,7 +309,7 @@
                             }
                             
                             <hr class="my-2">
-                            @if (job.IsInvoiced || job.Status == JobStatus.Active || job.Status == JobStatus.Completed)
+                            @if (job.IsInvoiced)
                             {
                                 <button class="btn btn-outline-danger btn-sm" disabled="true" title="@GetDeleteDisabledReason()">
                                     <i class="bi bi-lock me-1"></i>
@@ -434,21 +397,12 @@
                                 {
                                     <!-- Work Status -->
                                     <div class="pb-2 border-bottom mb-2">
-                                        @if (customer.HasActiveWork)
+                                        @if (customer.TotalJobs > 0)
                                         {
                                             <div class="mb-1">
                                                 <span class="text-success fw-normal">
                                                     <i class="bi bi-briefcase me-1"></i>
-                                                    @((customer.ActiveJobs + customer.NewJobs)) εργασίες σε εξέλιξη
-                                                </span>
-                                            </div>
-                                        }
-                                        else if (customer.CompletedJobs > 0)
-                                        {
-                                            <div class="mb-1">
-                                                <span class="text-muted">
-                                                    <i class="bi bi-check-circle me-1"></i>
-                                                    Τελευταία εργασία ολοκληρώθηκε
+                                                    @customer.TotalJobs συνολικές εργασίες
                                                 </span>
                                             </div>
                                         }
@@ -503,16 +457,9 @@
                     <div class="card-body">
                         <div class="small">
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Ημερομηνία Έναρξης:</span>
-                                <span class="fw-medium">@job.StartDate.ToString("dd/MM/yyyy")</span>
+                                <span class="text-muted">Ημερομηνία Εργασίας:</span>
+                                <span class="fw-medium">@job.JobDate.ToString("dd/MM/yyyy")</span>
                             </div>
-                            @if (job.EndDate.HasValue)
-                            {
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Ημερομηνία Ολοκλήρωσης:</span>
-                                    <span class="fw-medium">@job.EndDate.Value.ToString("dd/MM/yyyy")</span>
-                                </div>
-                            }
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Ημερομηνία Δημιουργίας:</span>
                                 <span class="fw-medium">@job.CreatedDate.ToString("dd/MM/yyyy")</span>
@@ -520,10 +467,6 @@
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Τελευταία Ενημέρωση:</span>
                                 <span class="fw-medium">@((job.UpdatedDate ?? job.CreatedDate).ToString("dd/MM/yyyy"))</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Διάρκεια:</span>
-                                <span class="fw-medium">@job.DurationDays ημέρες</span>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted">Αξία:</span>
@@ -593,14 +536,6 @@
                             Αυτό θα διαγράψει μόνιμα την εργασία <strong>@job?.Title</strong>.
                             Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
                         </p>
-                        @if (job!.Status == JobStatus.Cancelled)
-                        {
-                            <div class="alert alert-warning">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Προειδοποίηση:</strong> Αυτή η εργασία έχει ακυρωθεί. 
-                                Η διαγραφή θα την αφαιρέσει μόνιμα από τα αρχεία σας.
-                            </div>
-                        }
                     </div>
                 </div>
                 <div class="modal-footer">

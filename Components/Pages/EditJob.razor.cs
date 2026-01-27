@@ -69,11 +69,9 @@ namespace Invoqs.Components.Pages
                 isInvoiced = job.IsInvoiced;
                 isCustomerDeleted = job.CustomerIsDeleted;
                 
-                // Determine if job can be deleted based on status
-                // Can only delete: New jobs
-                // Warn but allow: Cancelled jobs
-                // Cannot delete: Active, Completed, or Invoiced jobs
-                canDeleteJob = job.Status == JobStatus.New || job.Status == JobStatus.Cancelled;
+                // Determine if job can be deleted
+                // Cannot delete invoiced jobs
+                canDeleteJob = !isInvoiced;
 
                 // Load customer information
                 customer = await CustomerService.GetCustomerByIdAsync(job.CustomerId);
@@ -126,17 +124,6 @@ namespace Invoqs.Components.Pages
                 successMessage = "";
                 validationErrors = null;
 
-                // Auto-set end date when marking as completed
-                if (job.Status == JobStatus.Completed && !job.EndDate.HasValue)
-                {
-                    job.EndDate = DateTime.Now;
-                }
-                // Clear end date if no longer completed
-                else if (job.Status != JobStatus.Completed)
-                {
-                    job.EndDate = null;
-                }
-
                 var (success, errors) = await JobService.UpdateJobAsync(job);
 
                 if (success)
@@ -175,52 +162,6 @@ namespace Invoqs.Components.Pages
             StateHasChanged();
         }
 
-        private async Task QuickStatusChange(JobStatus newStatus)
-        {
-            if (job == null) return;
-
-            try
-            {
-                job.Status = newStatus;
-
-                // Auto-set end date when marking as completed
-                if (newStatus == JobStatus.Completed && !job.EndDate.HasValue)
-                {
-                    job.EndDate = DateTime.Now;
-                }
-
-                var (success, errors) = await JobService.UpdateJobAsync(job);
-
-                if (success)
-                {
-                    successMessage = $"Job status changed to {newStatus}!";
-
-                    // Auto-hide success message
-                    _ = Task.Run(async () =>
-                    {
-                        await Task.Delay(2000);
-                        successMessage = "";
-                        await InvokeAsync(StateHasChanged);
-                    });
-                }
-                else if (errors != null)
-                {
-                    validationErrors = errors;
-                    errorMessage = "Validation error occurred while updating status.";
-                }
-                else
-                {
-                    errorMessage = "Failed to update job status.";
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Error updating job status: {ex.Message}";
-            }
-
-            StateHasChanged();
-        }
-
         private void ShowDeleteConfirmation()
         {
             if (job == null) return;
@@ -232,21 +173,6 @@ namespace Invoqs.Components.Pages
                 StateHasChanged();
                 return;
             }
-
-            if (job.Status == JobStatus.Active)
-            {
-                errorMessage = "Cannot delete an active job. Please mark it as cancelled first.";
-                StateHasChanged();
-                return;
-            }
-
-            if (job.Status == JobStatus.Completed)
-            {
-                errorMessage = "Cannot delete a completed job. Completed work must be preserved for audit trail and reporting.";
-                StateHasChanged();
-                return;
-            }
-
             showDeleteConfirmation = true;
             StateHasChanged();
         }
@@ -346,10 +272,6 @@ namespace Invoqs.Components.Pages
             
             if (isInvoiced)
                 return "Cannot Delete (Invoiced)";
-            if (job.Status == JobStatus.Completed)
-                return "Cannot Delete (Completed)";
-            if (job.Status == JobStatus.Active)
-                return "Cannot Delete (Active)";
             
             return "Delete Job";
         }
@@ -360,10 +282,6 @@ namespace Invoqs.Components.Pages
             
             if (isInvoiced)
                 return "Cannot delete invoiced jobs. Remove from invoice first.";
-            if (job.Status == JobStatus.Completed)
-                return "Cannot delete completed jobs. They must be preserved for audit trail.";
-            if (job.Status == JobStatus.Active)
-                return "Cannot delete active jobs. Mark as cancelled first.";
             
             return "";
         }

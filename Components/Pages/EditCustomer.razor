@@ -187,31 +187,19 @@
                             <div class="row text-center g-3">
                                 <div class="col-6">
                                     <div class="border rounded p-2">
-                                        <div class="h4 text-primary mb-1">@customer.ActiveJobs</div>
-                                        <small class="text-muted">Ενεργές</small>
+                                        <div class="h4 text-primary mb-1">@customer.TotalJobs</div>
+                                        <small class="text-muted">Σύνολο Εργασιών</small>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="border rounded p-2">
-                                        <div class="h4 text-secondary mb-1">@customer.NewJobs</div>
-                                        <small class="text-muted">Προγραμματισμένες</small>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="border rounded p-2">
-                                        <div class="h4 text-success mb-1">@customer.CompletedJobs</div>
-                                        <small class="text-muted">Ολοκληρωμένες</small>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="border rounded p-2">
-                                        <div class="h4 text-danger mb-1">@customer.CancelledJobs</div>
-                                        <small class="text-muted">Ακυρωμένες</small>
+                                        <div class="h4 text-warning mb-1">@customer.UninvoicedJobs</div>
+                                        <small class="text-muted">Μη Τιμολογημένες</small>
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="border rounded p-2">
-                                        <div class="h4 text-warning mb-1">€@customer.TotalRevenue.ToString("N0")</div>
+                                        <div class="h4 text-success mb-1">€@customer.TotalRevenue.ToString("N0")</div>
                                         <small class="text-muted">Συνολικά Έσοδα</small>
                                     </div>
                                 </div>
@@ -237,21 +225,12 @@
                                 
                                 <!-- Work Status -->
                                 <div class="pb-2 border-bottom mb-2">
-                                    @if (customer.HasActiveWork)
+                                    @if (customer.TotalJobs > 0)
                                     {
                                         <div class="mb-1">
                                             <span class="text-success">
                                                 <i class="bi bi-briefcase me-1"></i>
-                                                @((customer.ActiveJobs + customer.NewJobs)) εργασίες σε εξέλιξη
-                                            </span>
-                                        </div>
-                                    }
-                                    else if (customer.CompletedJobs > 0)
-                                    {
-                                        <div class="mb-1">
-                                            <span class="text-muted">
-                                                <i class="bi bi-check-circle me-1"></i>
-                                                Τελευταία εργασία ολοκληρώθηκε
+                                                @customer.TotalJobs συνολικές εργασίες
                                             </span>
                                         </div>
                                     }
@@ -341,11 +320,11 @@
                             Αυτή η ενέργεια θα διαγράψει οριστικά τον/την <strong>@customer?.Name</strong> και όλα τα σχετικά δεδομένα.
                             Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
                         </p>
-                        @if (customer?.ActiveJobs > 0 || customer?.CompletedJobs > 0)
+                        @if (customer?.TotalJobs > 0)
                         {
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                Αυτός ο πελάτης έχει @((customer.ActiveJobs + customer.CompletedJobs)) σχετικές εργασίες που θα παραμείνουν στο σύστημα.
+                                Αυτός ο πελάτης έχει @customer.TotalJobs σχετικές εργασίες που θα παραμείνουν στο σύστημα.
                             </div>
                         }
                     </div>

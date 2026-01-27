@@ -53,7 +53,7 @@ namespace Invoqs.Components.Pages
 
                     // Get recent jobs (last 10, ordered by date)
                     recentJobs = allCustomerJobs
-                        .OrderByDescending(j => j.StartDate)
+                        .OrderByDescending(j => j.JobDate)
                         .Take(10)
                         .ToList();
 
@@ -81,11 +81,9 @@ namespace Invoqs.Components.Pages
                 customerStats = new CustomerStats
                 {
                     TotalJobs = jobs.Count,
-                    ActiveJobs = jobs.Count(j => j.Status == JobStatus.Active),
-                    NewJobs = jobs.Count(j => j.Status == JobStatus.New),
-                    CompletedJobs = jobs.Count(j => j.Status == JobStatus.Completed),
-                    CancelledJobs = jobs.Count(j => j.Status == JobStatus.Cancelled),
-                    TotalRevenue = jobs.Where(j => j.Status == JobStatus.Completed).Sum(j => j.Price)
+                    UninvoicedJobs = jobs.Count(j => !j.IsInvoiced),
+                    InvoicedJobs = jobs.Count(j => j.IsInvoiced),
+                    TotalRevenue = jobs.Sum(j => j.Price)
                 };
 
                 // Calculate outstanding amount from unpaid invoices
@@ -103,9 +101,9 @@ namespace Invoqs.Components.Pages
         {
             if (customer == null) return;
 
-            if (customerStats.ActiveJobs > 0)
+            if (customerStats.UninvoicedJobs > 0)
             {
-                errorMessage = "Cannot delete a customer with active jobs. Please complete or cancel all active jobs first.";
+                errorMessage = "Cannot delete a customer with uninvoiced jobs. Please invoice or remove all jobs first.";
                 StateHasChanged();
                 return;
             }
@@ -156,16 +154,16 @@ namespace Invoqs.Components.Pages
 
         private string GetDeleteButtonText()
         {
-            if (customerStats.ActiveJobs > 0)
-                return "Cannot Delete (Active Jobs)";
+            if (customerStats.UninvoicedJobs > 0)
+                return "Cannot Delete (Uninvoiced Jobs)";
 
             return "Delete Customer";
         }
 
         private string GetDeleteDisabledReason()
         {
-            if (customerStats.ActiveJobs > 0)
-                return "Cannot delete customers with active jobs. Complete or cancel all active jobs first.";
+            if (customerStats.UninvoicedJobs > 0)
+                return "Cannot delete customers with uninvoiced jobs. Invoice or remove all jobs first.";
 
             return "";
         }
@@ -174,10 +172,8 @@ namespace Invoqs.Components.Pages
     public class CustomerStats
     {
         public int TotalJobs { get; set; }
-        public int ActiveJobs { get; set; }
-        public int NewJobs { get; set; }
-        public int CompletedJobs { get; set; }
-        public int CancelledJobs { get; set; }
+        public int UninvoicedJobs { get; set; }
+        public int InvoicedJobs { get; set; }
         public decimal TotalRevenue { get; set; }
         public decimal OutstandingAmount { get; set; }
     }

@@ -63,19 +63,19 @@ namespace Invoqs.Components.Pages
                 var jobs = await JobService.GetAllJobsAsync();
                 var invoices = await InvoiceService.GetAllInvoicesAsync();
 
-                // Calculate active jobs by type
-                var activeJobs = jobs.Where(j => j.Status == JobStatus.Active).ToList();
-                var skipRentals = activeJobs.Count(j => j.Type == JobType.SkipRental);
-                var sandDeliveries = activeJobs.Count(j => j.Type == JobType.SandDelivery);
-                var forkLiftServices = activeJobs.Count(j => j.Type == JobType.ForkLiftService);
+                // Calculate uninvoiced jobs by type
+                var uninvoicedJobs = jobs.Where(j => !j.IsInvoiced).ToList();
+                var skipRentals = uninvoicedJobs.Count(j => j.Type == JobType.SkipRental);
+                var sandDeliveries = uninvoicedJobs.Count(j => j.Type == JobType.SandDelivery);
+                var forkLiftServices = uninvoicedJobs.Count(j => j.Type == JobType.ForkLiftService);
 
-                // Calculate jobs scheduled today
+                // Calculate jobs for today
                 var today = DateTime.Today;
-                var jobsToday = jobs.Count(j => j.StartDate.Date == today && j.Status == JobStatus.New);
+                var jobsToday = jobs.Count(j => j.JobDate.Date == today && !j.IsInvoiced);
 
-                // Calculate new customers this week
-                var oneWeekAgo = DateTime.Now.AddDays(-7);
-                var newCustomersThisWeek = customers.Count(c => c.CreatedDate >= oneWeekAgo);
+                // Calculate new customers this month
+                var startOfThisMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                var newCustomersThisMonth = customers.Count(c => c.CreatedDate >= startOfThisMonth);
 
                 // Calculate pending invoices and amount
                 var pendingInvoices = invoices.Where(i => 
@@ -83,37 +83,36 @@ namespace Invoqs.Components.Pages
                     i.Status == InvoiceStatus.Delivered || 
                     i.Status == InvoiceStatus.Overdue).ToList();
 
-                // Calculate this week's revenue
-                var twoWeeksAgo = DateTime.Now.AddDays(-14);
+                // Calculate this month's revenue based on job dates (not payment dates)
+                var startOfLastMonth = startOfThisMonth.AddMonths(-1);
 
-                var thisWeekInvoices = invoices.Where(i => 
-                    i.Status == InvoiceStatus.Paid && 
-                    i.PaymentDate.HasValue && 
-                    i.PaymentDate >= oneWeekAgo).ToList();
+                // Jobs added this month (based on JobDate)
+                var thisMonthJobs = jobs.Where(j => 
+                    j.JobDate >= startOfThisMonth && 
+                    j.JobDate < startOfThisMonth.AddMonths(1)).ToList();
 
-                var lastWeekInvoices = invoices.Where(i => 
-                    i.Status == InvoiceStatus.Paid && 
-                    i.PaymentDate.HasValue && 
-                    i.PaymentDate >= twoWeeksAgo && 
-                    i.PaymentDate < oneWeekAgo).ToList();
+                var lastMonthJobs = jobs.Where(j => 
+                    j.JobDate >= startOfLastMonth && 
+                    j.JobDate < startOfThisMonth).ToList();
 
-                var weekRevenue = thisWeekInvoices.Sum(i => i.Total);
-                var lastWeekRevenue = lastWeekInvoices.Sum(i => i.Total);
+                var monthRevenue = thisMonthJobs.Sum(j => j.Price);
+                var lastMonthRevenue = lastMonthJobs.Sum(j => j.Price);
 
                 // Calculate growth percentage
                 decimal revenueGrowth = 0;
-                if (lastWeekRevenue > 0)
+                if (lastMonthRevenue > 0)
                 {
-                    revenueGrowth = ((weekRevenue - lastWeekRevenue) / lastWeekRevenue) * 100;
+                    revenueGrowth = ((monthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
                 }
 
                 dashboardData = new DashboardDataModel
                 {
-                    WeekRevenue = weekRevenue,
+                    MonthRevenue = monthRevenue,
                     RevenueGrowth = revenueGrowth,
 
                     // Job metrics
-                    ActiveJobs = activeJobs.Count,
+                    TotalJobs = jobs.Count,
+                    UninvoicedJobs = uninvoicedJobs.Count,
                     JobsScheduledToday = jobsToday,
                     SkipRentals = skipRentals,
                     SandDeliveries = sandDeliveries,
@@ -121,7 +120,7 @@ namespace Invoqs.Components.Pages
 
                     // Customer metrics
                     TotalCustomers = customers.Count,
-                    NewCustomersThisWeek = newCustomersThisWeek,
+                    NewCustomersThisMonth = newCustomersThisMonth,
 
                     // Invoice metrics
                     PendingInvoices = pendingInvoices.Count,

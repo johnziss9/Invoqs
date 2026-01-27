@@ -32,8 +32,6 @@ namespace Invoqs.Components.Pages
                 VatNumber = "",
                 Notes = "",
                 CreatedDate = DateTime.Now,
-                ActiveJobs = 0,
-                CompletedJobs = 0,
                 TotalRevenue = 0
             };
         }

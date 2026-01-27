@@ -57,7 +57,7 @@ namespace Invoqs.Components.Pages
                 {
                     await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Λεπτομέρειες Εργασίας - {job.Title.Replace("'", "\\'")} - Invoqs'");
 
-                    canDeleteJob = job.Status == JobStatus.New || job.Status == JobStatus.Cancelled;
+                    canDeleteJob = !job.IsInvoiced;
 
                     // Create customer object from job's flat properties
                     // This works even when the customer is soft-deleted
@@ -100,20 +100,6 @@ namespace Invoqs.Components.Pages
             if (job.IsInvoiced)
             {
                 errorMessage = "Cannot delete a job that has been invoiced. Please remove it from the invoice first.";
-                StateHasChanged();
-                return;
-            }
-
-            if (job.Status == JobStatus.Active)
-            {
-                errorMessage = "Cannot delete an active job. Please mark it as cancelled first.";
-                StateHasChanged();
-                return;
-            }
-
-            if (job.Status == JobStatus.Completed)
-            {
-                errorMessage = "Cannot delete a completed job. Completed work must be preserved for audit trail and reporting.";
                 StateHasChanged();
                 return;
             }
@@ -161,65 +147,6 @@ namespace Invoqs.Components.Pages
             }
         }
 
-        protected async Task StartJob(int jobId)
-        {
-            try
-            {
-                if (job != null)
-                {
-                    var (success, errors) = await JobService.UpdateJobStatusAsync(job.Id, JobStatus.Active);
-
-                    if (success)
-                    {
-                        job.Status = JobStatus.Active;
-                        StateHasChanged();
-                    }
-                    else if (errors != null)
-                    {
-                        errorMessage = string.Join(", ", errors.GetAllErrors());
-                    }
-                    else
-                    {
-                        errorMessage = "Failed to start job";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Error starting job: {ex.Message}";
-            }
-        }
-
-        protected async Task CompleteJob(int jobId)
-        {
-            try
-            {
-                if (job != null)
-                {
-                    var (success, errors) = await JobService.UpdateJobStatusAsync(job.Id, JobStatus.Completed);
-
-                    if (success)
-                    {
-                        job.Status = JobStatus.Completed;
-                        job.EndDate = DateTime.Now;
-                        StateHasChanged();
-                    }
-                    else if (errors != null)
-                    {
-                        errorMessage = string.Join(", ", errors.GetAllErrors());
-                    }
-                    else
-                    {
-                        errorMessage = "Failed to complete job";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Error completing job: {ex.Message}";
-            }
-        }
-
         protected void GoBack()
         {
             if (!string.IsNullOrWhiteSpace(ReturnUrl))
@@ -255,10 +182,6 @@ namespace Invoqs.Components.Pages
 
             if (job.IsInvoiced)
                 return "Cannot Delete (Invoiced)";
-            if (job.Status == JobStatus.Completed)
-                return "Cannot Delete (Completed)";
-            if (job.Status == JobStatus.Active)
-                return "Cannot Delete (Active)";
 
             return "Delete Job";
         }
@@ -269,10 +192,6 @@ namespace Invoqs.Components.Pages
 
             if (job.IsInvoiced)
                 return "Cannot delete invoiced jobs. Remove from invoice first.";
-            if (job.Status == JobStatus.Completed)
-                return "Cannot delete completed jobs. They must be preserved for audit trail.";
-            if (job.Status == JobStatus.Active)
-                return "Cannot delete active jobs. Mark as cancelled first.";
 
             return "";
         }

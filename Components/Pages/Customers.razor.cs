@@ -64,8 +64,8 @@ namespace Invoqs.Components.Pages
                 // Apply category filter
                 filtered = filterBy switch
                 {
-                    "active" => filtered.Where(c => c.ActiveJobs > 0),
-                    "inactive" => filtered.Where(c => c.ActiveJobs == 0),
+                    "active" => filtered.Where(c => c.UninvoicedJobs > 0),
+                    "inactive" => filtered.Where(c => c.UninvoicedJobs == 0),
                     _ => filtered
                 };
 
@@ -74,7 +74,7 @@ namespace Invoqs.Components.Pages
                 {
                     "created" => filtered.OrderByDescending(c => c.CreatedDate),
                     "revenue" => filtered.OrderByDescending(c => c.TotalRevenue),
-                    "jobs" => filtered.OrderByDescending(c => c.ActiveJobs + c.CompletedJobs),
+                    "jobs" => filtered.OrderByDescending(c => c.TotalJobs),
                     _ => filtered.OrderBy(c => c.Name)
                 };
 
