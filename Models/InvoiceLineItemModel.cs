@@ -33,6 +33,7 @@ namespace Invoqs.Models
         public string? JobTitle { get; set; }
         public JobType? JobType { get; set; }
         public string? JobAddress { get; set; }
+        public DateTime? JobDate { get; set; }
 
         // Computed properties for UI display
         public string FormattedUnitPrice => $"€{UnitPrice:N2}";

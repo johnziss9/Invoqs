@@ -150,7 +150,7 @@
                                     @invoice.DueDate.ToString("dd MMM yyyy")
                                     @if (invoice.IsOverdue)
                                     {
-                                        <small class="text-danger">(Καθυστερημένο)</small>
+                                        <small class="text-danger"> (Καθυστερημένο)</small>
                                     }
                                 </div>
                             </div>
@@ -187,9 +187,9 @@
                                                 <div class="fw-medium">@item.Description</div>
                                             </td>
                                             <td>
-                                                @if (item.Job != null)
+                                                @if (item.JobDate.HasValue)
                                                 {
-                                                    <span class="text-muted">@item.Job.JobDate.ToString("dd MMM yyyy")</span>
+                                                    <span class="text-muted">@item.JobDate.Value.ToString("dd MMM yyyy")</span>
                                                 }
                                             </td>
                                             <td class="text-end">
