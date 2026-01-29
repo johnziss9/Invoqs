@@ -175,6 +175,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Περιγραφή</th>
+                                        <th>Διεύθυνση</th>
                                         <th>Ημερομηνία</th>
                                         <th class="text-end">Ποσό</th>
                                     </tr>
@@ -185,6 +186,18 @@
                                         <tr>
                                             <td>
                                                 <div class="fw-medium">@item.Description</div>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrWhiteSpace(item.JobAddress))
+                                                {
+                                                    <span class="text-muted">
+                                                        @(item.JobAddress.Length > 40 ? item.JobAddress.Substring(0, 37) + "..." : item.JobAddress)
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Μ/Δ</span>
+                                                }
                                             </td>
                                             <td>
                                                 @if (item.JobDate.HasValue)
