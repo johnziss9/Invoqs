@@ -349,3 +349,9 @@
         </div>
     </div>
 }
+
+<DuplicateEmailModal 
+    IsVisible="@showDuplicateModal"
+    DuplicateCustomers="@duplicateCustomers"
+    OnCancel="@HandleDuplicateCancel"
+    OnContinue="@HandleDuplicateContinue" />

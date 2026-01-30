@@ -25,6 +25,10 @@ namespace Invoqs.Components.Pages
         protected List<string> customerEmails = new();
         
         private ApiValidationError? validationErrors;
+        protected bool showDuplicateModal = false;
+        protected List<DuplicateCustomerModel> duplicateCustomers = new();
+        private List<string> originalEmails = new();
+        private bool skipDuplicateCheck = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -61,6 +65,7 @@ namespace Invoqs.Components.Pages
                 {
                     // Load emails into the tag input component
                     customerEmails = customer.Emails.Select(e => e.Email).ToList();
+                    originalEmails = new List<string>(customerEmails); // Store original emails
                     
                     await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Επεξεργασία Πελάτη - {customer.Name.Replace("'", "\\'")} - Invoqs'");
                 }
@@ -95,6 +100,29 @@ namespace Invoqs.Components.Pages
                     StateHasChanged();
                     return;
                 }
+
+                // Check for duplicates only for NEW emails (not in originalEmails)
+                if (!skipDuplicateCheck)
+                {
+                    var newEmails = customerEmails.Except(originalEmails, StringComparer.OrdinalIgnoreCase).ToList();
+                    
+                    if (newEmails.Any())
+                    {
+                        var duplicateCheck = await CustomerService.CheckEmailDuplicatesAsync(newEmails, customer.Id);
+                        
+                        if (duplicateCheck.HasDuplicates)
+                        {
+                            duplicateCustomers = duplicateCheck.DuplicateCustomers;
+                            showDuplicateModal = true;
+                            isSaving = false;
+                            StateHasChanged();
+                            return;
+                        }
+                    }
+                }
+
+                // Reset skip flag for next save attempt
+                skipDuplicateCheck = false;
 
                 // Update customer emails
                 customer.Emails = customerEmails.Select(e => new EmailModel 
@@ -199,6 +227,23 @@ namespace Invoqs.Components.Pages
         {
             var returnUrl = $"/customer/{CustomerId}";
             Navigation.NavigateTo($"/customer/{CustomerId}/job/new?returnUrl={Uri.EscapeDataString(returnUrl)}", true);
+        }
+
+        private void HandleDuplicateCancel()
+        {
+            showDuplicateModal = false;
+            skipDuplicateCheck = false;
+            StateHasChanged();
+        }
+
+        private async Task HandleDuplicateContinue()
+        {
+            showDuplicateModal = false;
+            skipDuplicateCheck = true;
+            StateHasChanged();
+            
+            // Retry the save
+            await HandleValidSubmit();
         }
     }
 }

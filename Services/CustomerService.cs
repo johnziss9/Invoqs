@@ -193,5 +193,38 @@ namespace Invoqs.Services
                 throw;
             }
         }
+
+        public async Task<DuplicateCheckResponse> CheckEmailDuplicatesAsync(List<string> emails, int? excludeCustomerId = null)
+        {
+            try
+            {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
+                var request = new DuplicateCheckRequest
+                {
+                    Emails = emails,
+                    ExcludeCustomerId = excludeCustomerId
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("customers/check-duplicates", request);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    throw new UnauthorizedAccessException("Authentication required");
+                }
+
+                response.EnsureSuccessStatusCode();
+
+                var result = await response.Content.ReadFromJsonAsync<DuplicateCheckResponse>(_jsonOptions);
+                return result ?? new DuplicateCheckResponse();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error checking duplicate emails: {ex.Message}");
+                throw new Exception($"Error checking duplicate emails: {ex.Message}");
+            }
+        }
     }
 }

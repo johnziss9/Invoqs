@@ -1,0 +1,79 @@
+@if (IsVisible)
+{
+    <div class="modal fade show" style="display: block; background-color: rgba(0,0,0,0.5);" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Προειδοποίηση Διπλότυπων Email
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="Cancel"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning mb-3">
+                        <strong>Προσοχή!</strong> Τα παρακάτω email βρέθηκαν σε άλλους πελάτες:
+                    </div>
+
+                    @foreach (var customer in DuplicateCustomers)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h6 class="mb-2">
+                                            <i class="bi bi-person-circle text-primary me-2"></i>
+                                            @customer.Name
+                                        </h6>
+                                        <div class="small text-muted mb-2">
+                                            @if (!string.IsNullOrWhiteSpace(customer.Phone))
+                                            {
+                                                <span class="me-3">
+                                                    <i class="bi bi-telephone"></i> @customer.Phone
+                                                </span>
+                                            }
+                                            <span class="me-3">
+                                                <i class="bi bi-briefcase"></i> @customer.TotalJobs δουλειές
+                                            </span>
+                                            <span>
+                                                <i class="bi bi-calendar"></i> @customer.CreatedDate.ToString("dd/MM/yyyy")
+                                            </span>
+                                        </div>
+                                        <div class="matching-emails">
+                                            <strong class="small">Κοινά Email:</strong>
+                                            @foreach (var email in customer.MatchingEmails)
+                                            {
+                                                <span class="badge bg-warning text-dark ms-1">@email</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <a href="/customer/@customer.Id" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i>
+                                            Προβολή
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Μπορείτε να συνεχίσετε αν θέλετε να δημιουργήσετε νέο πελάτη με αυτά τα email, ή να ακυρώσετε για να τροποποιήσετε τα στοιχεία.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Ακύρωση
+                    </button>
+                    <button type="button" class="btn btn-warning" @onclick="ContinueAnyway">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Αποθήκευση
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

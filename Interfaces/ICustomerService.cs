@@ -9,5 +9,6 @@ namespace Invoqs.Interfaces
         Task<(CustomerModel? Customer, ApiValidationError? ValidationErrors)> CreateCustomerAsync(CustomerModel customer);
         Task<(CustomerModel? Customer, ApiValidationError? ValidationErrors)> UpdateCustomerAsync(CustomerModel customer);
         Task<bool> DeleteCustomerAsync(int id);
+        Task<DuplicateCheckResponse> CheckEmailDuplicatesAsync(List<string> emails, int? excludeCustomerId = null);
     }
 }

@@ -20,6 +20,9 @@ namespace Invoqs.Components.Pages
         protected List<string> customerEmails = new();
         
         private ApiValidationError? validationErrors;
+        protected bool showDuplicateModal = false;
+        protected List<DuplicateCustomerModel> duplicateCustomers = new();
+        private bool skipDuplicateCheck = false;
 
         protected override void OnInitialized()
         {
@@ -49,8 +52,27 @@ namespace Invoqs.Components.Pages
                 if (!customerEmails.Any())
                 {
                     errorMessage = "At least one email address is required.";
+                    isSaving = false;
                     return;
                 }
+
+                // Check for duplicates if not already skipped
+                if (!skipDuplicateCheck)
+                {
+                    var duplicateCheck = await CustomerService.CheckEmailDuplicatesAsync(customerEmails);
+                    
+                    if (duplicateCheck.HasDuplicates)
+                    {
+                        duplicateCustomers = duplicateCheck.DuplicateCustomers;
+                        showDuplicateModal = true;
+                        isSaving = false;
+                        StateHasChanged();
+                        return;
+                    }
+                }
+
+                // Reset skip flag for next save attempt
+                skipDuplicateCheck = false;
 
                 // Set emails on customer model
                 newCustomer.Emails = customerEmails.Select(e => new EmailModel 
@@ -133,5 +155,21 @@ namespace Invoqs.Components.Pages
             StateHasChanged();
         }
 
+        private void HandleDuplicateCancel()
+        {
+            showDuplicateModal = false;
+            skipDuplicateCheck = false;
+            StateHasChanged();
+        }
+
+        private async Task HandleDuplicateContinue()
+        {
+            showDuplicateModal = false;
+            skipDuplicateCheck = true;
+            StateHasChanged();
+            
+            // Retry the save
+            await HandleValidSubmit();
+        }
     }
 }

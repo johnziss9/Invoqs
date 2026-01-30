@@ -1,0 +1,16 @@
+.matching-emails {
+    margin-top: 0.5rem;
+}
+
+.matching-emails .badge {
+    font-size: 0.85rem;
+    padding: 0.35em 0.65em;
+}
+
+.modal-body .card {
+    border-left: 4px solid #ffc107;
+}
+
+.modal-body .card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

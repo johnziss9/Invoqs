@@ -266,4 +266,10 @@
             </div>
         </div>
     </EditForm>
+
+    <DuplicateEmailModal 
+        IsVisible="@showDuplicateModal"
+        DuplicateCustomers="@duplicateCustomers"
+        OnCancel="@HandleDuplicateCancel"
+        OnContinue="@HandleDuplicateContinue" />
 </div>
