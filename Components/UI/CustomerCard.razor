@@ -52,7 +52,21 @@
         <div class="customer-details mb-3 flex-grow-1">
             <div class="detail-item mb-2">
                 <i class="bi bi-envelope text-muted me-2"></i>
-                <span class="text-muted small">@Customer.Email</span>
+                @if (Customer.Emails.Count == 1)
+                {
+                    <span class="text-muted small">@Customer.Emails[0].Email</span>
+                }
+                else if (Customer.Emails.Count > 1)
+                {
+                    <span class="text-muted small" title="@string.Join(", ", Customer.Emails.Select(e => e.Email))">
+                        @Customer.Emails[0].Email
+                        <span class="badge bg-primary ms-1" style="font-size: 0.7rem;">+@(Customer.Emails.Count - 1)</span>
+                    </span>
+                }
+                else
+                {
+                    <span class="text-muted small fst-italic">No email</span>
+                }
             </div>
             <div class="detail-item mb-2">
                 <i class="bi bi-telephone text-muted me-2"></i>

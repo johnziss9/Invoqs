@@ -26,7 +26,10 @@ namespace Invoqs.Models
         {
             Id = CustomerId,
             Name = CustomerName,
-            Email = CustomerEmail ?? "",
+            Emails = string.IsNullOrEmpty(CustomerEmail) ? new List<EmailModel>() : new List<EmailModel> 
+            { 
+                new EmailModel { Email = CustomerEmail, CreatedDate = DateTime.Now } 
+            },
             Phone = CustomerPhone ?? ""
         };
 

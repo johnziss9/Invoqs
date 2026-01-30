@@ -81,7 +81,18 @@ namespace Invoqs.Services
                 var token = await _authService.GetTokenAsync();
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
-                var response = await _httpClient.PostAsJsonAsync("customers", customer);
+                // Convert CustomerModel to API request format
+                var requestBody = new
+                {
+                    name = customer.Name,
+                    emails = customer.Emails.Select(e => e.Email).ToList(),
+                    phone = customer.Phone,
+                    companyRegistrationNumber = customer.CompanyRegistrationNumber,
+                    vatNumber = customer.VatNumber,
+                    notes = customer.Notes
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("customers", requestBody);
                 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
@@ -115,7 +126,18 @@ namespace Invoqs.Services
                 var token = await _authService.GetTokenAsync();
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
-                var response = await _httpClient.PutAsJsonAsync($"customers/{customer.Id}", customer);
+                // Convert CustomerModel to API request format
+                var requestBody = new
+                {
+                    name = customer.Name,
+                    emails = customer.Emails.Select(e => e.Email).ToList(),
+                    phone = customer.Phone,
+                    companyRegistrationNumber = customer.CompanyRegistrationNumber,
+                    vatNumber = customer.VatNumber,
+                    notes = customer.Notes
+                };
+
+                var response = await _httpClient.PutAsJsonAsync($"customers/{customer.Id}", requestBody);
                 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {

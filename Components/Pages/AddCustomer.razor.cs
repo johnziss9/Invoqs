@@ -17,6 +17,7 @@ namespace Invoqs.Components.Pages
         protected bool isSaving = false;
         protected string errorMessage = "";
         protected string successMessage = "";
+        protected List<string> customerEmails = new();
         
         private ApiValidationError? validationErrors;
 
@@ -26,7 +27,6 @@ namespace Invoqs.Components.Pages
             newCustomer = new CustomerModel
             {
                 Name = "",
-                Email = "",
                 Phone = "",
                 CompanyRegistrationNumber = "",
                 VatNumber = "",
@@ -44,6 +44,20 @@ namespace Invoqs.Components.Pages
                 errorMessage = "";
                 successMessage = "";
                 validationErrors = null;
+
+                // Validate emails
+                if (!customerEmails.Any())
+                {
+                    errorMessage = "At least one email address is required.";
+                    return;
+                }
+
+                // Set emails on customer model
+                newCustomer.Emails = customerEmails.Select(e => new EmailModel 
+                { 
+                    Email = e,
+                    CreatedDate = DateTime.Now
+                }).ToList();
 
                 var (createdCustomer, errors) = await CustomerService.CreateCustomerAsync(newCustomer);
 

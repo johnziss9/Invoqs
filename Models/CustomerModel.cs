@@ -10,10 +10,11 @@ namespace Invoqs.Models
         [StringLength(100, ErrorMessage = "Customer name cannot exceed 100 characters")]
         public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Email address is required")]
-        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
-        [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters")]
-        public string Email { get; set; } = string.Empty;
+        // Email property removed - replaced with Emails collection
+        public List<EmailModel> Emails { get; set; } = new();
+
+        // Helper property to get first email for backward compatibility
+        public string Email => Emails.FirstOrDefault()?.Email ?? string.Empty;
 
         [Required(ErrorMessage = "Phone number is required")]
         [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]

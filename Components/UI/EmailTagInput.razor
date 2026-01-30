@@ -1,0 +1,36 @@
+@using System.Text.RegularExpressions
+
+<div class="email-tag-input-container">
+    <div class="email-tags">
+        @foreach (var email in Emails)
+        {
+            <span class="email-tag">
+                <span class="email-text">@email</span>
+                <button type="button" class="remove-btn" @onclick="() => RemoveEmail(email)" disabled="@ReadOnly">
+                    ×
+                </button>
+            </span>
+        }
+        
+        @if (!ReadOnly)
+        {
+            <input type="text" 
+                   class="email-input @(hasError ? "is-invalid" : "")"
+                   @bind="currentInput" 
+                   @bind:event="oninput"
+                   @onkeydown="HandleKeyDown"
+                   @onblur="HandleBlur"
+                   placeholder="@(Emails.Any() ? "Προσθήκη άλλου email..." : Placeholder)" />
+        }
+    </div>
+    
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="invalid-feedback d-block">@errorMessage</div>
+    }
+    
+    @if (Emails.Count > 0)
+    {
+        <small class="text-muted">@Emails.Count email@(Emails.Count == 1 ? "" : "s") added</small>
+    }
+</div>

@@ -80,13 +80,20 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-medium">Email</label>
+                                <label class="form-label fw-medium">Email Addresses (@customer.Emails.Count)</label>
                                 <div class="form-control-plaintext">
-                                    @if (!string.IsNullOrEmpty(customer.Email))
+                                    @if (customer.Emails.Any())
                                     {
-                                        <a href="mailto:@customer.Email" class="text-decoration-none">
-                                            <i class="bi bi-envelope me-2"></i>@customer.Email
-                                        </a>
+                                        <div class="d-flex flex-column gap-2">
+                                            @foreach (var email in customer.Emails)
+                                            {
+                                                <div class="d-flex align-items-center">
+                                                    <a href="mailto:@email.Email" class="text-decoration-none">
+                                                        <i class="bi bi-envelope me-2"></i>@email.Email
+                                                    </a>
+                                                </div>
+                                            }
+                                        </div>
                                     }
                                     else
                                     {

@@ -57,20 +57,22 @@
                                 <div class="form-text">Εισάγετε την πλήρη επωνυμία επιχείρησης ή το όνομα του ατομικού πελάτη</div>
                             </div>
 
-                            <!-- Email and Phone -->
-                            <div class="col-md-6">
-                                <label class="form-label required">Email</label>
-                                <InputText @bind-Value="newCustomer.Email" @bind-Value:after="UpdatePreview" 
-                                        class="@GetFieldErrorClass("Email")" type="email" placeholder="pelatis@example.com" />
-                                <ValidationMessage For="@(() => newCustomer.Email)" class="text-danger small" />
-                                @if (validationErrors?.GetFieldErrors("Email").Any() == true)
+                            <!-- Emails -->
+                            <div class="col-12">
+                                <label class="form-label required">Email Addresses</label>
+                                <EmailTagInput @bind-Emails="customerEmails" 
+                                                    Placeholder="Προσθήκη διευθύνσεων email (πατήστε Enter ή κόμμα)" />
+                                @if (validationErrors?.GetFieldErrors("Emails").Any() == true)
                                 {
-                                    @foreach (var error in validationErrors.GetFieldErrors("Email"))
+                                    @foreach (var error in validationErrors.GetFieldErrors("Emails"))
                                     {
                                         <div class="text-danger small">@error</div>
                                     }
                                 }
+                                <div class="form-text">Add one or more email addresses. Invoices can be sent to multiple recipients.</div>
                             </div>
+
+                            <!-- Phone -->
                             <div class="col-md-6">
                                 <label class="form-label required">Αριθμός Τηλεφώνου</label>
                                 <InputText @bind-Value="newCustomer.Phone" @bind-Value:after="UpdatePreview" 
@@ -194,9 +196,19 @@
                         <div class="customer-details">
                             <div class="detail-row mb-2">
                                 <i class="bi bi-envelope text-muted me-2"></i>
-                                <span class="@(string.IsNullOrWhiteSpace(newCustomer.Email) ? "text-muted" : "")">
-                                    @(string.IsNullOrWhiteSpace(newCustomer.Email) ? "Email" : newCustomer.Email)
-                                </span>
+                                @if (customerEmails.Any())
+                                {
+                                    <div class="d-flex flex-column gap-1">
+                                        @foreach (var email in customerEmails)
+                                        {
+                                            <span class="small">@email</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Email addresses</span>
+                                }
                             </div>
                             <div class="detail-row mb-2">
                                 <i class="bi bi-telephone text-muted me-2"></i>

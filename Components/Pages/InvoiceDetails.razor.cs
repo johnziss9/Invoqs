@@ -59,7 +59,10 @@ public partial class InvoiceDetails
                 {
                     Id = invoice.CustomerId,
                     Name = invoice.CustomerName ?? "[Unknown Customer]",
-                    Email = invoice.CustomerEmail ?? "",
+                    Emails = string.IsNullOrEmpty(invoice.CustomerEmail) ? new List<EmailModel>() : new List<EmailModel> 
+                    { 
+                        new EmailModel { Email = invoice.CustomerEmail, CreatedDate = DateTime.Now } 
+                    },
                     Phone = invoice.CustomerPhone ?? "",
                     IsDeleted = invoice.CustomerIsDeleted,
                     CreatedDate = invoice.CustomerCreatedDate,

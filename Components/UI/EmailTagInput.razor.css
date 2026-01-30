@@ -1,0 +1,149 @@
+.email-tag-input-container {
+    width: 100%;
+}
+
+.email-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    min-height: 38px;
+    background-color: #fff;
+    align-items: center;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.email-tags:focus-within {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.email-tag {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border: 1px solid #90caf9;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.875rem;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.email-tag:hover {
+    background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.email-text {
+    color: #1565c0;
+    font-weight: 500;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: #1565c0;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    font-weight: bold;
+}
+
+.remove-btn:hover {
+    background-color: #d32f2f;
+    color: white;
+    transform: scale(1.1);
+}
+
+.remove-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.email-input {
+    border: none;
+    outline: none;
+    flex: 1;
+    min-width: 200px;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #212529;
+    background-color: transparent;
+}
+
+.email-input::placeholder {
+    color: #6c757d;
+    opacity: 1;
+}
+
+.email-input.is-invalid {
+    color: #dc3545;
+}
+
+/* Error message styling */
+.invalid-feedback {
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+/* Email count text */
+.text-muted {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .email-tags {
+        padding: 8px 10px;
+        min-height: 42px;
+    }
+    
+    .email-tag {
+        font-size: 0.8125rem;
+        padding: 3px 6px;
+    }
+    
+    .email-input {
+        min-width: 150px;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .email-tags {
+        padding: 6px 8px;
+        min-height: 40px;
+    }
+    
+    .email-tag {
+        font-size: 0.75rem;
+        padding: 2px 5px;
+    }
+    
+    .remove-btn {
+        width: 16px;
+        height: 16px;
+        font-size: 1.1rem;
+    }
+    
+    .email-input {
+        min-width: 120px;
+        font-size: 0.8125rem;
+    }
+}

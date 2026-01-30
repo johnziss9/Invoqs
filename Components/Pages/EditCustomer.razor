@@ -72,20 +72,22 @@
                                     }
                                 </div>
 
-                                <!-- Email and Phone -->
-                                <div class="col-md-6">
-                                    <label class="form-label required">Email</label>
-                                    <InputText @bind-Value="customer.Email" class="@GetFieldErrorClass("Email")" type="email"
-                                        placeholder="customer@example.com" />
-                                    <ValidationMessage For="@(() => customer.Email)" class="text-danger small" />
-                                    @if (validationErrors?.GetFieldErrors("Email").Any() == true)
+                                <!-- Emails -->
+                                <div class="col-12">
+                                    <label class="form-label required">Email Addresses</label>
+                                    <EmailTagInput @bind-Emails="customerEmails" 
+                                            Placeholder="Προσθήκη ή αφαίρεση διευθύνσεων email" />
+                                    @if (validationErrors?.GetFieldErrors("Emails").Any() == true)
                                     {
-                                        @foreach (var error in validationErrors.GetFieldErrors("Email"))
+                                        @foreach (var error in validationErrors.GetFieldErrors("Emails"))
                                         {
                                             <div class="text-danger small">@error</div>
                                         }
                                     }
+                                    <div class="form-text">Manage email addresses for this customer. Invoices can be sent to multiple recipients.</div>
                                 </div>
+
+                                <!-- Phone (moved to its own row) -->
                                 <div class="col-md-6">
                                     <label class="form-label required">Αριθμός Τηλεφώνου</label>
                                     <InputText @bind-Value="customer.Phone" class="@GetFieldErrorClass("Phone")"

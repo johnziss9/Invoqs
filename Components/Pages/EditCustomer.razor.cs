@@ -22,6 +22,7 @@ namespace Invoqs.Components.Pages
         protected bool showDeleteConfirmation = false;
         protected string errorMessage = "";
         protected string successMessage = "";
+        protected List<string> customerEmails = new();
         
         private ApiValidationError? validationErrors;
 
@@ -58,6 +59,9 @@ namespace Invoqs.Components.Pages
                 }
                 else
                 {
+                    // Load emails into the tag input component
+                    customerEmails = customer.Emails.Select(e => e.Email).ToList();
+                    
                     await JSRuntime.InvokeVoidAsync("eval", $"document.title = 'Επεξεργασία Πελάτη - {customer.Name.Replace("'", "\\'")} - Invoqs'");
                 }
             }
@@ -82,6 +86,22 @@ namespace Invoqs.Components.Pages
                 errorMessage = "";
                 successMessage = "";
                 validationErrors = null;
+
+                // Validate emails
+                if (!customerEmails.Any())
+                {
+                    errorMessage = "At least one email address is required.";
+                    isSaving = false;
+                    StateHasChanged();
+                    return;
+                }
+
+                // Update customer emails
+                customer.Emails = customerEmails.Select(e => new EmailModel 
+                { 
+                    Email = e,
+                    CreatedDate = customer.Emails.FirstOrDefault(x => x.Email == e)?.CreatedDate ?? DateTime.Now
+                }).ToList();
 
                 var (updatedCustomer, errors) = await CustomerService.UpdateCustomerAsync(customer);
 
