@@ -1,0 +1,11 @@
+/* Modal backdrop overlay */
+.email-selection-modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Selected count badge - subtle compact style */
+.email-selection-count-alert {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    margin-bottom: 0;
+}

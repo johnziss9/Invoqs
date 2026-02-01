@@ -416,11 +416,18 @@
                             <strong>@receipt?.ReceiptNumber</strong> to
                             <strong>@receipt?.CustomerName</strong>.
                         </p>
-                        @if (!string.IsNullOrEmpty(receipt?.CustomerEmail))
+                        @if (receipt?.CustomerEmails?.Count > 1)
+                        {
+                            <div class="alert alert-info">
+                                <i class="bi bi-envelope-check me-2"></i>
+                                Ο πελάτης έχει <strong>@receipt.CustomerEmails.Count</strong> email. Θα επιλέξετε στο επόμενο βήμα.
+                            </div>
+                        }
+                        else if (receipt?.CustomerEmails?.Count == 1)
                         {
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle me-2"></i>
-                                Η απόδειξη θα αποσταλεί στο: <strong>@receipt.CustomerEmail</strong>
+                                Η απόδειξη θα αποσταλεί στο: <strong>@receipt.CustomerEmails.First()</strong>
                             </div>
                         }
                         else
@@ -442,7 +449,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="HideSendConfirmation">Ακύρωση</button>
                     <button type="button" class="btn btn-success" @onclick="ConfirmSend"
-                        disabled="@(isSending || string.IsNullOrEmpty(receipt?.CustomerEmail))">
+                        disabled="@(isSending || !(receipt?.CustomerEmails?.Any() == true))">
                         @if (isSending)
                         {
                             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -501,4 +508,15 @@
             </div>
         </div>
     </div>
+}
+
+@* Email Selection Modal *@
+@if (showEmailSelection)
+{
+    <EmailSelectionModal
+        AvailableEmails="@(receipt?.CustomerEmails ?? new List<string>())"
+        CustomerName="@(receipt?.CustomerName ?? string.Empty)"
+        DocumentType="την απόδειξη"
+        OnEmailsSelected="@HandleEmailsSelected"
+        OnCancelled="@(() => showEmailSelection = false)" />
 }

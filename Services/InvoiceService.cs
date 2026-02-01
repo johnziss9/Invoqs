@@ -222,7 +222,7 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<bool> MarkInvoiceAsSentAsync(int invoiceId)
+        public async Task<bool> MarkInvoiceAsSentAsync(int invoiceId, List<string>? recipientEmails = null)
         {
             try
             {
@@ -231,7 +231,13 @@ namespace Invoqs.Services
 
                 var sentDate = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
 
-                var content = JsonContent.Create(new { SentDate = sentDate });
+                var request = new
+                {
+                    SentDate = sentDate,
+                    RecipientEmails = recipientEmails
+                };
+
+                var content = JsonContent.Create(request);
                 var response = await _httpClient.PostAsync($"invoices/{invoiceId}/send", content);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
