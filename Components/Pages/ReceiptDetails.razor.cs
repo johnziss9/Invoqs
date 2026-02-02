@@ -23,6 +23,8 @@ namespace Invoqs.Components.Pages
         private bool isDeleting = false;
         private bool isDownloading = false;
         private bool showSendConfirmation = false;
+        private bool showEmailSelection = false;
+        private List<string>? selectedEmailsForSending = null;
         private bool isSending = false;
         private string successMessage = string.Empty;
 
@@ -166,70 +168,87 @@ namespace Invoqs.Components.Pages
         }
 
         private async Task ConfirmSend()
+    {
+        if (receipt == null) return;
+
+        if (receipt.CustomerEmails == null || !receipt.CustomerEmails.Any())
         {
-            if (receipt == null) return;
+            errorMessage = "Cannot send receipt: Customer has no email address. Please update customer details first.";
+            showSendConfirmation = false;
+            StateHasChanged();
+            return;
+        }
 
-            try
+        if (receipt.CustomerEmails.Count > 1)
+        {
+            showSendConfirmation = false;
+            showEmailSelection = true;
+            StateHasChanged();
+            return;
+        }
+
+        selectedEmailsForSending = new List<string> { receipt.CustomerEmails.First() };
+        await SendReceiptToSelectedEmails();
+    }
+
+    private async Task HandleEmailsSelected(List<string> selectedEmails)
+    {
+        showEmailSelection = false;
+        selectedEmailsForSending = selectedEmails;
+        await SendReceiptToSelectedEmails();
+    }
+
+    private async Task SendReceiptToSelectedEmails()
+    {
+        if (receipt == null || selectedEmailsForSending == null || !selectedEmailsForSending.Any()) return;
+
+        try
+        {
+            isSending = true;
+            StateHasChanged();
+
+            var success = await ReceiptService.SendReceiptAsync(receipt.Id, selectedEmailsForSending);
+
+            if (success)
             {
-                isSending = true;
-                showSendConfirmation = false;
-                StateHasChanged();
+                receipt.IsSent = true;
+                receipt.SentDate = DateTime.UtcNow;
 
-                // Check if customer has email
-                if (string.IsNullOrWhiteSpace(receipt.CustomerEmail))
+                var emailList = string.Join(", ", selectedEmailsForSending);
+                successMessage = $"Receipt sent successfully to {emailList}";
+
+                _ = Task.Delay(5000).ContinueWith(_ =>
                 {
-                    errorMessage = "Cannot send receipt: Customer has no email address. Please update customer details first.";
-                    return;
-                }
-
-                // Call service to send receipt
-                var success = await ReceiptService.SendReceiptAsync(receipt.Id);
-
-                if (success)
-                {
-                    receipt.IsSent = true;
-                    receipt.SentDate = DateTime.UtcNow;
-
-                    successMessage = $"Receipt sent successfully to {receipt.CustomerEmail}";
-
-                    // Clear the message after 5 seconds
-                    _ = Task.Delay(5000).ContinueWith(_ =>
-                    {
-                        successMessage = string.Empty;
-                        InvokeAsync(StateHasChanged);
-                    });
-                }
-                else
-                {
-                    errorMessage = "Failed to send receipt. Please try again.";
-                }
+                    successMessage = string.Empty;
+                    InvokeAsync(StateHasChanged);
+                });
             }
-            catch (Exception ex)
+            else
             {
-                // Parse error message for better user feedback
-                var errorMsg = ex.Message;
-
-                if (errorMsg.Contains("no email address"))
-                {
-                    errorMessage = "Cannot send receipt: Customer has no email address.";
-                }
-                else if (errorMsg.Contains("Failed to send email"))
-                {
-                    errorMessage = "Failed to send receipt email. Please check your email configuration and try again.";
-                }
-                else
-                {
-                    errorMessage = $"Error sending receipt: {errorMsg}";
-                }
-
-                Console.WriteLine($"Error sending receipt: {ex.Message}");
-            }
-            finally
-            {
-                isSending = false;
-                StateHasChanged();
+                errorMessage = "Failed to send receipt. Please try again.";
             }
         }
+        catch (Exception ex)
+        {
+            var errorMsg = ex.Message;
+
+            if (errorMsg.Contains("no email address"))
+                errorMessage = "Cannot send receipt: Customer has no email address.";
+            else if (errorMsg.Contains("Failed to send email"))
+                errorMessage = "Failed to send receipt email. Please check your email configuration and try again.";
+            else
+                errorMessage = $"Error sending receipt: {errorMsg}";
+
+            Console.WriteLine($"Error sending receipt: {ex.Message}");
+        }
+        finally
+        {
+            isSending = false;
+            selectedEmailsForSending = null;
+            StateHasChanged();
+        }
+    }
+
 
         private void ResendReceipt()
         {

@@ -15,6 +15,7 @@ namespace Invoqs.Models
         public string CustomerName { get; set; } = string.Empty;
         public bool CustomerIsDeleted { get; set; }
         public string? CustomerEmail { get; set; }
+        public List<string> CustomerEmails { get; set; } = new();
         public string? CustomerPhone { get; set; }
 
         [Required]

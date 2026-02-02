@@ -765,11 +765,18 @@
                             <strong>@invoice?.InvoiceNumber</strong> στον/στην
                             <strong>@invoice?.CustomerName</strong>.
                         </p>
-                        @if (!string.IsNullOrEmpty(invoice?.CustomerEmail))
+                        @if (invoice?.CustomerEmails?.Count > 1)
+                        {
+                            <div class="alert alert-info">
+                                <i class="bi bi-envelope-check me-2"></i>
+                                Ο πελάτης έχει <strong>@invoice.CustomerEmails.Count</strong> email. Θα επιλέξετε στο επόμενο βήμα.
+                            </div>
+                        }
+                        else if (invoice?.CustomerEmails?.Count == 1)
                         {
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle me-2"></i>
-                                Το τιμολόγιο θα σταλεί στο: <strong>@invoice.CustomerEmail</strong>
+                                Το τιμολόγιο θα σταλεί στο: <strong>@invoice.CustomerEmails.First()</strong>
                             </div>
                         }
                         else
@@ -805,7 +812,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="() => showSendConfirmation = false">Ακύρωση</button>
                     <button type="button" class="btn btn-success" @onclick="ConfirmSend" 
-                        disabled="@(isProcessing || string.IsNullOrEmpty(invoice?.CustomerEmail))">
+                        disabled="@(isProcessing || !(invoice?.CustomerEmails?.Any() == true))">
                         @if (isProcessing)
                         {
                             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -906,4 +913,15 @@
             </div>
         </div>
     </div>
+}
+
+@* Email Selection Modal *@
+@if (showEmailSelection)
+{
+    <EmailSelectionModal
+        AvailableEmails="@(invoice?.CustomerEmails ?? new List<string>())"
+        CustomerName="@(invoice?.CustomerName ?? string.Empty)"
+        DocumentType="το τιμολόγιο"
+        OnEmailsSelected="@HandleEmailsSelected"
+        OnCancelled="@(() => showEmailSelection = false)" />
 }

@@ -23,6 +23,8 @@ public partial class InvoiceDetails
     private string cancellationReason = "";
     private string customCancellationReason = "";
     private bool showSendConfirmation = false;
+    private bool showEmailSelection = false;
+    private List<string>? selectedEmailsForSending = null;
     private bool showMarkAsPaidConfirmation = false;
     private bool isMarkingPaid = false;
     private DateTime paymentDate = DateTime.Today;
@@ -59,7 +61,8 @@ public partial class InvoiceDetails
                 {
                     Id = invoice.CustomerId,
                     Name = invoice.CustomerName ?? "[Unknown Customer]",
-                    Email = invoice.CustomerEmail ?? "",
+                    Emails = invoice.CustomerEmails?.Select(e => new EmailModel { Email = e, CreatedDate = DateTime.Now }).ToList() 
+                        ?? new List<EmailModel>(),
                     Phone = invoice.CustomerPhone ?? "",
                     IsDeleted = invoice.CustomerIsDeleted,
                     CreatedDate = invoice.CustomerCreatedDate,
@@ -321,39 +324,62 @@ public partial class InvoiceDetails
     {
         if (invoice == null) return;
 
+        if (invoice.CustomerEmails == null || !invoice.CustomerEmails.Any())
+        {
+            errorMessage = "Cannot send invoice: Customer has no email address. Please update customer details first.";
+            showSendConfirmation = false;
+            StateHasChanged();
+            return;
+        }
+
+        // Multiple emails — show selection modal
+        if (invoice.CustomerEmails.Count > 1)
+        {
+            showSendConfirmation = false;
+            showEmailSelection = true;
+            StateHasChanged();
+            return;
+        }
+
+        // Single email — send directly
+        showSendConfirmation = false;
+        selectedEmailsForSending = new List<string> { invoice.CustomerEmails.First() };
+        await SendInvoiceToSelectedEmails();
+    }
+
+    private async Task HandleEmailsSelected(List<string> selectedEmails)
+    {
+        showEmailSelection = false;
+        selectedEmailsForSending = selectedEmails;
+        await SendInvoiceToSelectedEmails();
+    }
+
+    private async Task SendInvoiceToSelectedEmails()
+    {
+        if (invoice == null || selectedEmailsForSending == null || !selectedEmailsForSending.Any()) return;
+
         try
         {
             isProcessing = true;
-            showSendConfirmation = false;
             StateHasChanged();
 
-            // Check if customer has email
-            if (string.IsNullOrWhiteSpace(invoice.CustomerEmail))
-            {
-                errorMessage = "Cannot send invoice: Customer has no email address. Please update customer details first.";
-                return;
-            }
-
-            // Determine if this is a resend based on current status
             bool isResend = invoice.Status == InvoiceStatus.Sent;
 
-            var success = await InvoiceService.MarkInvoiceAsSentAsync(invoice.Id);
+            var success = await InvoiceService.MarkInvoiceAsSentAsync(invoice.Id, selectedEmailsForSending);
 
             if (success)
             {
                 if (!isResend)
-                {
                     invoice.Status = InvoiceStatus.Sent;
-                }
 
                 invoice.IsSent = true;
                 invoice.SentDate = DateTime.UtcNow;
 
+                var emailList = string.Join(", ", selectedEmailsForSending);
                 successMessage = isResend ?
-                    $"Invoice resent successfully to {invoice.CustomerEmail}" :
-                    $"Invoice sent successfully to {invoice.CustomerEmail}";
+                    $"Invoice resent successfully to {emailList}" :
+                    $"Invoice sent successfully to {emailList}";
 
-                // Clear the message after 5 seconds
                 _ = Task.Delay(5000).ContinueWith(_ =>
                 {
                     successMessage = string.Empty;
@@ -367,30 +393,25 @@ public partial class InvoiceDetails
         }
         catch (Exception ex)
         {
-            // Parse error message for better user feedback
             var errorMsg = ex.Message;
 
             if (errorMsg.Contains("no email address"))
-            {
                 errorMessage = "Cannot send invoice: Customer has no email address.";
-            }
             else if (errorMsg.Contains("Failed to send email"))
-            {
                 errorMessage = "Failed to send invoice email. Please check your email configuration and try again.";
-            }
             else
-            {
                 errorMessage = $"Error sending invoice: {errorMsg}";
-            }
 
             Console.WriteLine($"Error sending invoice: {ex.Message}");
         }
         finally
         {
             isProcessing = false;
+            selectedEmailsForSending = null;
             StateHasChanged();
         }
     }
+
 
     private async Task MarkAsDelivered()
     {

@@ -65,7 +65,10 @@ namespace Invoqs.Components.Pages
                     {
                         Id = job.CustomerId,
                         Name = job.CustomerName ?? "[Unknown Customer]",
-                        Email = job.CustomerEmail ?? "",
+                        Emails = string.IsNullOrEmpty(job.CustomerEmail) ? new List<EmailModel>() : new List<EmailModel> 
+                        { 
+                            new EmailModel { Email = job.CustomerEmail, CreatedDate = DateTime.Now } 
+                        },
                         Phone = job.CustomerPhone ?? "",
                         IsDeleted = job.CustomerIsDeleted,
                         CreatedDate = job.CustomerCreatedDate,

@@ -17,8 +17,12 @@ namespace Invoqs.Components.Pages
         protected bool isSaving = false;
         protected string errorMessage = "";
         protected string successMessage = "";
+        protected List<string> customerEmails = new();
         
         private ApiValidationError? validationErrors;
+        protected bool showDuplicateModal = false;
+        protected List<DuplicateCustomerModel> duplicateCustomers = new();
+        private bool skipDuplicateCheck = false;
 
         protected override void OnInitialized()
         {
@@ -26,7 +30,6 @@ namespace Invoqs.Components.Pages
             newCustomer = new CustomerModel
             {
                 Name = "",
-                Email = "",
                 Phone = "",
                 CompanyRegistrationNumber = "",
                 VatNumber = "",
@@ -44,6 +47,39 @@ namespace Invoqs.Components.Pages
                 errorMessage = "";
                 successMessage = "";
                 validationErrors = null;
+
+                // Validate emails
+                if (!customerEmails.Any())
+                {
+                    errorMessage = "At least one email address is required.";
+                    isSaving = false;
+                    return;
+                }
+
+                // Check for duplicates if not already skipped
+                if (!skipDuplicateCheck)
+                {
+                    var duplicateCheck = await CustomerService.CheckEmailDuplicatesAsync(customerEmails);
+                    
+                    if (duplicateCheck.HasDuplicates)
+                    {
+                        duplicateCustomers = duplicateCheck.DuplicateCustomers;
+                        showDuplicateModal = true;
+                        isSaving = false;
+                        StateHasChanged();
+                        return;
+                    }
+                }
+
+                // Reset skip flag for next save attempt
+                skipDuplicateCheck = false;
+
+                // Set emails on customer model
+                newCustomer.Emails = customerEmails.Select(e => new EmailModel 
+                { 
+                    Email = e,
+                    CreatedDate = DateTime.Now
+                }).ToList();
 
                 var (createdCustomer, errors) = await CustomerService.CreateCustomerAsync(newCustomer);
 
@@ -119,5 +155,21 @@ namespace Invoqs.Components.Pages
             StateHasChanged();
         }
 
+        private void HandleDuplicateCancel()
+        {
+            showDuplicateModal = false;
+            skipDuplicateCheck = false;
+            StateHasChanged();
+        }
+
+        private async Task HandleDuplicateContinue()
+        {
+            showDuplicateModal = false;
+            skipDuplicateCheck = true;
+            StateHasChanged();
+            
+            // Retry the save
+            await HandleValidSubmit();
+        }
     }
 }

@@ -14,6 +14,7 @@ namespace Invoqs.Models
         public int CustomerId { get; set; }
         public string? CustomerName { get; set; }
         public string? CustomerEmail { get; set; }
+        public List<string> CustomerEmails { get; set; } = new();
         public string? CustomerPhone { get; set; }
         public bool CustomerIsDeleted { get; set; }
         public DateTime CustomerCreatedDate { get; set; }
@@ -26,7 +27,10 @@ namespace Invoqs.Models
         {
             Id = CustomerId,
             Name = CustomerName,
-            Email = CustomerEmail ?? "",
+            Emails = string.IsNullOrEmpty(CustomerEmail) ? new List<EmailModel>() : new List<EmailModel> 
+            { 
+                new EmailModel { Email = CustomerEmail, CreatedDate = DateTime.Now } 
+            },
             Phone = CustomerPhone ?? ""
         };
 

@@ -15,7 +15,7 @@ namespace Invoqs.Interfaces
 
         // Business logic operations
         Task<(InvoiceModel? Invoice, ApiValidationError? ValidationErrors)> CreateInvoiceFromJobsAsync(int customerId, List<int> jobIds, DateTime? dueDate = null, decimal vatRate = 0m, int paymentTermsDays = 30, string? notes = null);
-        Task<bool> MarkInvoiceAsSentAsync(int invoiceId);
+        Task<bool> MarkInvoiceAsSentAsync(int invoiceId, List<string>? recipientEmails = null);
         Task<bool> MarkInvoiceAsDeliveredAsync(int invoiceId);
         Task<bool> MarkInvoiceAsPaidAsync(int invoiceId, DateTime paidDate, string? paymentMethod = null, string? paymentReference = null);
         Task<bool> CancelInvoiceAsync(int invoiceId, string? reason = null, string? notes = null);

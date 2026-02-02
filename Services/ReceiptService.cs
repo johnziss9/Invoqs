@@ -193,14 +193,18 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<bool> SendReceiptAsync(int receiptId)
+        public async Task<bool> SendReceiptAsync(int receiptId, List<string>? recipientEmails = null)
         {
             try
             {
                 var token = await _authService.GetTokenAsync();
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
-                var response = await _httpClient.PostAsync($"receipts/{receiptId}/send", null);
+                HttpContent? content = null;
+                if (recipientEmails != null)
+                    content = JsonContent.Create(new { RecipientEmails = recipientEmails });
+
+                var response = await _httpClient.PostAsync($"receipts/{receiptId}/send", content);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
