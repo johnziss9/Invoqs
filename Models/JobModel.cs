@@ -124,7 +124,8 @@ namespace Invoqs.Models
         public string ForkliftSizeDisplay => ForkliftSize switch
         {
             "17m" => "17μ",
-            "25m" => "25μ",
+            "26m" => "26μ",
+            "30m" => "30μ",
             _ => ""
         };
 

@@ -231,7 +231,8 @@
                                         <InputSelect @bind-Value="newJob.ForkliftSize" class="@(validationErrors?.GetFieldErrors("ForkliftSize").Any() == true ? "form-select is-invalid" : "form-select")">
                                             <option value="">-- Επιλέξτε Μέγεθος --</option>
                                             <option value="17m">17μ</option>
-                                            <option value="25m">25μ</option>
+                                            <option value="26m">26μ</option>
+                                            <option value="30m">30μ</option>
                                         </InputSelect>
                                         <ValidationMessage For="@(() => newJob.ForkliftSize)" class="text-danger small" />
                                         @if (validationErrors?.GetFieldErrors("ForkliftSize").Any() == true)
