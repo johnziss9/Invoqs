@@ -238,19 +238,23 @@ namespace Invoqs.Services
             }
         }
 
-        public async Task<List<string>> SearchAddressesAsync(string query)
+        public async Task<List<string>> SearchAddressesAsync(string query, int? customerId = null)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(query) || query.Length < 2)
+                // Build query string
+                var queryString = $"query={Uri.EscapeDataString(query ?? "")}";
+                
+                // Add customerId if provided
+                if (customerId.HasValue && customerId.Value > 0)
                 {
-                    return new List<string>();
+                    queryString += $"&customerId={customerId.Value}";
                 }
 
                 var token = await _authService.GetTokenAsync();
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
-                var response = await _httpClient.GetAsync($"jobs/addresses/search?query={Uri.EscapeDataString(query)}");
+                var response = await _httpClient.GetAsync($"jobs/addresses/search?{queryString}");
                 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {

@@ -266,6 +266,43 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        protected async Task OnAddressFocus()
+        {
+            if (job == null) return;
+            
+            // Show all customer addresses on focus
+            if (job.CustomerId > 0 && !isInvoiced)
+            {
+                await LoadCustomerAddresses();
+            }
+        }
+
+        private async Task LoadCustomerAddresses()
+        {
+            if (job == null) return;
+            
+            try
+            {
+                isSearchingAddresses = true;
+                StateHasChanged();
+
+                // Pass empty query and customer ID to get all customer addresses
+                addressSuggestions = (await JobService.SearchAddressesAsync("", job.CustomerId)).ToList();
+                showAddressSuggestions = addressSuggestions.Any();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading addresses: {ex.Message}");
+                addressSuggestions.Clear();
+                showAddressSuggestions = false;
+            }
+            finally
+            {
+                isSearchingAddresses = false;
+                StateHasChanged();
+            }
+        }
+
         private string GetDeleteButtonText()
         {
             if (job == null) return "Delete Job";
@@ -308,11 +345,25 @@ namespace Invoqs.Components.Pages
             // Cancel previous timer
             addressSearchTimer?.Dispose();
 
-            if (string.IsNullOrWhiteSpace(value) || value.Length < 2)
+            if (string.IsNullOrWhiteSpace(value))
             {
-                showAddressSuggestions = false;
-                addressSuggestions.Clear();
-                StateHasChanged();
+                // Show all customer addresses if empty
+                if (job.CustomerId > 0 && !isInvoiced)
+                {
+                    addressSearchTimer = new System.Threading.Timer(async _ =>
+                    {
+                        await InvokeAsync(async () =>
+                        {
+                            await LoadCustomerAddresses();
+                        });
+                    }, null, 300, Timeout.Infinite);
+                }
+                else
+                {
+                    showAddressSuggestions = false;
+                    addressSuggestions.Clear();
+                    StateHasChanged();
+                }
                 return;
             }
 
@@ -333,7 +384,7 @@ namespace Invoqs.Components.Pages
                 isSearchingAddresses = true;
                 StateHasChanged();
 
-                addressSuggestions = await JobService.SearchAddressesAsync(query);
+                addressSuggestions = (await JobService.SearchAddressesAsync(query, job?.CustomerId)).ToList();
                 showAddressSuggestions = addressSuggestions.Any();
             }
             catch (Exception ex)
