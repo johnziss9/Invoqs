@@ -257,7 +257,7 @@
                                                class="@GetFieldErrorClass("Address")" 
                                                value="@job.Address"
                                                @oninput="OnAddressInput"
-                                               @onfocus="@(() => { if (addressSuggestions.Any()) showAddressSuggestions = true; })"
+                                               @onfocus="OnAddressFocus"
                                                @onblur="HideAddressSuggestions"
                                                placeholder="Αρχίστε να πληκτρολογείτε μια διεύθυνση..."
                                                autocomplete="off"
