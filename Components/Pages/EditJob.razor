@@ -254,9 +254,9 @@
                                 <div class="col-12">
                                     <label class="form-label required">Διεύθυνση Υπηρεσίας</label>
                                     <div class="position-relative">
-                                        <input type="text" 
-                                               class="@GetFieldErrorClass("Address")" 
-                                               value="@job.Address"
+                                        <input type="text"
+                                               class="@GetFieldErrorClass("Address")"
+                                               value="@addressInputValue"
                                                @oninput="OnAddressInput"
                                                @onfocus="OnAddressFocus"
                                                @onblur="HideAddressSuggestions"

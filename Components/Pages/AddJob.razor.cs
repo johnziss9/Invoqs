@@ -31,6 +31,7 @@ namespace Invoqs.Components.Pages
         private ApiValidationError? validationErrors;
 
         // Address autocomplete properties
+        protected string addressInputValue = "";
         protected List<string> addressSuggestions = new();
         protected bool showAddressSuggestions = false;
         protected bool isSearchingAddresses = false;
@@ -85,6 +86,9 @@ namespace Invoqs.Components.Pages
                 CreatedDate = DateTime.Now
             };
 
+            // Reset address input value
+            addressInputValue = "";
+
             UpdateJobTypeDisplay();
         }
 
@@ -133,6 +137,9 @@ namespace Invoqs.Components.Pages
                 // Pass empty query and customer ID to get all customer addresses
                 addressSuggestions = await JobService.SearchAddressesAsync("", newJob.CustomerId);
                 showAddressSuggestions = addressSuggestions.Any();
+
+                // Update job address with current input value
+                newJob.Address = addressInputValue;
             }
             catch (Exception ex)
             {
@@ -285,13 +292,18 @@ namespace Invoqs.Components.Pages
         protected void OnAddressInput(ChangeEventArgs e)
         {
             var value = e.Value?.ToString() ?? "";
-            newJob.Address = value;
+
+            // Update local input value immediately (prevents input clearing)
+            addressInputValue = value;
 
             // Cancel previous timer
             addressSearchTimer?.Dispose();
 
             if (string.IsNullOrWhiteSpace(value))
             {
+                // Clear the job address when input is empty
+                newJob.Address = "";
+
                 // Show all customer addresses if empty
                 if (newJob.CustomerId > 0)
                 {
@@ -307,7 +319,6 @@ namespace Invoqs.Components.Pages
                 {
                     showAddressSuggestions = false;
                     addressSuggestions.Clear();
-                    StateHasChanged();
                 }
                 return;
             }
@@ -331,6 +342,9 @@ namespace Invoqs.Components.Pages
 
                 addressSuggestions = await JobService.SearchAddressesAsync(query, newJob.CustomerId);
                 showAddressSuggestions = addressSuggestions.Any();
+
+                // Update job address with current input value
+                newJob.Address = addressInputValue;
             }
             catch (Exception ex)
             {
@@ -347,6 +361,8 @@ namespace Invoqs.Components.Pages
 
         protected void SelectAddress(string address)
         {
+            // Update both the input value and the model
+            addressInputValue = address;
             newJob.Address = address;
             showAddressSuggestions = false;
             addressSuggestions.Clear();

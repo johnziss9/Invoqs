@@ -31,6 +31,7 @@ namespace Invoqs.Components.Pages
         private ApiValidationError? validationErrors;
 
         // Address autocomplete properties
+        protected string addressInputValue = "";
         protected List<string> addressSuggestions = new();
         protected bool showAddressSuggestions = false;
         protected bool isSearchingAddresses = false;
@@ -68,7 +69,10 @@ namespace Invoqs.Components.Pages
 
                 isInvoiced = job.IsInvoiced;
                 isCustomerDeleted = job.CustomerIsDeleted;
-                
+
+                // Initialize address input value with job's address
+                addressInputValue = job.Address ?? "";
+
                 // Determine if job can be deleted
                 // Cannot delete invoiced jobs
                 canDeleteJob = !isInvoiced;
@@ -280,7 +284,7 @@ namespace Invoqs.Components.Pages
         private async Task LoadCustomerAddresses()
         {
             if (job == null) return;
-            
+
             try
             {
                 isSearchingAddresses = true;
@@ -289,6 +293,9 @@ namespace Invoqs.Components.Pages
                 // Pass empty query and customer ID to get all customer addresses
                 addressSuggestions = (await JobService.SearchAddressesAsync("", job.CustomerId)).ToList();
                 showAddressSuggestions = addressSuggestions.Any();
+
+                // Update job address with current input value
+                job.Address = addressInputValue;
             }
             catch (Exception ex)
             {
@@ -340,13 +347,18 @@ namespace Invoqs.Components.Pages
             if (job == null) return;
 
             var value = e.Value?.ToString() ?? "";
-            job.Address = value;
+
+            // Update local input value immediately (prevents input clearing)
+            addressInputValue = value;
 
             // Cancel previous timer
             addressSearchTimer?.Dispose();
 
             if (string.IsNullOrWhiteSpace(value))
             {
+                // Clear the job address when input is empty
+                job.Address = "";
+
                 // Show all customer addresses if empty
                 if (job.CustomerId > 0 && !isInvoiced)
                 {
@@ -362,7 +374,6 @@ namespace Invoqs.Components.Pages
                 {
                     showAddressSuggestions = false;
                     addressSuggestions.Clear();
-                    StateHasChanged();
                 }
                 return;
             }
@@ -386,6 +397,12 @@ namespace Invoqs.Components.Pages
 
                 addressSuggestions = (await JobService.SearchAddressesAsync(query, job?.CustomerId)).ToList();
                 showAddressSuggestions = addressSuggestions.Any();
+
+                // Update job address with current input value
+                if (job != null)
+                {
+                    job.Address = addressInputValue;
+                }
             }
             catch (Exception ex)
             {
@@ -404,6 +421,8 @@ namespace Invoqs.Components.Pages
         {
             if (job == null) return;
 
+            // Update both the input value and the model
+            addressInputValue = address;
             job.Address = address;
             showAddressSuggestions = false;
             addressSuggestions.Clear();
