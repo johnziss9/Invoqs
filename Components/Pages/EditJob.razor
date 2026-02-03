@@ -113,6 +113,7 @@
                                         <option value="@JobType.SkipRental">Ενοικίαση Skip</option>
                                         <option value="@JobType.SandDelivery">Παράδοση Άμμου</option>
                                         <option value="@JobType.ForkLiftService">Υπηρεσία Forklift</option>
+                                        <option value="@JobType.Transfer">Μεταφορά</option>
                                     </InputSelect>
                                     <ValidationMessage For="@(() => job.Type)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Type").Any() == true)

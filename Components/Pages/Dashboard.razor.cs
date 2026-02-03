@@ -68,6 +68,7 @@ namespace Invoqs.Components.Pages
                 var skipRentals = uninvoicedJobs.Count(j => j.Type == JobType.SkipRental);
                 var sandDeliveries = uninvoicedJobs.Count(j => j.Type == JobType.SandDelivery);
                 var forkLiftServices = uninvoicedJobs.Count(j => j.Type == JobType.ForkLiftService);
+                var transfers = uninvoicedJobs.Count(j => j.Type == JobType.Transfer);
 
                 // Calculate jobs for today
                 var today = DateTime.Today;
@@ -117,6 +118,7 @@ namespace Invoqs.Components.Pages
                     SkipRentals = skipRentals,
                     SandDeliveries = sandDeliveries,
                     ForkLiftServices = forkLiftServices,
+                    Transfers = transfers,
 
                     // Customer metrics
                     TotalCustomers = customers.Count,

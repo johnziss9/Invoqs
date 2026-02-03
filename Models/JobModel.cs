@@ -14,7 +14,8 @@ namespace Invoqs.Models
     {
         SkipRental = 0,
         SandDelivery = 1,
-        ForkLiftService = 2
+        ForkLiftService = 2,
+        Transfer = 3
     }
 
     public class JobModel
@@ -82,8 +83,9 @@ namespace Invoqs.Models
         public string TypeIcon => Type switch
         {
             JobType.SkipRental => "/images/icons/skip.png",
-            JobType.SandDelivery => "/images/icons/sand.png", 
+            JobType.SandDelivery => "/images/icons/sand.png",
             JobType.ForkLiftService => "/images/icons/forklift.png",
+            JobType.Transfer => "/images/icons/transfer.png",
             _ => "bi-building"
         };
 
@@ -92,6 +94,7 @@ namespace Invoqs.Models
             JobType.SkipRental => "Ενοικίαση Skip",
             JobType.SandDelivery => "Παράδοση Άμμου",
             JobType.ForkLiftService => "Υπηρεσία Forklift",
+            JobType.Transfer => "Μεταφορά",
             _ => "Άγνωστο"
         };
 
