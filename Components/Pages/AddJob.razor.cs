@@ -154,6 +154,7 @@ namespace Invoqs.Components.Pages
                 JobType.SkipRental => "icon-skip",
                 JobType.SandDelivery => "icon-delivery-truck",
                 JobType.ForkLiftService => "icon-cliff",
+                JobType.Transfer => "icon-transfer",
                 _ => ""
             };
 
@@ -162,6 +163,7 @@ namespace Invoqs.Components.Pages
                 JobType.SkipRental => "Skip Rental",
                 JobType.SandDelivery => "Sand Delivery",
                 JobType.ForkLiftService => "Fork Lift Service",
+                JobType.Transfer => "Transfer",
                 _ => ""
             };
 

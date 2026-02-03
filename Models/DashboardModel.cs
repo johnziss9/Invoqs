@@ -13,6 +13,7 @@ namespace Invoqs.Models
         public int SkipRentals { get; set; }
         public int SandDeliveries { get; set; }
         public int ForkLiftServices { get; set; }
+        public int Transfers { get; set; }
 
         // Customer metrics
         public int TotalCustomers { get; set; }
