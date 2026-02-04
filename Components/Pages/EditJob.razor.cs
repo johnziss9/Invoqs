@@ -33,9 +33,9 @@ namespace Invoqs.Components.Pages
         // Address autocomplete properties
         protected string addressInputValue = "";
         protected List<string> addressSuggestions = new();
+        private List<string> allLoadedAddresses = new(); // Store all addresses for client-side filtering
         protected bool showAddressSuggestions = false;
         protected bool isSearchingAddresses = false;
-        private System.Threading.Timer? addressSearchTimer;
 
         protected override async Task OnInitializedAsync()
         {
@@ -292,20 +292,23 @@ namespace Invoqs.Components.Pages
             {
                 isSearchingAddresses = true;
 
-                // Pass empty query and customer ID to get all customer addresses
-                addressSuggestions = (await JobService.SearchAddressesAsync("", job.CustomerId)).ToList();
+                // Load all customer addresses once
+                allLoadedAddresses = (await JobService.SearchAddressesAsync("", job.CustomerId)).ToList();
+
+                // Show all addresses initially
+                addressSuggestions = allLoadedAddresses;
                 showAddressSuggestions = addressSuggestions.Any();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading addresses: {ex.Message}");
+                allLoadedAddresses.Clear();
                 addressSuggestions.Clear();
                 showAddressSuggestions = false;
             }
             finally
             {
                 isSearchingAddresses = false;
-                StateHasChanged();
             }
         }
 
@@ -350,63 +353,23 @@ namespace Invoqs.Components.Pages
             // Update local input value immediately (prevents input clearing)
             addressInputValue = value;
 
-            // Cancel previous timer
-            addressSearchTimer?.Dispose();
-
             if (string.IsNullOrWhiteSpace(value))
             {
                 // Clear the job address when input is empty
                 job.Address = "";
 
-                // Show all customer addresses if empty
-                if (job.CustomerId > 0 && !isInvoiced)
-                {
-                    addressSearchTimer = new System.Threading.Timer(async _ =>
-                    {
-                        await InvokeAsync(async () =>
-                        {
-                            await LoadCustomerAddresses();
-                        });
-                    }, null, 300, Timeout.Infinite);
-                }
-                else
-                {
-                    showAddressSuggestions = false;
-                    addressSuggestions.Clear();
-                }
+                // Show all loaded addresses when empty
+                addressSuggestions = allLoadedAddresses;
+                showAddressSuggestions = addressSuggestions.Any();
                 return;
             }
 
-            // Debounce: wait 300ms before searching
-            addressSearchTimer = new System.Threading.Timer(async _ =>
-            {
-                await InvokeAsync(async () =>
-                {
-                    await SearchAddresses(value);
-                });
-            }, null, 300, Timeout.Infinite);
-        }
+            // Client-side filtering - instant, no API calls!
+            addressSuggestions = allLoadedAddresses
+                .Where(addr => addr.Contains(value, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-        private async Task SearchAddresses(string query)
-        {
-            try
-            {
-                isSearchingAddresses = true;
-
-                addressSuggestions = (await JobService.SearchAddressesAsync(query, job?.CustomerId)).ToList();
-                showAddressSuggestions = addressSuggestions.Any();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error searching addresses: {ex.Message}");
-                addressSuggestions.Clear();
-                showAddressSuggestions = false;
-            }
-            finally
-            {
-                isSearchingAddresses = false;
-                StateHasChanged();
-            }
+            showAddressSuggestions = addressSuggestions.Any();
         }
 
         protected void SelectAddress(string address)
@@ -432,11 +395,6 @@ namespace Invoqs.Components.Pages
                     StateHasChanged();
                 });
             });
-        }
-
-        public void Dispose()
-        {
-            addressSearchTimer?.Dispose();
         }
     }
 }
