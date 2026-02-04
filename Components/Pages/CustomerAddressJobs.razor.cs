@@ -118,6 +118,7 @@ namespace Invoqs.Components.Pages
 
                 filtered = sortBy switch
                 {
+                    "createdDate" => filtered.OrderByDescending(j => j.CreatedDate),
                     "jobDate" => filtered.OrderByDescending(j => j.JobDate),
                     "type" => filtered.OrderBy(j => j.Type),
                     "price" => filtered.OrderByDescending(j => j.Price),
