@@ -295,14 +295,12 @@ namespace Invoqs.Components.Pages
         {
             var value = e.Value?.ToString() ?? "";
 
-            // Update local input value immediately (prevents input clearing)
+            // Update both local input value AND model immediately
             addressInputValue = value;
+            newJob.Address = value;
 
             if (string.IsNullOrWhiteSpace(value))
             {
-                // Clear the job address when input is empty
-                newJob.Address = "";
-
                 // Show all loaded addresses when empty
                 addressSuggestions = allLoadedAddresses;
                 showAddressSuggestions = addressSuggestions.Any();
