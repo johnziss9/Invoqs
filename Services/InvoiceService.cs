@@ -282,6 +282,40 @@ namespace Invoqs.Services
             }
         }
 
+        public async Task<bool> RecordPaymentAsync(int invoiceId, decimal amount, DateTime paymentDate,
+            string paymentMethod, string? paymentReference = null, string? notes = null)
+        {
+            try
+            {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
+                var request = new
+                {
+                    Amount = amount,
+                    PaymentDate = paymentDate,
+                    PaymentMethod = paymentMethod,
+                    PaymentReference = paymentReference,
+                    Notes = notes
+                };
+
+                var response = await _httpClient.PostAsJsonAsync($"invoices/{invoiceId}/payments", request);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error recording payment: {ex.Message}");
+                return false;
+            }
+        }
+
         public async Task<bool> MarkInvoiceAsPaidAsync(int invoiceId, DateTime paidDate, string? paymentMethod = null, string? paymentReference = null)
         {
             try
