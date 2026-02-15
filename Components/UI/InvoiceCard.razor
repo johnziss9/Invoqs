@@ -155,20 +155,38 @@
 
         <!-- Invoice Totals -->
         <div class="invoice-totals mb-3">
-            <div class="row text-center">
-                <div class="col-4">
-                    <div class="stat-number text-muted small">€@Invoice.Subtotal.ToString("N2")</div>
-                    <div class="stat-label text-muted small">Υποσύνολο</div>
+            @if (Invoice.Status == InvoiceStatus.PartiallyPaid)
+            {
+                <!-- Show payment progress for partially paid invoices -->
+                <div class="row text-center">
+                    <div class="col-12 mb-2">
+                        <div class="small text-muted">Πληρωμένο</div>
+                        <div class="fw-bold text-success">€@Invoice.AmountPaid.ToString("N2") / €@Invoice.Total.ToString("N2")</div>
+                        <div class="progress mt-1" style="height: 5px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: @((Invoice.AmountPaid / Invoice.Total * 100).ToString("F2"))%"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-4">
-                    <div class="stat-number text-muted small">€@Invoice.VatAmount.ToString("N2")</div>
-                    <div class="stat-label text-muted small">ΦΠΑ</div>
+            }
+            else
+            {
+                <!-- Original display for other statuses -->
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="stat-number text-muted small">€@Invoice.Subtotal.ToString("N2")</div>
+                        <div class="stat-label text-muted small">Υποσύνολο</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-number text-muted small">€@Invoice.VatAmount.ToString("N2")</div>
+                        <div class="stat-label text-muted small">ΦΠΑ</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-number text-success fw-bold">€@Invoice.Total.ToString("N2")</div>
+                        <div class="stat-label text-muted small">Σύνολο</div>
+                    </div>
                 </div>
-                <div class="col-4">
-                    <div class="stat-number text-success fw-bold">€@Invoice.Total.ToString("N2")</div>
-                    <div class="stat-label text-muted small">Σύνολο</div>
-                </div>
-            </div>
+            }
         </div>
 
         <!-- Due Date Display -->

@@ -81,6 +81,10 @@ namespace Invoqs.Models
         public string? CancellationNotes { get; set; }
         public bool HasReceipt { get; set; }
 
+        // Payment tracking
+        public decimal AmountPaid { get; set; }
+        public decimal RemainingAmount { get; set; }
+        public List<InvoicePaymentModel> Payments { get; set; } = new();
 
         // Computed properties for UI
         public string StatusBadgeClass => Status switch
@@ -88,6 +92,7 @@ namespace Invoqs.Models
             InvoiceStatus.Draft => "bg-secondary",
             InvoiceStatus.Sent => "bg-primary",
             InvoiceStatus.Delivered => "bg-info",
+            InvoiceStatus.PartiallyPaid => "bg-warning",
             InvoiceStatus.Paid => "bg-success",
             InvoiceStatus.Overdue => "bg-danger",
             InvoiceStatus.Cancelled => "bg-dark",
@@ -99,6 +104,7 @@ namespace Invoqs.Models
             InvoiceStatus.Draft => "bi-file-earmark",
             InvoiceStatus.Sent => "bi-send",
             InvoiceStatus.Delivered => "bi-hand-thumbs-up",
+            InvoiceStatus.PartiallyPaid => "bi-hourglass-split",
             InvoiceStatus.Paid => "bi-check-circle",
             InvoiceStatus.Overdue => "bi-exclamation-triangle",
             InvoiceStatus.Cancelled => "bi-x-circle",
@@ -110,6 +116,7 @@ namespace Invoqs.Models
             InvoiceStatus.Draft => "Πρόχειρο",
             InvoiceStatus.Sent => "Απεσταλμένο",
             InvoiceStatus.Delivered => "Παραδομένο",
+            InvoiceStatus.PartiallyPaid => "Μερικώς Πληρωμένο",
             InvoiceStatus.Paid => "Πληρωμένο",
             InvoiceStatus.Overdue => "Καθυστερημένο",
             InvoiceStatus.Cancelled => "Ακυρωμένο",
@@ -154,6 +161,7 @@ namespace Invoqs.Models
         Draft,
         Sent,
         Delivered,
+        PartiallyPaid,
         Paid,
         Overdue,
         Cancelled

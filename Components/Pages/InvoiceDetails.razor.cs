@@ -30,6 +30,10 @@ public partial class InvoiceDetails
     private DateTime paymentDate = DateTime.Today;
     private string paymentMethod = "Bank Transfer";
     private string paymentReference = string.Empty;
+    private bool isFullPayment = true;
+    private decimal paymentAmount = 0;
+    private string paymentAmountError = string.Empty;
+    private string paymentNotes = string.Empty;
     private bool showDeleteModal = false;
     private bool isDeleting = false;
     private bool showDeliveredConfirmation = false;
@@ -133,31 +137,62 @@ public partial class InvoiceDetails
         StateHasChanged();
     }
 
-    private async Task ConfirmMarkAsPaid()
+    private void SelectPaymentType(bool isFull)
+    {
+        isFullPayment = isFull;
+        if (isFull && invoice != null)
+        {
+            paymentAmount = invoice.RemainingAmount;
+        }
+        else
+        {
+            paymentAmount = 0;
+        }
+        paymentAmountError = string.Empty;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmPayment()
     {
         if (invoice == null) return;
+
+        // Validate payment amount
+        if (paymentAmount <= 0)
+        {
+            paymentAmountError = "Το ποσό πληρωμής πρέπει να είναι μεγαλύτερο από μηδέν";
+            StateHasChanged();
+            return;
+        }
+
+        if (paymentAmount > invoice.RemainingAmount)
+        {
+            paymentAmountError = $"Το ποσό πληρωμής δεν μπορεί να υπερβαίνει το υπόλοιπο (€{invoice.RemainingAmount:N2})";
+            StateHasChanged();
+            return;
+        }
 
         try
         {
             isMarkingPaid = true;
+            paymentAmountError = string.Empty;
 
             var utcPaymentDate = DateTime.SpecifyKind(paymentDate.Date, DateTimeKind.Utc);
 
-            var success = await InvoiceService.MarkInvoiceAsPaidAsync(
+            var success = await InvoiceService.RecordPaymentAsync(
                 invoice.Id,
+                paymentAmount,
                 utcPaymentDate,
                 paymentMethod,
-                paymentReference);
+                paymentReference,
+                paymentNotes);
 
             if (success)
             {
-                invoice.Status = InvoiceStatus.Paid;
-                invoice.PaymentDate = utcPaymentDate;
-                invoice.PaymentMethod = paymentMethod;
-                invoice.PaymentReference = paymentReference;
-
+                successMessage = paymentAmount >= invoice.RemainingAmount
+                    ? "Το τιμολόγιο σημειώθηκε ως πληρωμένο επιτυχώς!"
+                    : $"Η πληρωμή €{paymentAmount:N2} καταγράφηκε επιτυχώς!";
                 showMarkAsPaidConfirmation = false;
-                successMessage = "Invoice marked as paid successfully.";
+                await LoadInvoiceAsync();
 
                 // Clear the message after 3 seconds
                 _ = Task.Delay(3000).ContinueWith(_ =>
@@ -168,12 +203,12 @@ public partial class InvoiceDetails
             }
             else
             {
-                errorMessage = "Failed to mark invoice as paid.";
+                errorMessage = "Αποτυχία καταγραφής πληρωμής. Παρακαλώ δοκιμάστε ξανά.";
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"Error marking invoice as paid: {ex.Message}";
+            errorMessage = $"Σφάλμα κατά την καταγραφή πληρωμής: {ex.Message}";
         }
         finally
         {
@@ -182,15 +217,53 @@ public partial class InvoiceDetails
         }
     }
 
+    private async Task ConfirmMarkAsPaid()
+    {
+        // Keep old method for backwards compatibility, but call new method
+        await ConfirmPayment();
+    }
+
+    private void ShowMarkAsPaidConfirmation()
+    {
+        if (invoice == null) return;
+
+        showMarkAsPaidConfirmation = true;
+        isFullPayment = true;
+        paymentAmount = invoice.RemainingAmount;
+        paymentDate = DateTime.Today;
+        paymentMethod = "Bank Transfer";
+        paymentReference = string.Empty;
+        paymentNotes = string.Empty;
+        paymentAmountError = string.Empty;
+        StateHasChanged();
+    }
+
     private void HideMarkAsPaidConfirmation()
     {
         showMarkAsPaidConfirmation = false;
         // Reset payment details
+        isFullPayment = true;
+        paymentAmount = invoice?.RemainingAmount ?? 0;
         paymentDate = DateTime.Today;
         paymentMethod = "Bank Transfer";
         paymentReference = string.Empty;
+        paymentNotes = string.Empty;
+        paymentAmountError = string.Empty;
         StateHasChanged();
     }
+
+    private string TranslatePaymentMethod(string? method) => method switch
+    {
+        "Bank Transfer" => "Τραπεζική Μεταφορά",
+        "Cash" => "Μετρητά",
+        "Cheque" => "Επιταγή",
+        "Credit Card" => "Πιστωτική Κάρτα",
+        "Debit Card" => "Χρεωστική Κάρτα",
+        "PayPal" => "PayPal",
+        "Stripe" => "Stripe",
+        "Other" => "Άλλο",
+        _ => method ?? "-"
+    };
 
     private async Task CancelInvoice()
     {
@@ -532,20 +605,5 @@ public partial class InvoiceDetails
     private void GoToCreateReceipt()
     {
         Navigation.NavigateTo($"/receipts/new?customerId={customer!.Id}", true);
-    }
-
-    private string TranslatePaymentMethod(string? method)
-    {
-        if (string.IsNullOrEmpty(method)) return "Δεν καθορίστηκε";
-
-        return method switch
-        {
-            "Bank Transfer" => "Τραπεζική Μεταφορά",
-            "Cash" => "Μετρητά",
-            "Cheque" => "Επιταγή",
-            "Credit Card" => "Πιστωτική Κάρτα",
-            "Other" => "Άλλο",
-            _ => method // Return as-is if not found
-        };
     }
 }
