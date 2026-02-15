@@ -31,6 +31,7 @@ namespace Invoqs.Components.Pages
         // UI state
         protected bool isCreating = false;
         protected string? errorMessage = null;
+        protected decimal? discountAmount = null;
 
         protected override async Task OnInitializedAsync()
         {
@@ -176,6 +177,13 @@ namespace Invoqs.Components.Pages
                 .Sum(i => i.Total);
         }
 
+        protected decimal CalculateAmountToPay()
+        {
+            var total = CalculateTotalAmount();
+            var discount = discountAmount ?? 0m;
+            return total - discount;
+        }
+
         protected string GetSelectedCustomerName()
         {
             return customers.FirstOrDefault(c => c.Id == selectedCustomerId)?.Name ?? "";
@@ -203,6 +211,12 @@ namespace Invoqs.Components.Pages
                 return;
             }
 
+            if (discountAmount.HasValue && discountAmount.Value > CalculateTotalAmount())
+            {
+                errorMessage = "Discount cannot exceed total amount.";
+                return;
+            }
+
             isCreating = true;
 
             try
@@ -210,7 +224,8 @@ namespace Invoqs.Components.Pages
                 var createModel = new CreateReceiptModel
                 {
                     CustomerId = selectedCustomerId,
-                    InvoiceIds = selectedInvoiceIds.ToList()
+                    InvoiceIds = selectedInvoiceIds.ToList(),
+                    DiscountAmount = discountAmount
                 };
 
                 var receipt = await ReceiptService.CreateReceiptAsync(createModel);

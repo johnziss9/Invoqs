@@ -88,12 +88,38 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label fw-medium">Συνολικό Ποσό Πληρωμής</label>
-                                <div class="form-control-plaintext">
-                                    <h3 class="text-success mb-0">
-                                        <i class="bi bi-currency-euro me-1"></i>@receipt.TotalAmount.ToString("N2")
-                                    </h3>
-                                </div>
+                                <label class="form-label fw-medium">Πληροφορίες Πληρωμής</label>
+
+                                @if (receipt.DiscountAmount > 0)
+                                {
+                                    <!-- Show breakdown when discount exists -->
+                                    <div class="p-3 bg-light rounded">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Σύνολο Τιμολογίων:</span>
+                                            <span class="fw-medium">€@receipt.TotalAmount.ToString("N2")</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2 text-danger">
+                                            <span>Έκπτωση:</span>
+                                            <span class="fw-medium">-€@receipt.DiscountAmount.ToString("N2")</span>
+                                        </div>
+                                        <hr class="my-2" />
+                                        <div class="d-flex justify-content-between">
+                                            <span class="fs-5 fw-semibold">Ποσό Πληρωμής:</span>
+                                            <h3 class="text-success mb-0">
+                                                <i class="bi bi-currency-euro me-1"></i>@receipt.AmountToPay.ToString("N2")
+                                            </h3>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <!-- No discount - show simple total -->
+                                    <div class="form-control-plaintext">
+                                        <h3 class="text-success mb-0">
+                                            <i class="bi bi-currency-euro me-1"></i>@receipt.TotalAmount.ToString("N2")
+                                        </h3>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -206,7 +232,13 @@
                                             <td>
                                                 @if (!string.IsNullOrWhiteSpace(invoice.PaymentMethod))
                                                 {
-                                                    <span class="badge bg-info">@TranslatePaymentMethod(invoice.PaymentMethod)</span>
+                                                    <div>
+                                                        <span class="badge bg-info">@TranslatePaymentMethod(invoice.PaymentMethod)</span>
+                                                        @if (!string.IsNullOrWhiteSpace(invoice.PaymentReference))
+                                                        {
+                                                            <div class="small text-muted mt-1">@invoice.PaymentReference</div>
+                                                        }
+                                                    </div>
                                                 }
                                                 else
                                                 {
@@ -223,12 +255,31 @@
                                 </tbody>
                                 <tfoot class="table-light">
                                     <tr>
-                                        <td colspan="2" class="text-end fw-bold">Σύνολο:</td>
-                                        <td class="text-end fw-bold text-success">
-                                            €@receipt.TotalAmount.ToString("N2")
-                                        </td>
-                                        <td></td>
+                                        <td colspan="2" class="text-end fw-bold">Σύνολο Τιμολογίων:</td>
+                                        <td class="text-end fw-bold">€@receipt.TotalAmount.ToString("N2")</td>
+                                        <td colspan="3"></td>
                                     </tr>
+                                    @if (receipt.DiscountAmount > 0)
+                                    {
+                                        <tr>
+                                            <td colspan="2" class="text-end fw-bold text-danger">Έκπτωση:</td>
+                                            <td class="text-end fw-bold text-danger">-€@receipt.DiscountAmount.ToString("N2")</td>
+                                            <td colspan="3"></td>
+                                        </tr>
+                                        <tr class="table-success">
+                                            <td colspan="2" class="text-end fw-bold">Ποσό Πληρωμής:</td>
+                                            <td class="text-end fw-bold text-success">€@receipt.AmountToPay.ToString("N2")</td>
+                                            <td colspan="3"></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr class="table-success">
+                                            <td colspan="2" class="text-end fw-bold">Σύνολο:</td>
+                                            <td class="text-end fw-bold text-success">€@receipt.TotalAmount.ToString("N2")</td>
+                                            <td colspan="3"></td>
+                                        </tr>
+                                    }
                                 </tfoot>
                             </table>
                         </div>
@@ -314,8 +365,15 @@
                             </div>
                             <div class="col-12">
                                 <div class="border rounded p-3 bg-light">
-                                    <div class="h4 text-success mb-1">€@receipt.TotalAmount.ToString("N2")</div>
-                                    <small class="text-muted">Συνολικό Ποσό Πληρωμής</small>
+                                    <div class="h4 text-success mb-1">€@receipt.AmountToPay.ToString("N2")</div>
+                                    <small class="text-muted">Ποσό Πληρωμής</small>
+                                    @if (receipt.DiscountAmount > 0)
+                                    {
+                                        <div class="mt-2 small text-muted">
+                                            <div>Σύνολο: €@receipt.TotalAmount.ToString("N2")</div>
+                                            <div class="text-danger">Έκπτωση: -€@receipt.DiscountAmount.ToString("N2")</div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>

@@ -22,6 +22,11 @@ namespace Invoqs.Models
         [Range(0.01, double.MaxValue)]
         public decimal TotalAmount { get; set; }
 
+        [Range(0, double.MaxValue, ErrorMessage = "Discount must be non-negative")]
+        public decimal DiscountAmount { get; set; } = 0m;
+
+        public decimal AmountToPay => TotalAmount - DiscountAmount;
+
         public DateTime CreatedDate { get; set; }
 
         public bool IsSent { get; set; } = false;
@@ -38,6 +43,7 @@ namespace Invoqs.Models
         public decimal AllocatedAmount { get; set; }
         public DateTime? PaymentDate { get; set; }
         public string? PaymentMethod { get; set; }
+        public string? PaymentReference { get; set; }
     }
 
     public class CreateReceiptModel
@@ -48,5 +54,8 @@ namespace Invoqs.Models
         [Required]
         [MinLength(1, ErrorMessage = "At least one invoice must be selected")]
         public List<int> InvoiceIds { get; set; } = new();
+
+        [Range(0, double.MaxValue, ErrorMessage = "Discount must be non-negative")]
+        public decimal? DiscountAmount { get; set; }
     }
 }
