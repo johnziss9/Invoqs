@@ -114,6 +114,7 @@
                                         <option value="@JobType.SandDelivery">Παράδοση Άμμου</option>
                                         <option value="@JobType.ForkLiftService">Υπηρεσία Forklift</option>
                                         <option value="@JobType.Transfer">Μεταφορά</option>
+                                        <option value="@JobType.SellForklift">Πώληση Forklift</option>
                                     </InputSelect>
                                     <ValidationMessage For="@(() => job.Type)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Type").Any() == true)

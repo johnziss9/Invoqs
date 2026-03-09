@@ -107,8 +107,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">@customers.Sum(c => c.TotalJobs)</h3>
-                            <p class="mb-0 small">Σύνολο Εργασιών</p>
+                            <h3 class="mb-0">@GetMonthJobs()</h3>
+                            <p class="mb-0 small">Εργασίες Μήνα</p>
                         </div>
                         <i class="bi bi-briefcase fs-1 opacity-75"></i>
                     </div>
@@ -120,8 +120,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">€@customers.Sum(c => c.TotalRevenue).ToString("N0")</h3>
-                            <p class="mb-0 small">Συνολικά Έσοδα</p>
+                            <h3 class="mb-0">€@GetMonthRevenue().ToString("N0")</h3>
+                            <p class="mb-0 small">Έσοδα Μήνα</p>
                         </div>
                         <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                     </div>

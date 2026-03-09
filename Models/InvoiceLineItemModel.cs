@@ -47,8 +47,7 @@ namespace Invoqs.Models
                 JobId = job.Id,
                 Job = job,
                 Description = GenerateDescription(job),
-                UnitPrice = job.Price,
-                Quantity = 1
+                UnitPrice = job.Price
             };
         }
 

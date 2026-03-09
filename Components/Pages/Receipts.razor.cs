@@ -145,7 +145,7 @@ namespace Invoqs.Components.Pages
                 StateHasChanged();
 
                 var success = await ReceiptService.DeleteReceiptAsync(receiptToDelete.Id);
-                
+
                 if (success)
                 {
                     receipts = receipts.Where(r => r.Id != receiptToDelete.Id).ToList();
@@ -169,6 +169,24 @@ namespace Invoqs.Components.Pages
                 isDeleting = false;
                 StateHasChanged();
             }
+        }
+
+        protected decimal GetMonthTotalAmount()
+        {
+            var startOfThisMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var thisMonthReceipts = receipts.Where(r =>
+                r.CreatedDate >= startOfThisMonth &&
+                r.CreatedDate < startOfThisMonth.AddMonths(1)).ToList();
+
+            return thisMonthReceipts.Sum(r => r.TotalAmount);
+        }
+
+        protected int GetMonthReceiptCount()
+        {
+            var startOfThisMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            return receipts.Count(r =>
+                r.CreatedDate >= startOfThisMonth &&
+                r.CreatedDate < startOfThisMonth.AddMonths(1));
         }
     }
 }
