@@ -8,6 +8,7 @@ namespace Invoqs.Components.Pages
     public partial class Customers : ComponentBase
     {
         [Inject] private ICustomerService CustomerService { get; set; } = default!;
+        [Inject] private IJobService JobService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
@@ -19,6 +20,7 @@ namespace Invoqs.Components.Pages
         protected string errorMessage = "";
 
         protected List<CustomerModel> customers = new();
+        protected List<JobModel> jobs = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -32,18 +34,44 @@ namespace Invoqs.Components.Pages
                 isLoading = true;
                 errorMessage = "";
 
-                customers = await CustomerService.GetAllCustomersAsync();
+                // Load both customers and jobs
+                var customersTask = CustomerService.GetAllCustomersAsync();
+                var jobsTask = JobService.GetAllJobsAsync();
+
+                await Task.WhenAll(customersTask, jobsTask);
+
+                customers = await customersTask;
+                jobs = await jobsTask;
             }
             catch (Exception ex)
             {
                 errorMessage = $"Error loading customers: {ex.Message}";
                 customers = new List<CustomerModel>();
+                jobs = new List<JobModel>();
             }
             finally
             {
                 isLoading = false;
                 StateHasChanged();
             }
+        }
+
+        protected decimal GetMonthRevenue()
+        {
+            var startOfThisMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var thisMonthJobs = jobs.Where(j =>
+                j.JobDate >= startOfThisMonth &&
+                j.JobDate < startOfThisMonth.AddMonths(1)).ToList();
+
+            return thisMonthJobs.Sum(j => j.Price);
+        }
+
+        protected int GetMonthJobs()
+        {
+            var startOfThisMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            return jobs.Count(j =>
+                j.JobDate >= startOfThisMonth &&
+                j.JobDate < startOfThisMonth.AddMonths(1));
         }
 
         protected IEnumerable<CustomerModel> filteredCustomers

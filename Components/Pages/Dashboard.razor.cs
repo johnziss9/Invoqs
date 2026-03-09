@@ -69,6 +69,7 @@ namespace Invoqs.Components.Pages
                 var sandDeliveries = uninvoicedJobs.Count(j => j.Type == JobType.SandDelivery);
                 var forkLiftServices = uninvoicedJobs.Count(j => j.Type == JobType.ForkLiftService);
                 var transfers = uninvoicedJobs.Count(j => j.Type == JobType.Transfer);
+                var sellForklifts = uninvoicedJobs.Count(j => j.Type == JobType.SellForklift);
 
                 // Calculate jobs for today
                 var today = DateTime.Today;
@@ -119,6 +120,7 @@ namespace Invoqs.Components.Pages
                     SandDeliveries = sandDeliveries,
                     ForkLiftServices = forkLiftServices,
                     Transfers = transfers,
+                    SellForklifts = sellForklifts,
 
                     // Customer metrics
                     TotalCustomers = customers.Count,

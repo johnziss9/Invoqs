@@ -239,8 +239,7 @@ namespace Invoqs.Components.Pages
                     JobId = job.Id,
                     Job = job,
                     Description = job.GetInvoiceDescription(),
-                    UnitPrice = job.Price,
-                    Quantity = 1
+                    UnitPrice = job.Price
                 });
             }
         }

@@ -102,8 +102,8 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h3 class="mb-0">€@receipts.Sum(r => r.TotalAmount).ToString("N0")</h3>
-                                <p class="mb-0 small">Συνολικό Ποσό</p>
+                                <h3 class="mb-0">€@GetMonthTotalAmount().ToString("N0")</h3>
+                                <p class="mb-0 small">Ποσό Μήνα</p>
                             </div>
                             <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                         </div>
@@ -115,8 +115,8 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h3 class="mb-0">@receipts.Count(r => r.CreatedDate >= DateTime.Today.AddDays(-30))</h3>
-                                <p class="mb-0 small">Αυτό τον Μήνα</p>
+                                <h3 class="mb-0">@GetMonthReceiptCount()</h3>
+                                <p class="mb-0 small">Αποδείξεις Μήνα</p>
                             </div>
                             <i class="bi bi-calendar-check fs-1 opacity-75"></i>
                         </div>

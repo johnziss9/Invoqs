@@ -95,6 +95,7 @@ namespace Invoqs.Components.Pages
                         "sand" => JobType.SandDelivery,
                         "cliff" => JobType.ForkLiftService,
                         "transfer" => JobType.Transfer,
+                        "sellforklift" => JobType.SellForklift,
                         _ => JobType.SkipRental
                     };
                     filtered = filtered.Where(j => j.Type == type);
@@ -183,6 +184,24 @@ namespace Invoqs.Components.Pages
             var currentUrl = Navigation.Uri;
             Navigation.NavigateTo($"/job/new?returnUrl={Uri.EscapeDataString(currentUrl)}", true);
             return Task.CompletedTask;
+        }
+
+        protected decimal GetMonthJobValue()
+        {
+            var startOfThisMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var thisMonthJobs = jobs.Where(j =>
+                j.JobDate >= startOfThisMonth &&
+                j.JobDate < startOfThisMonth.AddMonths(1)).ToList();
+
+            return thisMonthJobs.Sum(j => j.Price);
+        }
+
+        protected int GetMonthJobCount()
+        {
+            var startOfThisMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            return jobs.Count(j =>
+                j.JobDate >= startOfThisMonth &&
+                j.JobDate < startOfThisMonth.AddMonths(1));
         }
     }
 }

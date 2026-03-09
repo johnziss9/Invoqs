@@ -126,7 +126,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-4">
-                            <div class="col-md-3">
+                            <div class="col-lg col-md-4 col-sm-6">
                                 <div class="text-center">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span class="text-muted">Ενοικιάσεις Skip</span>
@@ -139,7 +139,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-lg col-md-4 col-sm-6">
                                 <div class="text-center">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span class="text-muted">Παράδοση Άμμου</span>
@@ -152,7 +152,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-lg col-md-4 col-sm-6">
                                 <div class="text-center">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span class="text-muted">Υπηρεσία Forklift</span>
@@ -165,7 +165,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-lg col-md-4 col-sm-6">
                                 <div class="text-center">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span class="text-muted">Μεταφορές</span>
@@ -174,6 +174,19 @@
                                     <div class="progress" style="height: 8px;">
                                         <div class="progress-bar bg-warning"
                                             style="width: @(dashboardData.TotalJobs > 0 ? (dashboardData.Transfers * 100 / dashboardData.TotalJobs) : 0)%">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg col-md-4 col-sm-6">
+                                <div class="text-center">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Πώληση Forklift</span>
+                                        <span class="fw-bold fs-5">@dashboardData.SellForklifts</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-danger"
+                                            style="width: @(dashboardData.TotalJobs > 0 ? (dashboardData.SellForklifts * 100 / dashboardData.TotalJobs) : 0)%">
                                         </div>
                                     </div>
                                 </div>

@@ -48,8 +48,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">@jobs.Count</h3>
-                            <p class="mb-0 small">Σύνολο Εργασιών</p>
+                            <h3 class="mb-0">@GetMonthJobCount()</h3>
+                            <p class="mb-0 small">Εργασίες Μήνα</p>
                         </div>
                         <i class="bi bi-briefcase fs-1 opacity-75"></i>
                     </div>
@@ -74,8 +74,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">€@jobs.Sum(j => j.Price).ToString("N0")</h3>
-                            <p class="mb-0 small">Συνολική Αξία</p>
+                            <h3 class="mb-0">€@GetMonthJobValue().ToString("N0")</h3>
+                            <p class="mb-0 small">Αξία Μήνα</p>
                         </div>
                         <i class="bi bi-currency-euro fs-1 opacity-75"></i>
                     </div>
@@ -116,6 +116,7 @@
                                 <option value="sand">Παράδοση Άμμου</option>
                                 <option value="cliff">Υπηρεσία Forklift</option>
                                 <option value="transfer">Μεταφορά</option>
+                                <option value="sellforklift">Πώληση Forklift</option>
                             </select>
                         </div>
                         <div class="col-md-3 col-lg-2">

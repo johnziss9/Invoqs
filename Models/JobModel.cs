@@ -15,7 +15,8 @@ namespace Invoqs.Models
         SkipRental = 0,
         SandDelivery = 1,
         ForkLiftService = 2,
-        Transfer = 3
+        Transfer = 3,
+        SellForklift = 4
     }
 
     public class JobModel
@@ -86,6 +87,7 @@ namespace Invoqs.Models
             JobType.SandDelivery => "/images/icons/sand.png",
             JobType.ForkLiftService => "/images/icons/forklift.png",
             JobType.Transfer => "/images/icons/transfer.png",
+            JobType.SellForklift => "/images/icons/forklift_sell.png",
             _ => "bi-building"
         };
 
@@ -95,6 +97,7 @@ namespace Invoqs.Models
             JobType.SandDelivery => "Παράδοση Άμμου",
             JobType.ForkLiftService => "Υπηρεσία Forklift",
             JobType.Transfer => "Μεταφορά",
+            JobType.SellForklift => "Πώληση Forklift",
             _ => "Άγνωστο"
         };
 
