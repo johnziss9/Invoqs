@@ -68,7 +68,9 @@ namespace Invoqs.Components.Pages
                 // Calculate totals
                 totalValue = customerInvoices.Sum(i => i.Total);
                 totalOutstanding = customerInvoices
-                    .Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Overdue)
+                    .Where(i => i.Status == InvoiceStatus.Sent ||
+                                i.Status == InvoiceStatus.Delivered ||
+                                i.Status == InvoiceStatus.Overdue)
                     .Sum(i => i.Total);
             }
             catch (Exception ex)
@@ -229,7 +231,9 @@ namespace Invoqs.Components.Pages
                     // Recalculate totals
                     totalValue = customerInvoices.Sum(i => i.Total);
                     totalOutstanding = customerInvoices
-                        .Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Overdue)
+                        .Where(i => i.Status == InvoiceStatus.Sent ||
+                                    i.Status == InvoiceStatus.Delivered ||
+                                    i.Status == InvoiceStatus.Overdue)
                         .Sum(i => i.Total);
 
                     StateHasChanged();

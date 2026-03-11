@@ -404,8 +404,8 @@
                                         {
                                             <span class="spinner-border spinner-border-sm me-2"></span>
                                         }
-                                        <i class="bi bi-hand-thumbs-up me-1"></i>
-                                        Σημείωση ως Παραδοθέν
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Σημείωση ως Απεσταλμένο
                                     </button>
                                     
                                     <hr class="my-3">
@@ -1045,16 +1045,16 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Σημείωση Τιμολογίου ως Παραδοθέν</h5>
+                    <h5 class="modal-title">Σημείωση Τιμολογίου ως Απεσταλμένο</h5>
                     <button type="button" class="btn-close" @onclick="() => showDeliveredConfirmation = false"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center">
-                        <i class="bi bi-hand-thumbs-up text-info" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Σημείωση ως Παραδοθέν;</h5>
+                        <i class="bi bi-check-circle text-info" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Σημείωση ως Απεσταλμένο;</h5>
                         <p class="text-muted">
-                            Αυτή η ενέργεια θα σημειώσει το τιμολόγιο <strong>@invoice?.InvoiceNumber</strong> ως παραδοθέν στον πελάτη.
-                            Η κατάσταση του τιμολογίου θα αλλάξει σε "Παραδοθέν".
+                            Αυτή η ενέργεια θα σημειώσει το τιμολόγιο <strong>@invoice?.InvoiceNumber</strong> ως απεσταλμένο στον πελάτη.
+                            Η κατάσταση του τιμολογίου θα αλλάξει σε "Απεσταλμένο".
                         </p>
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
@@ -1071,9 +1071,9 @@
                         }
                         else
                         {
-                            <i class="bi bi-hand-thumbs-up me-1"></i>
+                            <i class="bi bi-check-circle me-1"></i>
                         }
-                        @(isProcessing ? "Επεξεργασία..." : "Σημείωση ως Παραδοθέν")
+                        @(isProcessing ? "Επεξεργασία..." : "Σημείωση ως Απεσταλμένο")
                     </button>
                 </div>
             </div>

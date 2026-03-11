@@ -1,0 +1,312 @@
+@rendermode InteractiveServer
+@page "/accounting"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+
+<PageTitle>Λογιστική - Invoqs</PageTitle>
+
+<Navbar />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Λογιστική</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">Καταστάσεις Λογιστηρίου</h2>
+                    <p class="text-muted mb-0">Δημιουργία και διαχείριση καταστάσεων για το λογιστήριο</p>
+                </div>
+                <div class="mt-2 mt-md-0">
+                    <a href="/accounting/new" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-2"></i>
+                        Δημιουργία Κατάστασης
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Φόρτωση...</span>
+            </div>
+        </div>
+    }
+    else if (!filteredStatements.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                @if (statements.Any())
+                {
+                    <!-- No results after filtering -->
+                    <i class="bi bi-funnel" style="font-size: 4rem; color: #ccc;"></i>
+                    <h4 class="mt-3">Δεν υπάρχουν καταστάσεις που να ταιριάζουν με τα φίλτρα σας</h4>
+                    <p class="text-muted">Δοκιμάστε να προσαρμόσετε τα κριτήρια αναζήτησης</p>
+                }
+                else
+                {
+                    <!-- No statements at all -->
+                    <i class="bi bi-file-earmark-text" style="font-size: 4rem; color: #ccc;"></i>
+                    <h4 class="mt-3">Δεν υπάρχουν καταστάσεις ακόμα</h4>
+                    <p class="text-muted">Δημιουργήστε την πρώτη σας κατάσταση για το λογιστήριο</p>
+                    <a href="/accounting/new" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-lg me-2"></i>
+                        Δημιουργία Κατάστασης
+                    </a>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Statement Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card bg-primary text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@statements.Count</h3>
+                                <p class="mb-0 small">Σύνολο Καταστάσεων</p>
+                            </div>
+                            <i class="bi bi-file-earmark-text fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card bg-success text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@statements.Sum(s => s.InvoiceCount)</h3>
+                                <p class="mb-0 small">Σύνολο Τιμολογίων</p>
+                            </div>
+                            <i class="bi bi-receipt fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card bg-info text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">€@(statements.Any() ? (statements.Sum(s => s.TotalAmount) / statements.Count).ToString("N2") : "0.00")</h3>
+                                <p class="mb-0 small">Μέσος Όρος</p>
+                            </div>
+                            <i class="bi bi-graph-up fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card bg-warning text-white border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-0">@GetMonthStatementCount()</h3>
+                                <p class="mb-0 small">Καταστάσεις Μήνα</p>
+                            </div>
+                            <i class="bi bi-calendar-check fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <!-- Search Statements -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="form-label small text-muted">Αναζήτηση Καταστάσεων</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text"
+                                        class="form-control"
+                                        @bind="searchTerm"
+                                        @bind:event="oninput"
+                                        placeholder="Αναζήτηση με αριθμό κατάστασης...">
+                                </div>
+                            </div>
+
+                            <!-- Sort By -->
+                            <div class="col-md-3 col-lg-2">
+                                <label class="form-label small text-muted">Ταξινόμηση</label>
+                                <select class="form-select" @bind="sortBy">
+                                    <option value="date">Ημερομηνία</option>
+                                    <option value="number">Αριθμός</option>
+                                    <option value="amount">Ποσό</option>
+                                </select>
+                            </div>
+
+                            <!-- Filter by Status -->
+                            <div class="col-md-3 col-lg-2">
+                                <label class="form-label small text-muted">Φίλτρο</label>
+                                <select class="form-select" @bind="filterBy">
+                                    <option value="all">Όλες οι Καταστάσεις</option>
+                                    <option value="sent">Απεσταλμένες</option>
+                                    <option value="notSent">Μη Απεσταλμένες</option>
+                                </select>
+                            </div>
+
+                            <!-- Filter Summary -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <small class="text-muted">
+                                        Εμφάνιση @filteredStatements.Count() από @statements.Count καταστάσεις
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statements Table -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Αρ. Κατάστασης</th>
+                                <th>Περίοδος</th>
+                                <th>Τιμολόγια</th>
+                                <th>Ποσό</th>
+                                <th>Κατάσταση</th>
+                                <th>Δημιουργήθηκε</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var statement in filteredStatements)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-medium text-primary">@statement.StatementNumber</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">@statement.StartDate.ToString("dd/MM/yyyy") - @statement.EndDate.ToString("dd/MM/yyyy")</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">
+                                            @statement.InvoiceCount τιμολόγιο(α)
+                                            @if (statement.CancelledInvoiceCount > 0)
+                                            {
+                                                <span class="text-danger small">(+@statement.CancelledInvoiceCount ακυρ.)</span>
+                                            }
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium">€@statement.TotalAmount.ToString("N2")</span>
+                                    </td>
+                                    <td>
+                                        @if (statement.IsSent || statement.IsDelivered)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1"></i>Απεστάλη
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-clock me-1"></i>Δεν Απεστάλη
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium">@statement.CreatedDate.ToString("dd/MM/yyyy")</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-primary" @onclick="() => ViewStatement(statement.Id)"
+                                                title="Προβολή Κατάστασης">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                @onclick="() => DownloadPdf(statement.Id, statement.StatementNumber)"
+                                                title="Λήψη PDF"
+                                                disabled="@(downloadingPdf == statement.Id)">
+                                                @if (downloadingPdf == statement.Id)
+                                                {
+                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-download"></i>
+                                                }
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                @onclick="() => ShowDeleteModal(statement)" title="Διαγραφή Κατάστασης">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@* Delete Confirmation Modal *@
+@if (showDeleteModal && statementToDelete != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Διαγραφή Κατάστασης</h5>
+                    <button type="button" class="btn-close" @onclick="HideDeleteModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Είστε σίγουροι;</h5>
+                        <p class="text-muted">
+                            Αυτό θα διαγράψει την κατάσταση <strong>@statementToDelete.StatementNumber</strong>.
+                        </p>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Αυτή η κατάσταση καλύπτει @statementToDelete.InvoiceCount τιμολόγιο/α συνολικού ποσού
+                            <strong>€@statementToDelete.TotalAmount.ToString("N2")</strong>.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteModal">Ακύρωση</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
+                        @if (isDeleting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-trash me-1"></i>
+                        }
+                        @(isDeleting ? "Διαγραφή..." : "Διαγραφή Κατάστασης")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

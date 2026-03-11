@@ -1,0 +1,506 @@
+@rendermode InteractiveServer
+@page "/accounting/{StatementId:int}"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+
+<PageTitle>Κατάσταση @(statement?.StatementNumber ?? "") - Invoqs</PageTitle>
+
+<Navbar />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/accounting" class="text-decoration-none">Λογιστική</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@(statement?.StatementNumber ?? "Λεπτομέρειες Κατάστασης")</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">Κατάσταση @(statement?.StatementNumber ?? "Φόρτωση...")</h2>
+                    @if (statement != null)
+                    {
+                        <p class="text-muted mb-0">
+                            Δημιουργήθηκε στις @statement.CreatedDate.ToString("dd MMMM yyyy")
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Φόρτωση...</span>
+            </div>
+        </div>
+    }
+    else if (statement == null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Η κατάσταση δεν βρέθηκε ή παρουσιάστηκε σφάλμα κατά τη φόρτωση.
+            <div class="mt-3">
+                <a href="/accounting" class="btn btn-primary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Επιστροφή στις Καταστάσεις
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Period Information -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-range me-2"></i>Περίοδος Κατάστασης
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Ημερομηνία Έναρξης</label>
+                                <div class="form-control-plaintext">
+                                    <i class="bi bi-calendar-event me-2"></i>@statement.StartDate.ToString("dd MMMM yyyy")
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Ημερομηνία Λήξης</label>
+                                <div class="form-control-plaintext">
+                                    <i class="bi bi-calendar-event me-2"></i>@statement.EndDate.ToString("dd MMMM yyyy")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Invoices -->
+                @if (statement.Invoices.Any())
+                {
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-file-earmark-text me-2"></i>Τιμολόγια (@statement.InvoiceCount)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Αριθμός</th>
+                                            <th>Ημερομηνία</th>
+                                            <th>Πελάτης</th>
+                                            <th class="text-end">Ποσό (συμπ. ΦΠΑ)</th>
+                                            <th class="text-end">ΦΠΑ</th>
+                                            <th>Κατάσταση</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var invoice in statement.Invoices)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <span class="fw-medium text-primary">@invoice.InvoiceNumber</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-muted">@invoice.InvoiceDate.ToString("dd MMM yyyy")</span>
+                                                </td>
+                                                <td>@invoice.CustomerName</td>
+                                                <td class="text-end">
+                                                    <span class="fw-medium">€@invoice.Total.ToString("N2")</span>
+                                                </td>
+                                                <td class="text-end">€@invoice.VatAmount.ToString("N2")</td>
+                                                <td><span class="badge bg-info">@TranslateStatus(invoice.Status)</span></td>
+                                                <td class="text-end">
+                                                    <a href="/invoice/@invoice.InvoiceId" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye"></i> Προβολή
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot class="table-light">
+                                        <tr>
+                                            <td colspan="3" class="text-end fw-bold">Σύνολο Τιμολογίων:</td>
+                                            <td class="text-end fw-bold">€@statement.TotalAmount.ToString("N2")</td>
+                                            <td class="text-end fw-bold">€@statement.TotalVatAmount.ToString("N2")</td>
+                                            <td colspan="2"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Cancelled Invoices -->
+                @if (statement.CancelledInvoices.Any())
+                {
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0 text-danger">
+                                <i class="bi bi-x-circle me-2"></i>Ακυρωμένα Τιμολόγια (@statement.CancelledInvoiceCount)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Αριθμός</th>
+                                            <th>Ημερομηνία</th>
+                                            <th>Πελάτης</th>
+                                            <th class="text-end">Ποσό (συμπ. ΦΠΑ)</th>
+                                            <th class="text-end">ΦΠΑ</th>
+                                            <th>Κατάσταση</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var invoice in statement.CancelledInvoices)
+                                        {
+                                            <tr class="table-secondary">
+                                                <td>
+                                                    <span class="fw-medium text-muted">@invoice.InvoiceNumber</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-muted">@invoice.InvoiceDate.ToString("dd MMM yyyy")</span>
+                                                </td>
+                                                <td>@invoice.CustomerName</td>
+                                                <td class="text-end">€@invoice.Total.ToString("N2")</td>
+                                                <td class="text-end">€@invoice.VatAmount.ToString("N2")</td>
+                                                <td><span class="badge bg-danger">Ακυρωμένο</span></td>
+                                                <td class="text-end">
+                                                    <a href="/invoice/@invoice.InvoiceId" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye"></i> Προβολή
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot class="table-light">
+                                        <tr>
+                                            <td colspan="3" class="text-end fw-bold">Σύνολο Ακυρωμένων:</td>
+                                            <td class="text-end fw-bold">€@statement.CancelledAmount.ToString("N2")</td>
+                                            <td class="text-end fw-bold">€@statement.CancelledVatAmount.ToString("N2")</td>
+                                            <td colspan="2"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Statement Actions -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0">Ενέργειες Κατάστασης</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            @if (!statement.IsSent)
+                            {
+                                <button class="btn btn-success btn-sm" @onclick="ShowEmailModal"
+                                    disabled="@isSending">
+                                    @if (isSending)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-send me-1"></i>
+                                    }
+                                    Αποστολή Κατάστασης
+                                </button>
+
+                                @if (!statement.IsDelivered)
+                                {
+                                    <button class="btn btn-info btn-sm" @onclick="ShowDeliveredConfirmation" disabled="@isProcessing">
+                                        @if (isProcessing)
+                                        {
+                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                        }
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Σημείωση ως Απεσταλμένη
+                                    </button>
+                                }
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-secondary btn-sm" @onclick="ShowEmailModal" disabled="@isSending">
+                                    @if (isSending)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-envelope me-1"></i>
+                                    }
+                                    Επαναποστολή Κατάστασης
+                                </button>
+                            }
+                            <button class="btn btn-primary btn-sm"
+                                @onclick="DownloadPdf"
+                                disabled="@isDownloading">
+                                @if (isDownloading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-download me-1"></i>
+                                }
+                                Λήψη PDF
+                            </button>
+                            <hr class="my-2">
+                            <button class="btn btn-outline-danger btn-sm" @onclick="ShowDeleteModal">
+                                <i class="bi bi-trash me-1"></i>
+                                Διαγραφή Κατάστασης
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statement Summary -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0">Σύνοψη Κατάστασης</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center g-3">
+                            <div class="col-12">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="h4 text-primary mb-1">@statement.InvoiceCount</div>
+                                    <small class="text-muted">Ενεργά Τιμολόγια</small>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="h4 text-danger mb-1">@statement.CancelledInvoiceCount</div>
+                                    <small class="text-muted">Ακυρωμένα Τιμολόγια</small>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="h4 text-success mb-1">€@statement.TotalAmount.ToString("N2")</div>
+                                    <small class="text-muted">Συνολικό Ποσό</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statement Details -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0">Λεπτομέρειες Κατάστασης</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Αρ. Κατάστασης:</span>
+                            <span class="fw-medium">@statement.StatementNumber</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Κατάσταση:</span>
+                            @if (statement.IsSent || statement.IsDelivered)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Απεστάλη
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-clock me-1"></i>Δεν Απεστάλη
+                                </span>
+                            }
+                        </div>
+                        @if (statement.IsSent && statement.SentDate.HasValue)
+                        {
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Απεστάλη στις:</span>
+                                <span class="fw-medium">@statement.SentDate.Value.ToString("dd/MM/yyyy")</span>
+                            </div>
+                        }
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Δημιουργήθηκε:</span>
+                            <span class="fw-medium">@statement.CreatedDate.ToString("dd/MM/yyyy")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0">Γρήγορες Ενέργειες</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/accounting/new" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-plus-lg me-1"></i>
+                                Δημιουργία Νέας Κατάστασης
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@* Send Email Modal *@
+@if (showEmailModal)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(statement!.IsSent ? "Επαναποστολή" : "Αποστολή") Κατάστασης</h5>
+                    <button type="button" class="btn-close" @onclick="HideEmailModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-envelope text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">@(statement!.IsSent ? "Επαναποστολή" : "Αποστολή") Κατάστασης;</h5>
+                        <p class="text-muted">
+                            Αυτό θα @(statement!.IsSent ? "επαναποστείλει" : "αποστείλει") την κατάσταση
+                            <strong>@statement?.StatementNumber</strong>.
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email Παραλήπτη *</label>
+                        <input type="email"
+                               class="form-control"
+                               @bind="emailRecipient"
+                               placeholder="accountant@example.com" />
+                        <small class="text-muted">Εισαγάγετε το email του λογιστή</small>
+                    </div>
+                    @if (!string.IsNullOrEmpty(emailError))
+                    {
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            @emailError
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideEmailModal">Ακύρωση</button>
+                    <button type="button" class="btn btn-success" @onclick="SendEmail" disabled="@isSending">
+                        @if (isSending)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-send me-1"></i>
+                        }
+                        @(isSending ? "Αποστολή..." : statement!.IsSent ? "Επαναποστολή Κατάστασης" : "Αποστολή Κατάστασης")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Delete Confirmation Modal *@
+@if (showDeleteModal)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Διαγραφή Κατάστασης</h5>
+                    <button type="button" class="btn-close" @onclick="HideDeleteModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Είστε σίγουροι;</h5>
+                        <p class="text-muted">
+                            Αυτό θα διαγράψει την κατάσταση <strong>@statement?.StatementNumber</strong>.
+                            Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
+                        </p>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Αυτή η κατάσταση καλύπτει @statement?.InvoiceCount τιμολόγιο/α συνολικού ποσού
+                            <strong>€@statement?.TotalAmount.ToString("N2")</strong>.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeleteModal">Ακύρωση</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
+                        @if (isDeleting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-trash me-1"></i>
+                        }
+                        @(isDeleting ? "Διαγραφή..." : "Διαγραφή Κατάστασης")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Mark as Delivered Confirmation Modal *@
+@if (showDeliveredConfirmation)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Σημείωση ως Απεσταλμένη</h5>
+                    <button type="button" class="btn-close" @onclick="HideDeliveredConfirmation"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-check-circle text-info" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Σημείωση Κατάστασης ως Απεσταλμένη;</h5>
+                        <p class="text-muted">
+                            Αυτό θα σημειώσει την κατάσταση <strong>@statement?.StatementNumber</strong> ως απεσταλμένη.
+                        </p>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Χρησιμοποιήστε αυτό όταν η κατάσταση έχει αποσταλεί εκτός της εφαρμογής (π.χ. με χέρι ή άλλο email).
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeliveredConfirmation">Ακύρωση</button>
+                    <button type="button" class="btn btn-info" @onclick="ConfirmMarkAsDelivered" disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-check-circle me-1"></i>
+                        }
+                        @(isProcessing ? "Επεξεργασία..." : "Σημείωση ως Απεσταλμένη")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

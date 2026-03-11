@@ -42,6 +42,7 @@ try
     builder.Services.AddScoped<IJobService, JobService>();
     builder.Services.AddScoped<IInvoiceService, InvoiceService>();
     builder.Services.AddScoped<IReceiptService, ReceiptService>();
+    builder.Services.AddScoped<IStatementService, StatementService>();
 
     var app = builder.Build();
 

@@ -220,5 +220,29 @@ namespace Invoqs.Services
                 return false;
             }
         }
+
+        public async Task<bool> MarkReceiptAsDeliveredAsync(int receiptId)
+        {
+            try
+            {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
+                var response = await _httpClient.PutAsync($"receipts/{receiptId}/mark-as-delivered", null);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error marking receipt {receiptId} as delivered: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

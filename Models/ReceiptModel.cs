@@ -32,6 +32,9 @@ namespace Invoqs.Models
         public bool IsSent { get; set; } = false;
         public DateTime? SentDate { get; set; }
 
+        public bool IsDelivered { get; set; } = false;
+        public DateTime? DeliveredDate { get; set; }
+
         public List<ReceiptInvoiceModel> Invoices { get; set; } = new();
     }
 

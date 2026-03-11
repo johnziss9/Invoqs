@@ -1,0 +1,150 @@
+@rendermode InteractiveServer
+@page "/accounting/new"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Δημιουργία Κατάστασης - Invoqs</PageTitle>
+
+<Navbar />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/accounting" class="text-decoration-none">Λογιστική</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Δημιουργία Κατάστασης</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">Δημιουργία Κατάστασης</h2>
+                    <p class="text-muted mb-0">Επιλέξτε την περίοδο για τη δημιουργία της κατάστασης λογιστηρίου</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Period Selection -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-range me-2"></i>
+                        Επιλογή Περιόδου
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@model" OnValidSubmit="HandleValidSubmit">
+                        <DataAnnotationsValidator />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold required">Από Ημερομηνία</label>
+                                <InputDate @bind-Value="model.StartDate"
+                                           class="form-control"
+                                           placeholder="Επιλέξτε ημερομηνία" />
+                                <ValidationMessage For="@(() => model.StartDate)" class="text-danger small" />
+                                <div class="form-text">Επιλέξτε την ημερομηνία έναρξης της περιόδου</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold required">Έως Ημερομηνία</label>
+                                <InputDate @bind-Value="model.EndDate"
+                                           class="form-control"
+                                           placeholder="Επιλέξτε ημερομηνία" />
+                                <ValidationMessage For="@(() => model.EndDate)" class="text-danger small" />
+                                <div class="form-text">Επιλέξτε την ημερομηνία λήξης της περιόδου</div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex gap-2">
+                            <button type="submit"
+                                    class="btn btn-success"
+                                    disabled="@isSubmitting">
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    <span>Δημιουργία...</span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-file-earmark-text me-2"></i>
+                                    <span>Δημιουργία Κατάστασης</span>
+                                }
+                            </button>
+                            <a href="/accounting" class="btn btn-outline-secondary">
+                                Ακύρωση
+                            </a>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+
+            <!-- Information Card -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Πληροφορίες
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li class="mb-2">Η κατάσταση θα περιλαμβάνει όλα τα τιμολόγια που δημιουργήθηκαν στην επιλεγμένη περίοδο</li>
+                        <li class="mb-2">Θα συμπεριληφθούν τιμολόγια όλων των πελατών</li>
+                        <li class="mb-2">Τα ακυρωμένα τιμολόγια θα εμφανιστούν ξεχωριστά</li>
+                        <li>Μπορείτε να κατεβάσετε και να στείλετε την κατάσταση μέσω email μετά τη δημιουργία</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white py-3">
+                    <h6 class="mb-0 text-white">
+                        <i class="bi bi-lightbulb-fill me-2"></i>
+                        Βοήθεια
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-3">Πώς να δημιουργήσετε μια κατάσταση:</h6>
+                    <ol class="small mb-0 ps-3">
+                        <li class="mb-2">Επιλέξτε την ημερομηνία έναρξης της περιόδου</li>
+                        <li class="mb-2">Επιλέξτε την ημερομηνία λήξης της περιόδου</li>
+                        <li class="mb-2">Πατήστε "Δημιουργία Κατάστασης"</li>
+                        <li>Η κατάσταση θα δημιουργηθεί και θα μπορείτε να την προβάλετε αμέσως</li>
+                    </ol>
+
+                    <hr />
+
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        <small>
+                            <strong>Συμβουλή:</strong> Επιλέξτε περιόδους που ταιριάζουν με τις λογιστικές σας ανάγκες (π.χ. μηνιαίες, τριμηνιαίες)
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -26,6 +26,8 @@ namespace Invoqs.Components.Pages
         private bool showEmailSelection = false;
         private List<string>? selectedEmailsForSending = null;
         private bool isSending = false;
+        private bool isProcessing = false;
+        private bool showDeliveredConfirmation = false;
         private string successMessage = string.Empty;
 
 
@@ -255,6 +257,64 @@ namespace Invoqs.Components.Pages
             // Show the send confirmation modal for resending
             showSendConfirmation = true;
             StateHasChanged();
+        }
+
+        private void ShowDeliveredConfirmation()
+        {
+            showDeliveredConfirmation = true;
+            StateHasChanged();
+        }
+
+        private void HideDeliveredConfirmation()
+        {
+            showDeliveredConfirmation = false;
+            StateHasChanged();
+        }
+
+        private async Task ConfirmMarkAsDelivered()
+        {
+            showDeliveredConfirmation = false;
+            await MarkAsDelivered();
+        }
+
+        private async Task MarkAsDelivered()
+        {
+            if (receipt == null) return;
+
+            try
+            {
+                isProcessing = true;
+                StateHasChanged();
+
+                var success = await ReceiptService.MarkReceiptAsDeliveredAsync(receipt.Id);
+
+                if (success)
+                {
+                    receipt.IsDelivered = true;
+                    receipt.DeliveredDate = DateTime.UtcNow;
+                    successMessage = "Receipt marked as delivered successfully.";
+
+                    _ = Task.Delay(3000).ContinueWith(_ =>
+                    {
+                        successMessage = string.Empty;
+                        InvokeAsync(StateHasChanged);
+                    });
+                }
+                else
+                {
+                    errorMessage = "Failed to mark receipt as delivered.";
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error marking receipt as delivered: {ex.Message}";
+                Console.WriteLine($"Error marking receipt as delivered: {ex.Message}");
+            }
+            finally
+            {
+                isProcessing = false;
+                StateHasChanged();
+            }
         }
 
         private string TranslatePaymentMethod(string? method)

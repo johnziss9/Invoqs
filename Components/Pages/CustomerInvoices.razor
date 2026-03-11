@@ -110,8 +110,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">@customerInvoices.Count(i => i.Status == InvoiceStatus.Sent)</h3>
-                            <p class="mb-0 small">Απεσταλμένο</p>
+                            <h3 class="mb-0">@customerInvoices.Count(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.Delivered)</h3>
+                            <p class="mb-0 small">Απεσταλμένο/Παραδοθέν</p>
                         </div>
                         <i class="bi bi-send fs-1 opacity-75"></i>
                     </div>
@@ -162,7 +162,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="mb-0">€@totalOutstanding.ToString("N0")</h3>
+                            <h3 class="mb-0">€@totalOutstanding.ToString("N2")</h3>
                             <p class="mb-0 small">Οφειλόμενο</p>
                         </div>
                         <i class="bi bi-currency-euro fs-1 opacity-75"></i>

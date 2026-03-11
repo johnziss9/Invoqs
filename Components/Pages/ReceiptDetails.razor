@@ -312,6 +312,18 @@
                                         }
                                         Αποστολή Απόδειξης
                                     </button>
+
+                                    @if (!receipt.IsDelivered)
+                                    {
+                                        <button class="btn btn-info btn-sm" @onclick="ShowDeliveredConfirmation" disabled="@isProcessing">
+                                            @if (isProcessing)
+                                            {
+                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                            }
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Σημείωση ως Απεσταλμένη
+                                        </button>
+                                    }
                                 }
                                 else
                                 {
@@ -386,37 +398,35 @@
                         <h6 class="mb-0">Λεπτομέρειες Απόδειξης</h6>
                     </div>
                     <div class="card-body">
-                        <div class="small">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Αρ. Απόδειξης:</span>
-                                <span class="fw-medium">@receipt.ReceiptNumber</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Κατάσταση:</span>
-                                @if (receipt.IsSent)
-                                {
-                                    <span class="badge bg-success">
-                                        <i class="bi bi-check-circle me-1"></i>Απεστάλη
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">
-                                        <i class="bi bi-clock me-1"></i>Δεν Απεστάλη
-                                    </span>
-                                }
-                            </div>
-                            @if (receipt.IsSent && receipt.SentDate.HasValue)
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Αρ. Απόδειξης:</span>
+                            <span class="fw-medium">@receipt.ReceiptNumber</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Κατάσταση:</span>
+                            @if (receipt.IsSent || receipt.IsDelivered)
                             {
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Απεστάλη στις:</span>
-                                    <span class="fw-medium">@receipt.SentDate.Value.ToString("dd/MM/yyyy")</span>
-                                </div>
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Απεστάλη
+                                </span>
                             }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-clock me-1"></i>Δεν Απεστάλη
+                                </span>
+                            }
+                        </div>
+                        @if (receipt.IsSent && receipt.SentDate.HasValue)
+                        {
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Δημιουργήθηκε:</span>
-                                <span class="fw-medium">@receipt.CreatedDate.ToString("dd/MM/yyyy")</span>
+                                <span class="text-muted">Απεστάλη στις:</span>
+                                <span class="fw-medium">@receipt.SentDate.Value.ToString("dd/MM/yyyy")</span>
                             </div>
+                        }
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Δημιουργήθηκε:</span>
+                            <span class="fw-medium">@receipt.CreatedDate.ToString("dd/MM/yyyy")</span>
                         </div>
                     </div>
                 </div>
@@ -577,4 +587,46 @@
         DocumentType="την απόδειξη"
         OnEmailsSelected="@HandleEmailsSelected"
         OnCancelled="@(() => showEmailSelection = false)" />
+}
+
+@* Mark as Delivered Confirmation Modal *@
+@if (showDeliveredConfirmation)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Σημείωση ως Απεσταλμένη</h5>
+                    <button type="button" class="btn-close" @onclick="HideDeliveredConfirmation"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-check-circle text-info" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Σημείωση Απόδειξης ως Απεσταλμένη;</h5>
+                        <p class="text-muted">
+                            Αυτό θα σημειώσει την απόδειξη <strong>@receipt?.ReceiptNumber</strong> ως απεσταλμένη.
+                        </p>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Χρησιμοποιήστε αυτό όταν η απόδειξη έχει αποσταλεί εκτός της εφαρμογής (π.χ. με χέρι ή άλλο email).
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideDeliveredConfirmation">Ακύρωση</button>
+                    <button type="button" class="btn btn-info" @onclick="ConfirmMarkAsDelivered" disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-check-circle me-1"></i>
+                        }
+                        @(isProcessing ? "Επεξεργασία..." : "Σημείωση ως Απεσταλμένη")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
