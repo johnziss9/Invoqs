@@ -1,0 +1,322 @@
+@rendermode InteractiveServer
+@page "/customers/bulk-email"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+
+<PageTitle>Μαζική Αποστολή Email - Invoqs</PageTitle>
+
+<Navbar />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/customers" class="text-decoration-none">Πελάτες</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Μαζική Αποστολή Email</li>
+        </ol>
+    </nav>
+
+    <!-- Result Alert -->
+    @if (sendResult != null)
+    {
+        <div class="alert @(sendResult.FailedCount == 0 ? "alert-success" : sendResult.SentCount == 0 ? "alert-danger" : "alert-warning") alert-dismissible fade show mb-4" role="alert">
+            <i class="bi @(sendResult.FailedCount == 0 ? "bi-check-circle" : "bi-exclamation-triangle") me-2"></i>
+            <strong>@(sendResult.FailedCount == 0 ? "Επιτυχία!" : sendResult.SentCount == 0 ? "Αποτυχία!" : "Μερική Αποστολή")</strong>
+            @if (sendResult.SentCount > 0)
+            {
+                <span> @sendResult.SentCount email(s) εστάλησαν επιτυχώς.</span>
+            }
+            @if (sendResult.FailedCount > 0)
+            {
+                <span> @sendResult.FailedCount απέτυχαν:</span>
+                <ul class="mt-2 mb-0 small">
+                    @foreach (var f in sendResult.Failures)
+                    {
+                        <li><strong>@f.CustomerName</strong> @(!string.IsNullOrEmpty(f.Email) ? $"({f.Email})" : "") — @f.Error</li>
+                    }
+                </ul>
+            }
+            <button type="button" class="btn-close" @onclick="() => sendResult = null"></button>
+        </div>
+    }
+
+    <!-- Error Alert -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>@errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = string.Empty"></button>
+        </div>
+    }
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="bi bi-envelope-paper me-2"></i>Μαζική Αποστολή Email
+                    </h2>
+                    <p class="text-muted mb-0">Συνθέστε και στείλτε email σε επιλεγμένους πελάτες</p>
+                </div>
+                <a href="/customers/bulk-email/history" class="btn btn-outline-secondary mt-2 mt-md-0">
+                    <i class="bi bi-clock-history me-1"></i>Ιστορικό Αποστολών
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Compose Panel -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm compose-card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-pencil me-2"></i>Σύνταξη Email</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Θέμα <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" @bind="subject" @bind:event="oninput"
+                               placeholder="Εισάγετε θέμα email...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Γλώσσα</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="language" id="lang-el"
+                                       value="el" checked="@(language == "el")"
+                                       @onchange='() => language = "el"'>
+                                <label class="form-check-label" for="lang-el">Ελληνικά</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="language" id="lang-en"
+                                       value="en" checked="@(language == "en")"
+                                       @onchange='() => language = "en"'>
+                                <label class="form-check-label" for="lang-en">English</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Μήνυμα <span class="text-danger">*</span></label>
+                        <div class="email-template-preview text-muted small mb-1 px-1">
+                            <em>@Greeting</em>
+                        </div>
+                        <textarea class="form-control body-textarea" @bind="body" @bind:event="oninput"
+                                  rows="10" placeholder="@BodyPlaceholder"></textarea>
+                        <div class="email-template-preview text-muted small mt-1 px-1">
+                            <em>@SignOff<br>ANDREAS SAVVA SERVICES COMPANY LTD</em>
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            @(language == "el"
+                                ? "Ο χαιρετισμός και η υπογραφή προστίθενται αυτόματα."
+                                : "The greeting and sign-off are added automatically.")
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-primary btn-lg"
+                                @onclick="OpenConfirmModal"
+                                disabled="@(!CanSend)">
+                            <i class="bi bi-send me-2"></i>
+                            Αποστολή σε @selectedIds.Count @(selectedIds.Count == 1 ? "πελάτη" : "πελάτες")
+                        </button>
+                    </div>
+                    @if (selectedIds.Count == 0)
+                    {
+                        <small class="text-muted mt-2 d-block text-center">
+                            <i class="bi bi-info-circle me-1"></i>Επιλέξτε τουλάχιστον έναν πελάτη
+                        </small>
+                    }
+                    else if (string.IsNullOrWhiteSpace(subject) || string.IsNullOrWhiteSpace(body))
+                    {
+                        <small class="text-muted mt-2 d-block text-center">
+                            <i class="bi bi-info-circle me-1"></i>Συμπληρώστε θέμα και μήνυμα
+                        </small>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Selection Panel -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <h6 class="mb-0">
+                            <i class="bi bi-people me-2"></i>Επιλογή Παραληπτών
+                        </h6>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" @onclick="SelectAll">
+                                <i class="bi bi-check-all me-1"></i>Επιλογή Όλων
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" @onclick="DeselectAll">
+                                <i class="bi bi-x-lg me-1"></i>Αποεπιλογή Όλων
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body border-bottom pb-3">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" @bind="searchTerm" @bind:event="oninput"
+                                       placeholder="Αναζήτηση πελατών...">
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <small class="text-muted">
+                                <span class="badge bg-primary me-1">@selectedIds.Count</span> επιλεγμένοι
+                                <span class="ms-2 text-muted">@customersWithEmail.Count() με email</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                @if (isLoading)
+                {
+                    <div class="d-flex justify-content-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Φόρτωση...</span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive customer-table">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th style="width: 48px;"></th>
+                                    <th>Πελάτης</th>
+                                    <th>Email</th>
+                                    <th>Τηλέφωνο</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var customer in filteredCustomers)
+                                {
+                                    var hasEmail = customer.Emails.Any();
+                                    var isSelected = selectedIds.Contains(customer.Id);
+                                    <tr class="@(!hasEmail ? "no-email-row" : "") @(isSelected ? "table-primary" : "")">
+                                        <td class="text-center">
+                                            <input type="checkbox"
+                                                   class="form-check-input"
+                                                   disabled="@(!hasEmail)"
+                                                   checked="@isSelected"
+                                                   @onchange="e => ToggleCustomer(customer.Id, (bool)e.Value!)" />
+                                        </td>
+                                        <td>
+                                            <span class="fw-semibold">@customer.Name</span>
+                                        </td>
+                                        <td>
+                                            @if (hasEmail)
+                                            {
+                                                <span class="text-muted small">@customer.Email</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Χωρίς email</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small">@customer.Phone</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        @if (!filteredCustomers.Any())
+                        {
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-search" style="font-size: 2rem;"></i>
+                                <p class="mt-2 mb-0">Δεν βρέθηκαν πελάτες</p>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+@if (showConfirmModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-send me-2"></i>Επιβεβαίωση Αποστολής
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal" disabled="@isSending"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">
+                        Πρόκειται να σταλεί email σε
+                        <strong>@selectedIds.Count @(selectedIds.Count == 1 ? "πελάτη" : "πελάτες")</strong>.
+                        Θέλετε να συνεχίσετε;
+                    </p>
+
+                    <!-- Email Preview -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <span class="text-muted small text-uppercase fw-semibold">Θέμα</span>
+                                <p class="mb-0 fw-semibold">@subject</p>
+                            </div>
+                            <hr class="my-2">
+                            <div>
+                                <span class="text-muted small text-uppercase fw-semibold">Μήνυμα</span>
+                                <p class="mb-0 mt-1 small text-muted body-preview">@(body.Length > 300 ? body[..300] + "…" : body)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recipients List -->
+                    <h6 class="mb-2">
+                        <i class="bi bi-people me-1"></i>Παραλήπτες (@selectedIds.Count)
+                    </h6>
+                    <div class="table-responsive recipients-table">
+                        <table class="table table-sm table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Πελάτης</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var customer in customers.Where(c => selectedIds.Contains(c.Id)).OrderBy(c => c.Name))
+                                {
+                                    <tr>
+                                        <td>@customer.Name</td>
+                                        <td class="text-muted">@customer.Email</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal" disabled="@isSending">
+                        <i class="bi bi-x me-1"></i>Ακύρωση
+                    </button>
+                    <button class="btn btn-primary" @onclick="ConfirmSend" disabled="@isSending">
+                        @if (isSending)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                            <span>Αποστολή...</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-send me-1"></i>
+                            <span>Αποστολή</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
