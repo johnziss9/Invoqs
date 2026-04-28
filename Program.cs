@@ -43,6 +43,7 @@ try
     builder.Services.AddScoped<IInvoiceService, InvoiceService>();
     builder.Services.AddScoped<IReceiptService, ReceiptService>();
     builder.Services.AddScoped<IStatementService, StatementService>();
+    builder.Services.AddScoped<IEmailService, EmailService>();
 
     var app = builder.Build();
 
