@@ -1,0 +1,198 @@
+@rendermode InteractiveServer
+@page "/customer-statements/new"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Νέα Κατάσταση Πελάτη - Invoqs</PageTitle>
+
+<Navbar />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item"><a href="/customer-statements" class="text-decoration-none">Καταστάσεις Πελατών</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Νέα Κατάσταση</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary mb-1">Δημιουργία Κατάστασης Πελάτη</h2>
+            <p class="text-muted mb-0">Επιλέξτε πελάτη και περίοδο για τη δημιουργία κατάστασης</p>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-lines-fill me-2"></i>Στοιχεία Κατάστασης
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@model" OnValidSubmit="HandleValidSubmit">
+                        <DataAnnotationsValidator />
+
+                        <!-- Customer selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold required">Πελάτης</label>
+                            @if (preselectedCustomer != null)
+                            {
+                                <!-- Preselected from CustomerDetails page -->
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded bg-light">
+                                    <i class="bi bi-person-circle text-primary" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <div class="fw-semibold">@preselectedCustomer.Name</div>
+                                        @if (!string.IsNullOrEmpty(preselectedCustomer.Phone))
+                                        {
+                                            <small class="text-muted">@preselectedCustomer.Phone</small>
+                                        }
+                                    </div>
+                                    <a href="/customer-statements/new" class="btn btn-sm btn-outline-secondary ms-auto">
+                                        <i class="bi bi-x me-1"></i>Αλλαγή
+                                    </a>
+                                </div>
+                            }
+                            else if (isLoadingCustomers)
+                            {
+                                <div class="d-flex align-items-center gap-2 text-muted">
+                                    <div class="spinner-border spinner-border-sm"></div>
+                                    <span>Φόρτωση πελατών...</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <!-- Autocomplete search -->
+                                <div class="position-relative">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="Πληκτρολογήστε για αναζήτηση πελάτη..."
+                                               value="@customerSearch"
+                                               @oninput="OnCustomerSearchInput"
+                                               @onfocus="ShowDropdown"
+                                               autocomplete="off" />
+                                    </div>
+
+                                    @if (selectedCustomer != null)
+                                    {
+                                        <div class="mt-2 p-2 border rounded bg-light d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-person-check text-success"></i>
+                                                <div>
+                                                    <div class="fw-semibold">@selectedCustomer.Name</div>
+                                                    @if (!string.IsNullOrEmpty(selectedCustomer.Phone))
+                                                    {
+                                                        <small class="text-muted">@selectedCustomer.Phone</small>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="ClearCustomerSelection">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
+                                    }
+
+                                    @if (showDropdown && filteredCustomers.Any())
+                                    {
+                                        <div class="position-absolute w-100 border rounded bg-white shadow-sm" style="z-index: 1000; max-height: 250px; overflow-y: auto;">
+                                            @foreach (var customer in filteredCustomers.Take(10))
+                                            {
+                                                <div class="px-3 py-2 border-bottom customer-option"
+                                                     style="cursor: pointer;"
+                                                     @onclick="() => SelectCustomer(customer)">
+                                                    <div class="fw-medium">@customer.Name</div>
+                                                    @if (!string.IsNullOrEmpty(customer.Phone))
+                                                    {
+                                                        <small class="text-muted">@customer.Phone</small>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                                @if (model.CustomerId == null && submitAttempted)
+                                {
+                                    <div class="text-danger small mt-1">Απαιτείται επιλογή πελάτη</div>
+                                }
+                            }
+                        </div>
+
+                        <hr />
+
+                        <!-- Date range -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold required">Από Ημερομηνία</label>
+                                <InputDate @bind-Value="model.StartDate" class="form-control" />
+                                <ValidationMessage For="@(() => model.StartDate)" class="text-danger small" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold required">Έως Ημερομηνία</label>
+                                <InputDate @bind-Value="model.EndDate" class="form-control" />
+                                <ValidationMessage For="@(() => model.EndDate)" class="text-danger small" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex gap-2">
+                            <button type="submit"
+                                    class="btn btn-success"
+                                    disabled="@isSubmitting"
+                                    @onclick="() => submitAttempted = true">
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    <span>Δημιουργία...</span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-file-earmark-person me-2"></i>
+                                    <span>Δημιουργία Κατάστασης</span>
+                                }
+                            </button>
+                            <a href="/customer-statements" class="btn btn-outline-secondary">Ακύρωση</a>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white py-3">
+                    <h6 class="mb-0 text-white"><i class="bi bi-lightbulb-fill me-2"></i>Βοήθεια</h6>
+                </div>
+                <div class="card-body">
+                    <ol class="small mb-0 ps-3">
+                        <li class="mb-2">Επιλέξτε τον πελάτη για τον οποίο θέλετε να δημιουργήσετε κατάσταση</li>
+                        <li class="mb-2">Επιλέξτε την περίοδο (από - έως)</li>
+                        <li class="mb-2">Πατήστε "Δημιουργία Κατάστασης"</li>
+                        <li>Μπορείτε να κατεβάσετε ή να στείλετε την κατάσταση αμέσως μετά</li>
+                    </ol>
+                    <hr />
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <small>Τα τιμολόγια σε κατάσταση Πρόχειρο δεν συμπεριλαμβάνονται.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
