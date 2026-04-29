@@ -1,0 +1,149 @@
+@rendermode InteractiveServer
+@page "/customer-statements"
+@using Invoqs.Components.UI
+@using Invoqs.Models
+
+<PageTitle>Καταστάσεις Πελατών - Invoqs</PageTitle>
+
+<Navbar />
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Πίνακας Ελέγχου</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Καταστάσεις Πελατών</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h2 class="text-primary mb-1">Καταστάσεις Πελατών</h2>
+                    <p class="text-muted mb-0">Διαχείριση καταστάσεων λογαριασμού ανά πελάτη</p>
+                </div>
+                <a href="/customer-statements/new" class="btn btn-success">
+                    <i class="bi bi-plus-lg me-2"></i>Νέα Κατάσταση
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Φόρτωση...</span>
+            </div>
+        </div>
+    }
+    else if (!statements.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-file-earmark-person text-muted" style="font-size: 3rem;"></i>
+                <h5 class="text-muted mt-3">Δεν υπάρχουν καταστάσεις ακόμα</h5>
+                <p class="text-muted mb-3">Δημιουργήστε την πρώτη κατάσταση πελάτη.</p>
+                <a href="/customer-statements/new" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i>Δημιουργία Κατάστασης
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Αριθμός</th>
+                                <th>Πελάτης</th>
+                                <th>Περίοδος</th>
+                                <th class="text-end">Σύνολο</th>
+                                <th class="text-end">Υπόλοιπο</th>
+                                <th>Κατάσταση</th>
+                                <th>Δημιουργήθηκε</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in statements)
+                            {
+                                <tr>
+                                    <td><span class="fw-medium text-primary">@s.StatementNumber</span></td>
+                                    <td>@s.CustomerName</td>
+                                    <td>
+                                        <small class="text-muted">
+                                            @s.StartDate.ToString("dd/MM/yyyy") - @s.EndDate.ToString("dd/MM/yyyy")
+                                        </small>
+                                    </td>
+                                    <td class="text-end fw-medium">€@s.TotalInvoiced.ToString("N2")</td>
+                                    <td class="text-end">
+                                        @if (s.OutstandingBalance > 0)
+                                        {
+                                            <span class="fw-bold text-danger">€@s.OutstandingBalance.ToString("N2")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-success fw-medium">€0.00</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (s.IsSent || s.IsDelivered)
+                                        {
+                                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Απεστάλη</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary"><i class="bi bi-clock me-1"></i>Εκκρεμεί</span>
+                                        }
+                                    </td>
+                                    <td><small class="text-muted">@s.CreatedDate.ToString("dd/MM/yyyy")</small></td>
+                                    <td class="text-end">
+                                        <a href="/customer-statements/@s.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> Προβολή
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="h4 text-primary mb-1">@statements.Count</div>
+                    <small class="text-muted">Σύνολο Καταστάσεων</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="h4 text-success mb-1">€@statements.Sum(s => s.TotalInvoiced).ToString("N2")</div>
+                    <small class="text-muted">Συνολικά Τιμολόγια</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="h4 text-danger mb-1">€@statements.Sum(s => s.OutstandingBalance).ToString("N2")</div>
+                    <small class="text-muted">Συνολικό Υπόλοιπο</small>
+                </div>
+            </div>
+        </div>
+    }
+</div>
