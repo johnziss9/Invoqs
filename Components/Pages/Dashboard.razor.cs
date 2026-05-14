@@ -15,6 +15,7 @@ namespace Invoqs.Components.Pages
 
         protected string currentUser = "User";
         protected bool isLoading = true;
+        protected bool showMonthlyReport = false;
         protected DashboardDataModel dashboardData = new();
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -190,6 +191,16 @@ namespace Invoqs.Components.Pages
             {
                 Navigation.NavigateTo(url, forceLoad: true);
             }
+        }
+
+        protected void OpenMonthlyReport()
+        {
+            showMonthlyReport = true;
+        }
+
+        protected void CloseMonthlyReport()
+        {
+            showMonthlyReport = false;
         }
 
         // Method to refresh dashboard data
