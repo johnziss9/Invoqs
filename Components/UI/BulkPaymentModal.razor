@@ -1,0 +1,116 @@
+@using Invoqs.Models
+
+<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Καταγραφή Πληρωμής Πελάτη</h5>
+                <button type="button" class="btn-close" @onclick="OnCancel"></button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Payment details -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label class="form-label">Συνολικό Ποσό Πληρωμής <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="number" class="form-control" value="@totalPaymentAmount"
+                                   @oninput="OnTotalAmountChanged" step="0.01" min="0.01" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Ημερομηνία Πληρωμής <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" @bind="paymentDate" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Μέθοδος Πληρωμής <span class="text-danger">*</span></label>
+                        <select class="form-select" @bind="paymentMethod">
+                            <option value="Bank Transfer">Τραπεζική Μεταφορά</option>
+                            <option value="Cash">Μετρητά</option>
+                            <option value="Cheque">Επιταγή</option>
+                            <option value="Credit Card">Πιστωτική Κάρτα</option>
+                            <option value="Other">Άλλο</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Αναφορά (προαιρετικό)</label>
+                        <input type="text" class="form-control" @bind="paymentReference"
+                               placeholder="Αριθμός συναλλαγής, επιταγής, κλπ." />
+                    </div>
+                </div>
+
+                <!-- Auto-allocate button + summary bar -->
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <button class="btn btn-outline-primary btn-sm" @onclick="AutoAllocate"
+                            disabled="@(totalPaymentAmount <= 0)">
+                        <i class="bi bi-magic me-1"></i>Αυτόματη Κατανομή (Παλαιότερα Πρώτα)
+                    </button>
+                    <div class="d-flex gap-3 text-sm">
+                        <span>Σύνολο: <strong>€@totalPaymentAmount.ToString("N2")</strong></span>
+                        <span>Κατανεμημένο: <strong class="@(TotalAllocated > totalPaymentAmount ? "text-danger" : "text-success")">€@TotalAllocated.ToString("N2")</strong></span>
+                        <span>Αδιάθετο: <strong class="@(Unallocated < 0 ? "text-danger" : "")">€@Unallocated.ToString("N2")</strong></span>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger py-2">@errorMessage</div>
+                }
+
+                <!-- Invoice allocation table -->
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Τιμολόγιο</th>
+                                <th>Κατάσταση</th>
+                                <th class="text-end">Σύνολο</th>
+                                <th class="text-end">Πληρωμένο</th>
+                                <th class="text-end">Υπόλοιπο</th>
+                                <th style="width: 160px;">Κατανομή (€)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var invoice in OutstandingInvoices.OrderBy(i => i.CreatedDate))
+                            {
+                                var allocated = allocations.ContainsKey(invoice.Id) ? allocations[invoice.Id] : 0m;
+                                var isOverAllocated = allocated > invoice.RemainingAmount;
+                                <tr>
+                                    <td>
+                                        <span class="fw-semibold">@invoice.InvoiceNumber</span>
+                                        <div class="text-muted small">@invoice.CreatedDate.ToString("dd/MM/yyyy")</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge @invoice.StatusBadgeClass">@invoice.StatusDisplay</span>
+                                    </td>
+                                    <td class="text-end">€@invoice.Total.ToString("N2")</td>
+                                    <td class="text-end">€@invoice.AmountPaid.ToString("N2")</td>
+                                    <td class="text-end fw-semibold">€@invoice.RemainingAmount.ToString("N2")</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm @(isOverAllocated ? "is-invalid" : "")"
+                                               value="@allocated"
+                                               @onchange="e => OnAllocationChanged(invoice.Id, invoice.RemainingAmount, e)"
+                                               step="0.01" min="0" max="@invoice.RemainingAmount" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="OnCancel">Ακύρωση</button>
+                <button type="button" class="btn btn-success" @onclick="Confirm"
+                        disabled="@(!CanConfirm || isSubmitting)">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                    }
+                    Καταγραφή Πληρωμής
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

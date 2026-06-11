@@ -19,6 +19,7 @@ namespace Invoqs.Interfaces
         Task<bool> MarkInvoiceAsDeliveredAsync(int invoiceId);
         Task<bool> RecordPaymentAsync(int invoiceId, decimal amount, DateTime paymentDate, string paymentMethod, string? paymentReference = null, string? notes = null);
         Task<bool> MarkInvoiceAsPaidAsync(int invoiceId, DateTime paidDate, string? paymentMethod = null, string? paymentReference = null);
+        Task<bool> RecordBulkPaymentAsync(List<(int InvoiceId, decimal Amount)> allocations, DateTime paymentDate, string paymentMethod, string? paymentReference = null, string? notes = null);
         Task<bool> CancelInvoiceAsync(int invoiceId, string? reason = null, string? notes = null);
 
         // Statistics

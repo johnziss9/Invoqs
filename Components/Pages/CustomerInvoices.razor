@@ -2,6 +2,7 @@
 @page "/customer/{customerId:int}/invoices"
 @using Invoqs.Components.UI
 @using Invoqs.Models
+@using System.Linq
 
 <PageTitle>Τιμολόγια Πελάτη - Invoqs</PageTitle>
 
@@ -34,6 +35,13 @@
                         <i class="bi bi-arrow-left me-1"></i>
                         Επιστροφή στον Πελάτη
                     </button>
+                    @if (outstandingInvoices.Any())
+                    {
+                        <button class="btn btn-success" @onclick="ShowBulkPaymentModal">
+                            <i class="bi bi-cash-stack me-1"></i>
+                            Καταγραφή Πληρωμής
+                        </button>
+                    }
                     <a href="/customer/@CustomerId/invoice/new?returnUrl=@Uri.EscapeDataString(Navigation.Uri)"
                         class="btn btn-primary">
                         <i class="bi bi-plus-lg me-1"></i>
@@ -291,15 +299,22 @@
             @foreach (var invoice in filteredInvoices)
             {
                 <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-                    <InvoiceCard Invoice="invoice" 
-                                OnView="HandleViewInvoice" 
+                    <InvoiceCard Invoice="invoice"
+                                OnView="HandleViewInvoice"
                                 OnEdit="HandleEditInvoice"
-                                OnMarkAsSent="HandleMarkAsSent" 
+                                OnMarkAsSent="HandleMarkAsSent"
                                 OnMarkAsDelivered="HandleMarkAsDelivered"
-                                OnMarkAsPaid="HandleMarkAsPaid" 
+                                OnMarkAsPaid="HandleMarkAsPaid"
                                 OnCancel="HandleCancelInvoice" />
                 </div>
             }
         </div>
     }
 </div>
+
+@if (showBulkPaymentModal)
+{
+    <BulkPaymentModal OutstandingInvoices="outstandingInvoices"
+                      OnConfirm="HandleBulkPayment"
+                      OnCancel="() => showBulkPaymentModal = false" />
+}

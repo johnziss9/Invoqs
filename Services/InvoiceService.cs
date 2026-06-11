@@ -347,6 +347,39 @@ namespace Invoqs.Services
             }
         }
 
+        public async Task<bool> RecordBulkPaymentAsync(List<(int InvoiceId, decimal Amount)> allocations, DateTime paymentDate, string paymentMethod, string? paymentReference = null, string? notes = null)
+        {
+            try
+            {
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
+                var request = new
+                {
+                    PaymentDate = paymentDate,
+                    PaymentMethod = paymentMethod,
+                    PaymentReference = paymentReference,
+                    Notes = notes,
+                    Allocations = allocations.Select(a => new { InvoiceId = a.InvoiceId, Amount = a.Amount }).ToList()
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("invoices/bulk-payment", request);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return false;
+                }
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error recording bulk payment: {ex.Message}");
+                return false;
+            }
+        }
+
         public async Task<bool> CancelInvoiceAsync(int invoiceId, string? reason = null, string? notes = null)
         {
             try
