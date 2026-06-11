@@ -3,6 +3,7 @@ using Invoqs.Models;
 using Invoqs.Interfaces;
 using Microsoft.JSInterop;
 using Invoqs.Components.UI;
+using System.Linq;
 
 namespace Invoqs.Components.Pages
 {
@@ -25,6 +26,10 @@ namespace Invoqs.Components.Pages
         protected List<InvoiceModel> customerInvoices = new();
         protected decimal totalValue = 0;
         protected decimal totalOutstanding = 0;
+
+        // Bulk payment state
+        protected bool showBulkPaymentModal = false;
+        protected List<InvoiceModel> outstandingInvoices = new();
 
         // Filter state
         protected string searchTerm = "";
@@ -67,11 +72,13 @@ namespace Invoqs.Components.Pages
 
                 // Calculate totals
                 totalValue = customerInvoices.Sum(i => i.Total);
-                totalOutstanding = customerInvoices
+                outstandingInvoices = customerInvoices
                     .Where(i => i.Status == InvoiceStatus.Sent ||
                                 i.Status == InvoiceStatus.Delivered ||
-                                i.Status == InvoiceStatus.Overdue)
-                    .Sum(i => i.Total);
+                                i.Status == InvoiceStatus.Overdue ||
+                                i.Status == InvoiceStatus.PartiallyPaid)
+                    .ToList();
+                totalOutstanding = outstandingInvoices.Sum(i => i.RemainingAmount);
             }
             catch (Exception ex)
             {
@@ -247,6 +254,42 @@ namespace Invoqs.Components.Pages
             catch (Exception ex)
             {
                 errorMessage = $"Error marking invoice as paid: {ex.Message}";
+                StateHasChanged();
+            }
+        }
+
+        protected void ShowBulkPaymentModal()
+        {
+            showBulkPaymentModal = true;
+        }
+
+        protected async Task HandleBulkPayment(BulkPaymentConfirmArgs args)
+        {
+            try
+            {
+                var success = await InvoiceService.RecordBulkPaymentAsync(
+                    args.Allocations,
+                    args.PaymentDate,
+                    args.PaymentMethod,
+                    args.PaymentReference
+                );
+
+                showBulkPaymentModal = false;
+
+                if (success)
+                {
+                    await LoadData();
+                }
+                else
+                {
+                    errorMessage = "Αποτυχία καταγραφής πληρωμής. Παρακαλώ προσπαθήστε ξανά.";
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                showBulkPaymentModal = false;
+                errorMessage = $"Σφάλμα κατά την καταγραφή πληρωμής: {ex.Message}";
                 StateHasChanged();
             }
         }
