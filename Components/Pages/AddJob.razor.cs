@@ -33,9 +33,15 @@ namespace Invoqs.Components.Pages
         // Address autocomplete properties
         protected string addressInputValue = "";
         protected List<string> addressSuggestions = new();
-        private List<string> allLoadedAddresses = new(); // Store all addresses for client-side filtering
+        private List<string> allLoadedAddresses = new();
         protected bool showAddressSuggestions = false;
         protected bool isSearchingAddresses = false;
+
+        // Title autocomplete properties
+        protected string titleInputValue = "";
+        protected List<string> titleSuggestions = new();
+        private List<string> allLoadedTitles = new();
+        protected bool showTitleSuggestions = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -81,13 +87,15 @@ namespace Invoqs.Components.Pages
             newJob = new JobModel
             {
                 CustomerId = CustomerId,
-                JobDate = DateTime.Today, // Default to today
-                Type = JobType.SkipRental, // Default type
+                JobDate = DateTime.Today,
+                Type = JobType.SkipRental,
                 CreatedDate = DateTime.Now
             };
 
-            // Reset address input value
             addressInputValue = "";
+            titleInputValue = "";
+            allLoadedAddresses.Clear();
+            allLoadedTitles.Clear();
 
             UpdateJobTypeDisplay();
         }
@@ -115,7 +123,74 @@ namespace Invoqs.Components.Pages
         private void OnCustomerChanged()
         {
             selectedCustomer = customers.FirstOrDefault(c => c.Id == newJob.CustomerId);
+            // Reset loaded suggestions so they are re-fetched for the new customer
+            allLoadedAddresses.Clear();
+            allLoadedTitles.Clear();
             StateHasChanged();
+        }
+
+        protected async Task OnTitleFocus()
+        {
+            if (newJob.CustomerId > 0)
+                await LoadCustomerTitles();
+        }
+
+        private async Task LoadCustomerTitles()
+        {
+            try
+            {
+                allLoadedTitles = await JobService.SearchTitlesAsync("", newJob.CustomerId);
+                titleSuggestions = allLoadedTitles;
+                showTitleSuggestions = titleSuggestions.Any();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading titles: {ex.Message}");
+                allLoadedTitles.Clear();
+                titleSuggestions.Clear();
+                showTitleSuggestions = false;
+            }
+        }
+
+        protected void OnTitleInput(ChangeEventArgs e)
+        {
+            var value = e.Value?.ToString() ?? "";
+            titleInputValue = value;
+            newJob.Title = value;
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                titleSuggestions = allLoadedTitles;
+                showTitleSuggestions = titleSuggestions.Any();
+                return;
+            }
+
+            titleSuggestions = allLoadedTitles
+                .Where(t => t.Contains(value, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            showTitleSuggestions = titleSuggestions.Any();
+        }
+
+        protected void SelectTitle(string title)
+        {
+            titleInputValue = title;
+            newJob.Title = title;
+            showTitleSuggestions = false;
+            titleSuggestions.Clear();
+            StateHasChanged();
+        }
+
+        protected void HideTitleSuggestions()
+        {
+            Task.Delay(200).ContinueWith(_ =>
+            {
+                InvokeAsync(() =>
+                {
+                    showTitleSuggestions = false;
+                    StateHasChanged();
+                });
+            });
         }
 
         protected async Task OnAddressFocus()

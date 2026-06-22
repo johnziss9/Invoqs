@@ -242,20 +242,16 @@ namespace Invoqs.Services
         {
             try
             {
-                // Build query string
                 var queryString = $"query={Uri.EscapeDataString(query ?? "")}";
-                
-                // Add customerId if provided
+
                 if (customerId.HasValue && customerId.Value > 0)
-                {
                     queryString += $"&customerId={customerId.Value}";
-                }
 
                 var token = await _authService.GetTokenAsync();
                 _authService.AddAuthorizationHeader(_httpClient, token);
 
                 var response = await _httpClient.GetAsync($"jobs/addresses/search?{queryString}");
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authService.LogoutAsync();
@@ -270,6 +266,38 @@ namespace Invoqs.Services
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"Error searching addresses: {ex.Message}");
+                return new List<string>();
+            }
+        }
+
+        public async Task<List<string>> SearchTitlesAsync(string query, int? customerId = null)
+        {
+            try
+            {
+                var queryString = $"query={Uri.EscapeDataString(query ?? "")}";
+
+                if (customerId.HasValue && customerId.Value > 0)
+                    queryString += $"&customerId={customerId.Value}";
+
+                var token = await _authService.GetTokenAsync();
+                _authService.AddAuthorizationHeader(_httpClient, token);
+
+                var response = await _httpClient.GetAsync($"jobs/titles/search?{queryString}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authService.LogoutAsync();
+                    return new List<string>();
+                }
+
+                response.EnsureSuccessStatusCode();
+
+                var titles = await response.Content.ReadFromJsonAsync<List<string>>(_jsonOptions);
+                return titles ?? new List<string>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error searching titles: {ex.Message}");
                 return new List<string>();
             }
         }
