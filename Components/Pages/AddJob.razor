@@ -90,7 +90,28 @@
                                 <!-- Job Title -->
                                 <div class="col-12">
                                     <label class="form-label required">Τίτλος Εργασίας</label>
-                                    <InputText @bind-Value="newJob.Title" class="@GetFieldErrorClass("Title")" placeholder="Εισάγετε τίτλο εργασίας" />
+                                    <div class="position-relative">
+                                        <input type="text"
+                                               class="@GetFieldErrorClass("Title")"
+                                               value="@titleInputValue"
+                                               @oninput="OnTitleInput"
+                                               @onfocus="OnTitleFocus"
+                                               @onblur="HideTitleSuggestions"
+                                               placeholder="Εισάγετε τίτλο εργασίας"
+                                               autocomplete="off" />
+                                        @if (showTitleSuggestions && titleSuggestions.Any())
+                                        {
+                                            <div class="address-suggestions">
+                                                @foreach (var suggestion in titleSuggestions)
+                                                {
+                                                    <div class="address-suggestion-item" @onmousedown="@(() => SelectTitle(suggestion))">
+                                                        <i class="bi bi-briefcase me-2 text-muted"></i>
+                                                        @suggestion
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
                                     <ValidationMessage For="@(() => newJob.Title)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Title").Any() == true)
                                     {

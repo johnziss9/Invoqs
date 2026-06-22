@@ -24,5 +24,6 @@ namespace Invoqs.Interfaces
         Task<bool> CanJobBeInvoicedAsync(int jobId);
         Task<bool> CanJobsBeInvoicedAsync(List<int> jobIds);
         Task<List<string>> SearchAddressesAsync(string query, int? customerId = null);
+        Task<List<string>> SearchTitlesAsync(string query, int? customerId = null);
     }
 }
