@@ -92,8 +92,8 @@
                                     <label class="form-label required">Τίτλος Εργασίας</label>
                                     <div class="position-relative">
                                         <input type="text"
+                                               @ref="titleInputRef"
                                                class="@GetFieldErrorClass("Title")"
-                                               value="@titleInputValue"
                                                @oninput="OnTitleInput"
                                                @onfocus="OnTitleFocus"
                                                @onblur="HideTitleSuggestions"
@@ -273,8 +273,8 @@
                                     <label class="form-label required">Διεύθυνση Υπηρεσίας</label>
                                     <div class="position-relative">
                                         <input type="text"
+                                            @ref="addressInputRef"
                                             class="@GetFieldErrorClass("Address")"
-                                            value="@addressInputValue"
                                             @oninput="OnAddressInput"
                                             @onfocus="OnAddressFocus"
                                             @onblur="HideAddressSuggestions"

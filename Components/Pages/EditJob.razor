@@ -94,7 +94,28 @@
                                 <!-- Job Title -->
                                 <div class="col-12">
                                     <label class="form-label required">Τίτλος Εργασίας</label>
-                                    <InputText @bind-Value="job.Title" class="@GetFieldErrorClass("Title")" placeholder="Εισάγετε τίτλο εργασίας" disabled="@isInvoiced" />
+                                    <div class="position-relative">
+                                        <input type="text"
+                                               @ref="titleInputRef"
+                                               class="@GetFieldErrorClass("Title")"
+                                               placeholder="Εισάγετε τίτλο εργασίας"
+                                               @oninput="OnTitleInput"
+                                               @onfocus="OnTitleFocus"
+                                               @onblur="HideTitleSuggestions"
+                                               disabled="@isInvoiced"
+                                               autocomplete="off" />
+                                        @if (showTitleSuggestions && titleSuggestions.Any())
+                                        {
+                                            <div class="address-suggestions">
+                                                @foreach (var suggestion in titleSuggestions)
+                                                {
+                                                    <div class="address-suggestion-item" @onmousedown="@(() => SelectTitle(suggestion))">
+                                                        @suggestion
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
                                     <ValidationMessage For="@(() => job.Title)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Title").Any() == true)
                                     {
@@ -256,8 +277,8 @@
                                     <label class="form-label required">Διεύθυνση Υπηρεσίας</label>
                                     <div class="position-relative">
                                         <input type="text"
+                                               @ref="addressInputRef"
                                                class="@GetFieldErrorClass("Address")"
-                                               value="@addressInputValue"
                                                @oninput="OnAddressInput"
                                                @onfocus="OnAddressFocus"
                                                @onblur="HideAddressSuggestions"
