@@ -31,6 +31,7 @@ namespace Invoqs.Components.Pages
         private ApiValidationError? validationErrors;
 
         // Address autocomplete properties
+        protected ElementReference addressInputRef;
         protected string addressInputValue = "";
         protected List<string> addressSuggestions = new();
         private List<string> allLoadedAddresses = new();
@@ -38,6 +39,7 @@ namespace Invoqs.Components.Pages
         protected bool isSearchingAddresses = false;
 
         // Title autocomplete properties
+        protected ElementReference titleInputRef;
         protected string titleInputValue = "";
         protected List<string> titleSuggestions = new();
         private List<string> allLoadedTitles = new();
@@ -172,13 +174,13 @@ namespace Invoqs.Components.Pages
             showTitleSuggestions = titleSuggestions.Any();
         }
 
-        protected void SelectTitle(string title)
+        protected async Task SelectTitle(string title)
         {
             titleInputValue = title;
             newJob.Title = title;
             showTitleSuggestions = false;
             titleSuggestions.Clear();
-            StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("setInputValue", titleInputRef, title);
         }
 
         protected void HideTitleSuggestions()
@@ -390,14 +392,13 @@ namespace Invoqs.Components.Pages
             showAddressSuggestions = addressSuggestions.Any();
         }
 
-        protected void SelectAddress(string address)
+        protected async Task SelectAddress(string address)
         {
-            // Update both the input value and the model
             addressInputValue = address;
             newJob.Address = address;
             showAddressSuggestions = false;
             addressSuggestions.Clear();
-            StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("setInputValue", addressInputRef, address);
         }
 
         protected void HideAddressSuggestions()

@@ -30,12 +30,22 @@ namespace Invoqs.Components.Pages
 
         private ApiValidationError? validationErrors;
 
+        // Title autocomplete properties
+        protected ElementReference titleInputRef;
+        protected string titleInputValue = "";
+        protected List<string> titleSuggestions = new();
+        private List<string> allLoadedTitles = new();
+        protected bool showTitleSuggestions = false;
+
         // Address autocomplete properties
+        protected ElementReference addressInputRef;
         protected string addressInputValue = "";
         protected List<string> addressSuggestions = new();
         private List<string> allLoadedAddresses = new(); // Store all addresses for client-side filtering
         protected bool showAddressSuggestions = false;
         protected bool isSearchingAddresses = false;
+
+        private bool _inputsInitialized = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -47,6 +57,16 @@ namespace Invoqs.Components.Pages
             if (JobId > 0)
             {
                 await LoadJob();
+            }
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (!isLoading && !_inputsInitialized && job != null)
+            {
+                _inputsInitialized = true;
+                await JSRuntime.InvokeVoidAsync("setInputValue", titleInputRef, titleInputValue);
+                await JSRuntime.InvokeVoidAsync("setInputValue", addressInputRef, addressInputValue);
             }
         }
 
@@ -70,7 +90,8 @@ namespace Invoqs.Components.Pages
                 isInvoiced = job.IsInvoiced;
                 isCustomerDeleted = job.CustomerIsDeleted;
 
-                // Initialize address input value with job's address
+                // Initialize input values with job's existing data
+                titleInputValue = job.Title ?? "";
                 addressInputValue = job.Address ?? "";
 
                 // Determine if job can be deleted
@@ -128,7 +149,8 @@ namespace Invoqs.Components.Pages
                 successMessage = "";
                 validationErrors = null;
 
-                // Sync the address from input to model before submitting
+                // Sync the inputs from input to model before submitting
+                job.Title = titleInputValue;
                 job.Address = addressInputValue;
 
                 var (success, errors) = await JobService.UpdateJobAsync(job);
@@ -273,10 +295,82 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        protected async Task OnTitleFocus()
+        {
+            if (job == null) return;
+
+            if (job.CustomerId > 0 && !isInvoiced)
+                await LoadCustomerTitles();
+        }
+
+        private async Task LoadCustomerTitles()
+        {
+            if (job == null) return;
+
+            try
+            {
+                allLoadedTitles = await JobService.SearchTitlesAsync("", job.CustomerId);
+                titleSuggestions = allLoadedTitles;
+                showTitleSuggestions = titleSuggestions.Any();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading titles: {ex.Message}");
+                allLoadedTitles.Clear();
+                titleSuggestions.Clear();
+                showTitleSuggestions = false;
+            }
+        }
+
+        protected void OnTitleInput(ChangeEventArgs e)
+        {
+            if (job == null) return;
+
+            var value = e.Value?.ToString() ?? "";
+            titleInputValue = value;
+            job.Title = value;
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                titleSuggestions = allLoadedTitles;
+                showTitleSuggestions = titleSuggestions.Any();
+                return;
+            }
+
+            titleSuggestions = allLoadedTitles
+                .Where(t => t.Contains(value, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            showTitleSuggestions = titleSuggestions.Any();
+        }
+
+        protected async Task SelectTitle(string title)
+        {
+            if (job == null) return;
+
+            titleInputValue = title;
+            job.Title = title;
+            showTitleSuggestions = false;
+            titleSuggestions.Clear();
+            await JSRuntime.InvokeVoidAsync("setInputValue", titleInputRef, title);
+        }
+
+        protected void HideTitleSuggestions()
+        {
+            Task.Delay(200).ContinueWith(_ =>
+            {
+                InvokeAsync(() =>
+                {
+                    showTitleSuggestions = false;
+                    StateHasChanged();
+                });
+            });
+        }
+
         protected async Task OnAddressFocus()
         {
             if (job == null) return;
-            
+
             // Show all customer addresses on focus
             if (job.CustomerId > 0 && !isInvoiced)
             {
@@ -372,16 +466,15 @@ namespace Invoqs.Components.Pages
             showAddressSuggestions = addressSuggestions.Any();
         }
 
-        protected void SelectAddress(string address)
+        protected async Task SelectAddress(string address)
         {
             if (job == null) return;
 
-            // Update both the input value and the model
             addressInputValue = address;
             job.Address = address;
             showAddressSuggestions = false;
             addressSuggestions.Clear();
-            StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("setInputValue", addressInputRef, address);
         }
 
         protected void HideAddressSuggestions()
