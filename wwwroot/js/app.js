@@ -1,8 +1,3 @@
-// Set an input element's value directly without Blazor re-render interference
-window.setInputValue = function (element, value) {
-    if (element) element.value = value;
-};
-
 // File download helper
 window.downloadFile = function (fileName, contentType, data) {
     // Convert byte array to blob
