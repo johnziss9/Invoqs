@@ -148,7 +148,20 @@
                                                 <td><span class="text-muted small">@(string.IsNullOrEmpty(invoice.JobAddress) ? "—" : invoice.JobAddress)</span></td>
                                                 <td><span class="badge @GetStatusBadgeClass(invoice.Status)">@TranslateStatus(invoice.Status)</span></td>
                                                 <td>
-                                                    @if (!string.IsNullOrEmpty(invoice.PaymentMethod))
+                                                    @if (invoice.Payments.Any())
+                                                    {
+                                                        @foreach (var payment in invoice.Payments)
+                                                        {
+                                                            <div class="@(invoice.Status == InvoiceStatus.PartiallyPaid ? "text-warning" : "text-success") small">
+                                                                €@payment.Amount.ToString("N2") @TranslatePaymentMethod(payment.PaymentMethod)
+                                                                @if (!string.IsNullOrEmpty(payment.PaymentReference))
+                                                                {
+                                                                    <span class="text-muted"> (@payment.PaymentReference)</span>
+                                                                }
+                                                            </div>
+                                                        }
+                                                    }
+                                                    else if (!string.IsNullOrEmpty(invoice.PaymentMethod))
                                                     {
                                                         <span>@TranslatePaymentMethod(invoice.PaymentMethod)</span>
                                                         @if (!string.IsNullOrEmpty(invoice.PaymentReference))
@@ -163,7 +176,13 @@
                                                 </td>
                                                 <td class="text-end">€@invoice.Subtotal.ToString("N2")</td>
                                                 <td class="text-end">€@invoice.VatAmount.ToString("N2")</td>
-                                                <td class="text-end fw-medium">€@invoice.Total.ToString("N2")</td>
+                                                <td class="text-end fw-medium">
+                                                    €@invoice.Total.ToString("N2")
+                                                    @if (invoice.AmountRemaining.HasValue)
+                                                    {
+                                                        <div class="text-warning small">Υπόλοιπο: €@invoice.AmountRemaining.Value.ToString("N2")</div>
+                                                    }
+                                                </td>
                                                 <td class="text-end">
                                                     <a href="/invoice/@invoice.InvoiceId" class="btn btn-sm btn-outline-primary">
                                                         <i class="bi bi-eye"></i>
