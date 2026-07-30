@@ -33,6 +33,10 @@ namespace Invoqs.Components.Pages
         protected string? errorMessage = null;
         protected decimal? discountAmount = null;
 
+        // Duplicate receipt warning modal
+        protected bool showDuplicateWarning = false;
+        protected List<InvoiceModel> conflictingInvoices = new();
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -95,9 +99,9 @@ namespace Invoqs.Components.Pages
             {
                 allInvoices = await InvoiceService.GetInvoicesByCustomerIdAsync(selectedCustomerId);
 
-                // Filter to only paid invoices
+                // Filter to paid and partially paid invoices
                 allInvoices = allInvoices
-                    .Where(i => i.Status == InvoiceStatus.Paid && !i.HasReceipt)
+                    .Where(i => i.Status == InvoiceStatus.Paid || i.Status == InvoiceStatus.PartiallyPaid)
                     .OrderByDescending(i => i.CreatedDate)
                     .ToList();
 
@@ -174,7 +178,7 @@ namespace Invoqs.Components.Pages
         {
             return allInvoices
                 .Where(i => selectedInvoiceIds.Contains(i.Id))
-                .Sum(i => i.Total);
+                .Sum(i => i.Status == InvoiceStatus.PartiallyPaid ? i.AmountPaid : i.Total);
         }
 
         protected decimal CalculateAmountToPay()
@@ -217,6 +221,24 @@ namespace Invoqs.Components.Pages
                 return;
             }
 
+            // Check if any selected invoices already appear on existing receipts
+            conflictingInvoices = allInvoices
+                .Where(i => selectedInvoiceIds.Contains(i.Id) && i.ExistingReceipts.Any())
+                .ToList();
+
+            if (conflictingInvoices.Any())
+            {
+                showDuplicateWarning = true;
+                StateHasChanged();
+                return;
+            }
+
+            await SubmitCreateReceipt();
+        }
+
+        protected async Task SubmitCreateReceipt()
+        {
+            showDuplicateWarning = false;
             isCreating = true;
 
             try

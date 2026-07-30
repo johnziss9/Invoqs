@@ -80,6 +80,7 @@ namespace Invoqs.Models
         public string? CancellationReason { get; set; }
         public string? CancellationNotes { get; set; }
         public bool HasReceipt { get; set; }
+        public List<InvoiceReceiptRefModel> ExistingReceipts { get; set; } = new();
 
         // Payment tracking
         public decimal AmountPaid { get; set; }
@@ -154,6 +155,12 @@ namespace Invoqs.Models
         {
             return $"INV-{DateTime.Now.Year}-{invoiceId:D4}";
         }
+    }
+
+    public class InvoiceReceiptRefModel
+    {
+        public int Id { get; set; }
+        public string ReceiptNumber { get; set; } = string.Empty;
     }
 
     public enum InvoiceStatus
