@@ -209,9 +209,16 @@
                                 <tbody>
                                     @foreach (var invoice in receipt.Invoices)
                                     {
+                                        var hasMultiplePayments = invoice.Payments.Count > 1;
+                                        var isExpanded = expandedInvoiceIds.Contains(invoice.InvoiceId);
+
                                         <tr>
                                             <td>
                                                 <span class="fw-medium text-primary">@invoice.InvoiceNumber</span>
+                                                @if (invoice.InvoiceStatus == InvoiceStatus.PartiallyPaid)
+                                                {
+                                                    <span class="badge bg-warning ms-2" style="font-size: 0.7em;">Μερική</span>
+                                                }
                                             </td>
                                             <td>
                                                 <span class="text-muted">@invoice.InvoiceDate.ToString("dd MMM yyyy")</span>
@@ -220,7 +227,15 @@
                                                 <span class="fw-medium">€@invoice.AllocatedAmount.ToString("N2")</span>
                                             </td>
                                             <td>
-                                                @if (invoice.PaymentDate.HasValue)
+                                                @if (hasMultiplePayments)
+                                                {
+                                                    <button class="btn btn-sm btn-link p-0 text-decoration-none"
+                                                            @onclick="() => TogglePaymentExpansion(invoice.InvoiceId)">
+                                                        <i class="bi @(isExpanded ? "bi-chevron-up" : "bi-chevron-down") me-1"></i>
+                                                        @invoice.Payments.Count πληρωμές
+                                                    </button>
+                                                }
+                                                else if (invoice.PaymentDate.HasValue)
                                                 {
                                                     <span class="text-muted">@invoice.PaymentDate.Value.ToString("dd MMM yyyy")</span>
                                                 }
@@ -230,7 +245,7 @@
                                                 }
                                             </td>
                                             <td>
-                                                @if (!string.IsNullOrWhiteSpace(invoice.PaymentMethod))
+                                                @if (!hasMultiplePayments && !string.IsNullOrWhiteSpace(invoice.PaymentMethod))
                                                 {
                                                     <div>
                                                         <span class="badge bg-info">@TranslatePaymentMethod(invoice.PaymentMethod)</span>
@@ -240,7 +255,7 @@
                                                         }
                                                     </div>
                                                 }
-                                                else
+                                                else if (!hasMultiplePayments)
                                                 {
                                                     <span class="text-muted">-</span>
                                                 }
@@ -251,6 +266,32 @@
                                                 </a>
                                             </td>
                                         </tr>
+
+                                        @if (hasMultiplePayments && isExpanded)
+                                        {
+                                            foreach (var payment in invoice.Payments)
+                                            {
+                                                <tr class="table-light">
+                                                    <td class="ps-4 text-muted">
+                                                        <i class="bi bi-arrow-return-right small"></i>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">@payment.PaymentDate.ToString("dd MMM yyyy")</small>
+                                                    </td>
+                                                    <td>
+                                                        <small class="fw-medium">€@payment.Amount.ToString("N2")</small>
+                                                    </td>
+                                                    <td colspan="2">
+                                                        <span class="badge bg-info">@TranslatePaymentMethod(payment.PaymentMethod)</span>
+                                                        @if (!string.IsNullOrWhiteSpace(payment.PaymentReference))
+                                                        {
+                                                            <small class="text-muted ms-2">@payment.PaymentReference</small>
+                                                        }
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                            }
+                                        }
                                     }
                                 </tbody>
                                 <tfoot class="table-light">

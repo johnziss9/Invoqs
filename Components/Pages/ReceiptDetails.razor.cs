@@ -18,6 +18,14 @@ namespace Invoqs.Components.Pages
         protected ReceiptModel? receipt;
         protected bool isLoading = true;
         protected string errorMessage = string.Empty;
+        private HashSet<int> expandedInvoiceIds = new();
+
+        protected void TogglePaymentExpansion(int invoiceId)
+        {
+            if (!expandedInvoiceIds.Add(invoiceId))
+                expandedInvoiceIds.Remove(invoiceId);
+            StateHasChanged();
+        }
 
         private bool showDeleteConfirmation = false;
         private bool isDeleting = false;
