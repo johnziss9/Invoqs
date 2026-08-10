@@ -76,13 +76,17 @@
 
         <div class="customer-stats mb-3">
             <div class="row text-center">
-                <div class="col-6">
+                <div class="col-4">
                     <div class="stat-number text-primary fw-bold">@Customer.TotalJobs</div>
                     <div class="stat-label text-muted small">Σύνολο Εργασιών</div>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                     <div class="stat-number text-success fw-bold">€@Customer.TotalRevenue.ToString("N0")</div>
                     <div class="stat-label text-muted small">Έσοδα</div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-number fw-bold @(Customer.OutstandingAmount > 0 ? "text-danger" : "text-muted")">€@Customer.OutstandingAmount.ToString("N0")</div>
+                    <div class="stat-label text-muted small">Οφειλές</div>
                 </div>
             </div>
         </div>
