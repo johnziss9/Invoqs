@@ -248,6 +248,20 @@ namespace Invoqs.Components.Pages
             }
         }
 
+        private string StatusBadgeClass(InvoiceStatus status)
+        {
+            return status switch
+            {
+                InvoiceStatus.Sent => "bg-primary",
+                InvoiceStatus.Delivered => "bg-info",
+                InvoiceStatus.PartiallyPaid => "bg-warning",
+                InvoiceStatus.Paid => "bg-success",
+                InvoiceStatus.Overdue => "bg-danger",
+                InvoiceStatus.Cancelled => "bg-dark",
+                _ => "bg-secondary"
+            };
+        }
+
         private string TranslateStatus(InvoiceStatus status)
         {
             return status switch
