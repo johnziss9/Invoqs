@@ -126,10 +126,24 @@
                         {
                             <div class="alert alert-info mb-0">
                                 <i class="bi bi-info-circle-fill me-2"></i>
-                                Δεν βρέθηκαν πληρωμένα ή μερικώς πληρωμένα τιμολόγια για αυτόν τον πελάτη
-                                @if (!string.IsNullOrEmpty(selectedAddress))
+                                @if (fullyReceiptedCount > 0 && !allInvoices.Any())
                                 {
-                                    <text> στη διεύθυνση: @selectedAddress</text>
+                                    <text>
+                                        Όλα τα πληρωμένα τιμολόγια αυτού του πελάτη βρίσκονται ήδη σε απόδειξη.
+                                        <a href="/customer/@selectedCustomerId/receipts" class="alert-link">
+                                            Προβολή αποδείξεων πελάτη
+                                        </a>
+                                    </text>
+                                }
+                                else
+                                {
+                                    <text>
+                                        Δεν βρέθηκαν πληρωμένα ή μερικώς πληρωμένα τιμολόγια για αυτόν τον πελάτη
+                                        @if (!string.IsNullOrEmpty(selectedAddress))
+                                        {
+                                            <text> στη διεύθυνση: @selectedAddress</text>
+                                        }
+                                    </text>
                                 }
                             </div>
                         }
@@ -164,12 +178,6 @@
                                                 </td>
                                                 <td>
                                                     <strong>@invoice.InvoiceNumber</strong>
-                                                    @if (invoice.ExistingReceipts.Any())
-                                                    {
-                                                        <span class="badge bg-secondary ms-2" style="font-size: 0.7em;" title="Already on @string.Join(", ", invoice.ExistingReceipts.Select(r => r.ReceiptNumber))">
-                                                            <i class="bi bi-receipt me-1"></i>@invoice.ExistingReceipts.Count
-                                                        </span>
-                                                    }
                                                 </td>
                                                 <td>
                                                     <small class="text-muted">@invoice.Address</small>
@@ -182,15 +190,25 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-end">
-                                                    @if (invoice.Status == InvoiceStatus.PartiallyPaid)
+                                                    <strong>€@invoice.UnreceiptedAmount.ToString("N2")</strong>
+                                                    @if (invoice.Status == InvoiceStatus.PartiallyPaid && invoice.ReceiptedAmount <= 0)
                                                     {
-                                                        <strong>€@invoice.AmountPaid.ToString("N2")</strong>
                                                         <br />
                                                         <small class="text-muted">από €@invoice.Total.ToString("N2")</small>
                                                     }
-                                                    else
+                                                    @if (invoice.ReceiptedAmount > 0)
                                                     {
-                                                        <strong>€@invoice.Total.ToString("N2")</strong>
+                                                        <br />
+                                                        <small class="text-muted">
+                                                            €@invoice.ReceiptedAmount.ToString("N2") ήδη σε απόδειξη
+                                                            @foreach (var r in invoice.ExistingReceipts)
+                                                            {
+                                                                <a href="/receipt/@r.Id"
+                                                                   class="text-decoration-none ms-1"
+                                                                   @onclick="() => { }"
+                                                                   @onclick:stopPropagation="true">@r.ReceiptNumber</a>
+                                                            }
+                                                        </small>
                                                     }
                                                 </td>
                                             </tr>
@@ -332,71 +350,3 @@
     </div>
 </div>
 
-@if (showDuplicateWarning)
-{
-    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>
-                        Τιμολόγια που Υπάρχουν ήδη σε Αποδείξεις
-                    </h5>
-                    <button type="button" class="btn-close" @onclick="() => showDuplicateWarning = false"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-muted mb-3">
-                        Τα παρακάτω τιμολόγια που επιλέξατε εμφανίζονται ήδη σε υπάρχουσες αποδείξεις.
-                        Θέλετε να συνεχίσετε και να δημιουργήσετε νέα απόδειξη;
-                    </p>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-bordered mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Τιμολόγιο</th>
-                                    <th>Υπάρχουσες Αποδείξεις</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var invoice in conflictingInvoices)
-                                {
-                                    <tr>
-                                        <td class="fw-medium">@invoice.InvoiceNumber</td>
-                                        <td>
-                                            @foreach (var r in invoice.ExistingReceipts)
-                                            {
-                                                <a href="/receipt/@r.Id" target="_blank"
-                                                   class="badge bg-secondary text-decoration-none me-1">
-                                                    @r.ReceiptNumber
-                                                </a>
-                                            }
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary"
-                            @onclick="() => showDuplicateWarning = false">
-                        <i class="bi bi-arrow-left me-1"></i>Ακύρωση
-                    </button>
-                    <button type="button" class="btn btn-success"
-                            @onclick="SubmitCreateReceipt"
-                            disabled="@isCreating">
-                        @if (isCreating)
-                        {
-                            <span class="spinner-border spinner-border-sm me-2"></span>
-                        }
-                        else
-                        {
-                            <i class="bi bi-receipt me-1"></i>
-                        }
-                        Δημιουργία Απόδειξης
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
