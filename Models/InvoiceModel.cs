@@ -82,6 +82,11 @@ namespace Invoqs.Models
         public bool HasReceipt { get; set; }
         public List<InvoiceReceiptRefModel> ExistingReceipts { get; set; } = new();
 
+        // Receipt allocation tracking - how much of this invoice live receipts already cover,
+        // and how much is still available to put on a new receipt
+        public decimal ReceiptedAmount { get; set; }
+        public decimal UnreceiptedAmount { get; set; }
+
         // Payment tracking
         public decimal AmountPaid { get; set; }
         public decimal RemainingAmount { get; set; }
