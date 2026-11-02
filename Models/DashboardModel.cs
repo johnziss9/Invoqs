@@ -15,6 +15,7 @@ namespace Invoqs.Models
         public int ForkLiftServices { get; set; }
         public int Transfers { get; set; }
         public int SellForklifts { get; set; }
+        public int SellSkips { get; set; }
 
         // Customer metrics
         public int TotalCustomers { get; set; }

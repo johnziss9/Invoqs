@@ -11,14 +11,6 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Job type icon styling */
-.job-type-image {
-    width: 48px;
-    height: 48px;
-    object-fit: contain;
-    filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(200deg) brightness(104%) contrast(97%);
-}
-
 /* Badge styling */
 .job-card .badge {
     border-radius: 6px;

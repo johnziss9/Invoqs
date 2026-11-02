@@ -24,10 +24,6 @@ namespace Invoqs.Components.Pages
         protected string errorMessage = "";
         protected string successMessage = "";
 
-        // Job type display properties
-        protected string jobTypeIcon = "";
-        protected string jobTypeDisplayName = "";
-
         private ApiValidationError? validationErrors;
 
         // Address autocomplete properties
@@ -232,24 +228,6 @@ namespace Invoqs.Components.Pages
 
         private void UpdateJobTypeDisplay()
         {
-            jobTypeIcon = newJob.Type switch
-            {
-                JobType.SkipRental => "icon-skip",
-                JobType.SandDelivery => "icon-delivery-truck",
-                JobType.ForkLiftService => "icon-cliff",
-                JobType.Transfer => "icon-transfer",
-                _ => ""
-            };
-
-            jobTypeDisplayName = newJob.Type switch
-            {
-                JobType.SkipRental => "Skip Rental",
-                JobType.SandDelivery => "Sand Delivery",
-                JobType.ForkLiftService => "Fork Lift Service",
-                JobType.Transfer => "Transfer",
-                _ => ""
-            };
-
             // Clear type-specific fields when job type changes
             ClearTypeSpecificFields();
             StateHasChanged();

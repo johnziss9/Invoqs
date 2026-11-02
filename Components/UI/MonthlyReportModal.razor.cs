@@ -93,15 +93,7 @@ namespace Invoqs.Components.UI
             await OnClose.InvokeAsync();
         }
 
-        protected static string GetJobTypeDisplay(JobType type) => type switch
-        {
-            JobType.SkipRental => "Ενοικίαση Skip",
-            JobType.SandDelivery => "Παράδοση Άμμου",
-            JobType.ForkLiftService => "Υπηρεσία Forklift",
-            JobType.Transfer => "Μεταφορά",
-            JobType.SellForklift => "Πώληση Forklift",
-            _ => type.ToString()
-        };
+        protected static string GetJobTypeDisplay(JobType type) => JobModel.GetTypeDisplayName(type);
 
         protected static string GetStatusDisplay(InvoiceStatus status) => status switch
         {
