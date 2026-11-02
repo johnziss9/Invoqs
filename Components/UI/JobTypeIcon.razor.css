@@ -1,0 +1,6 @@
+/* The icon PNGs are black line art, tinted here to the app's primary blue */
+.job-type-icon {
+    object-fit: contain;
+    vertical-align: -0.15em;
+    filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(200deg) brightness(104%) contrast(97%);
+}

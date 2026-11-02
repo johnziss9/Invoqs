@@ -96,6 +96,7 @@ namespace Invoqs.Components.Pages
                         "cliff" => JobType.ForkLiftService,
                         "transfer" => JobType.Transfer,
                         "sellforklift" => JobType.SellForklift,
+                        "sellskip" => JobType.SellSkip,
                         _ => JobType.SkipRental
                     };
                     filtered = filtered.Where(j => j.Type == type);

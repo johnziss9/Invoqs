@@ -15,14 +15,7 @@
         <!-- Header with status and actions -->
         <div class="d-flex justify-content-between align-items-start mb-3">
             <div class="job-type-icon">
-                @if (Job.TypeIcon.StartsWith("/images/"))
-                {
-                    <img src="@Job.TypeIcon" alt="@Job.TypeDisplayName" class="job-type-image" />
-                }
-                else
-                {
-                    <i class="@Job.TypeIcon text-primary fs-4"></i>
-                }
+                <JobTypeIcon Type="Job.Type" Size="3rem" />
             </div>
             <div class="d-flex align-items-center gap-2">
                 @if (Job.IsInvoiced)
@@ -85,7 +78,7 @@
         <h5 class="card-title text-primary mb-2">@Job.Title</h5>
         <div class="mb-3">
             <span class="badge bg-light text-dark mb-2">
-                <i class="@Job.TypeIcon me-1"></i>
+                <JobTypeIcon Type="Job.Type" CssClass="me-1" />
                 @Job.TypeDisplayName
             </span>
             <div class="mt-2">

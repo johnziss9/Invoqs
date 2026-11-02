@@ -16,7 +16,8 @@ namespace Invoqs.Models
         SandDelivery = 1,
         ForkLiftService = 2,
         Transfer = 3,
-        SellForklift = 4
+        SellForklift = 4,
+        SellSkip = 5
     }
 
     public class JobModel
@@ -81,23 +82,29 @@ namespace Invoqs.Models
         public InvoiceModel? Invoice { get; set; }
 
         // Existing computed properties
-        public string TypeIcon => Type switch
+        public string TypeIcon => GetTypeIcon(Type);
+
+        public static string GetTypeIcon(JobType type) => type switch
         {
             JobType.SkipRental => "/images/icons/skip.png",
             JobType.SandDelivery => "/images/icons/sand.png",
             JobType.ForkLiftService => "/images/icons/forklift.png",
             JobType.Transfer => "/images/icons/transfer.png",
             JobType.SellForklift => "/images/icons/forklift_sell.png",
+            JobType.SellSkip => "/images/icons/skip_sell.png",
             _ => "bi-building"
         };
 
-        public string TypeDisplayName => Type switch
+        public string TypeDisplayName => GetTypeDisplayName(Type);
+
+        public static string GetTypeDisplayName(JobType type) => type switch
         {
             JobType.SkipRental => "Ενοικίαση Skip",
             JobType.SandDelivery => "Παράδοση Άμμου",
             JobType.ForkLiftService => "Υπηρεσία Forklift",
             JobType.Transfer => "Μεταφορά",
             JobType.SellForklift => "Πώληση Forklift",
+            JobType.SellSkip => "Πώληση Skip",
             _ => "Άγνωστο"
         };
 

@@ -1,0 +1,25 @@
+@* The one place that decides how a job type's icon is rendered. JobModel.TypeIcon returns
+   an image path for the known types and a Bootstrap icon class as a fallback, so callers
+   must not assume either; use this component instead of binding TypeIcon to a class. *@
+@using Invoqs.Models
+
+@if (IconPath.StartsWith("/images/"))
+{
+    <img src="@IconPath" alt="@JobModel.GetTypeDisplayName(Type)" class="job-type-icon @CssClass"
+        style="width: @Size; height: @Size;" />
+}
+else
+{
+    <i class="@IconPath @CssClass" style="font-size: @Size;"></i>
+}
+
+@code {
+    [Parameter, EditorRequired] public JobType Type { get; set; }
+
+    /// Rendered size. Defaults to 1em so inline icons follow the surrounding text.
+    [Parameter] public string Size { get; set; } = "1em";
+
+    [Parameter] public string? CssClass { get; set; }
+
+    private string IconPath => JobModel.GetTypeIcon(Type);
+}

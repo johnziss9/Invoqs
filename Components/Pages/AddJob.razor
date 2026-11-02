@@ -132,6 +132,7 @@
                                         <option value="@JobType.ForkLiftService">Υπηρεσία Forklift</option>
                                         <option value="@JobType.Transfer">Μεταφορά</option>
                                         <option value="@JobType.SellForklift">Πώληση Forklift</option>
+                                        <option value="@JobType.SellSkip">Πώληση Skip</option>
                                     </InputSelect>
                                     <ValidationMessage For="@(() => newJob.Type)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Type").Any() == true)
@@ -425,18 +426,12 @@
                         <div class="card-body">
                             <!-- Job Type Icon -->
                             <div class="text-center mb-3">
-                                @if (!string.IsNullOrEmpty(jobTypeIcon))
-                                {
-                                    <i class="@jobTypeIcon fs-1 text-primary mb-2"></i>
-                                    <div class="badge bg-light text-dark fs-6 px-3 py-2">
-                                        @jobTypeDisplayName
-                                    </div>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-question-circle fs-1 text-muted mb-2"></i>
-                                    <div class="text-muted small">Επιλέξτε τύπο εργασίας</div>
-                                }
+                                <div class="mb-2">
+                                    <JobTypeIcon Type="newJob.Type" Size="4rem" />
+                                </div>
+                                <div class="badge bg-light text-dark fs-6 px-3 py-2">
+                                    @newJob.TypeDisplayName
+                                </div>
                             </div>
 
                             <!-- Job Details -->

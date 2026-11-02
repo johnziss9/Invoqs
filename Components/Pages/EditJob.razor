@@ -136,6 +136,7 @@
                                         <option value="@JobType.ForkLiftService">Υπηρεσία Forklift</option>
                                         <option value="@JobType.Transfer">Μεταφορά</option>
                                         <option value="@JobType.SellForklift">Πώληση Forklift</option>
+                                        <option value="@JobType.SellSkip">Πώληση Skip</option>
                                     </InputSelect>
                                     <ValidationMessage For="@(() => job.Type)" class="text-danger small" />
                                     @if (validationErrors?.GetFieldErrors("Type").Any() == true)
@@ -535,7 +536,7 @@
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">Τύπος Εργασίας:</span>
                                     <span class="badge bg-light text-dark">
-                                        <i class="@job.TypeIcon me-1"></i>
+                                        <JobTypeIcon Type="job.Type" CssClass="me-1" />
                                         @job.TypeDisplayName
                                     </span>
                                 </div>
